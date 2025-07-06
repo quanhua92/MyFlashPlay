@@ -54,13 +54,17 @@ export class StorageManager {
     try {
       switch (key) {
         case STORAGE_KEYS.DECKS:
-          return data && Array.isArray(data.decks);
+          // Accept both array format and object with decks array
+          return Array.isArray(data) || (data && Array.isArray(data.decks));
         case STORAGE_KEYS.SCORES:
-          return data && Array.isArray(data.sessions) && data.statistics;
+          // Accept empty object or proper structure
+          return data === null || (data && (Array.isArray(data.sessions) || data.statistics));
         case STORAGE_KEYS.PREFERENCES:
-          return data && data.theme && data.version;
+          // Accept any object for preferences
+          return data === null || typeof data === 'object';
         case STORAGE_KEYS.PROGRESS:
-          return data && typeof data.cardProgress === 'object';
+          // Accept empty object or proper structure
+          return data === null || (data && typeof data === 'object');
         default:
           return true;
       }
@@ -202,8 +206,16 @@ export const deckStorage = {
   },
   
   load(): Deck[] {
-    const stored = storageManager.load<StoredDecks>(STORAGE_KEYS.DECKS);
-    return stored?.decks || [];
+    const stored = storageManager.load<any>(STORAGE_KEYS.DECKS);
+    
+    // Handle both array format and object with decks array
+    if (Array.isArray(stored)) {
+      return stored;
+    } else if (stored?.decks && Array.isArray(stored.decks)) {
+      return stored.decks;
+    }
+    
+    return [];
   },
   
   saveDeck(deck: Deck): void {

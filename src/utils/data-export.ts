@@ -53,8 +53,17 @@ export class DataExporter {
   // Export specific data types
   exportDecks(): void {
     try {
-      const decks = storageManager.load<StoredDecks>(STORAGE_KEYS.DECKS);
-      if (!decks) {
+      const stored = storageManager.load<any>(STORAGE_KEYS.DECKS);
+      let decks: any[] = [];
+      
+      // Handle both array format and object with decks array
+      if (Array.isArray(stored)) {
+        decks = stored;
+      } else if (stored?.decks && Array.isArray(stored.decks)) {
+        decks = stored.decks;
+      }
+      
+      if (decks.length === 0) {
         throw new Error('No decks found to export');
       }
 
@@ -62,7 +71,7 @@ export class DataExporter {
         version: '1.0.0',
         type: 'decks',
         exportDate: new Date().toISOString(),
-        data: decks
+        data: { decks }
       };
 
       this.downloadJSON(exportData, `flashplay-decks-${this.getTimestamp()}.json`);
@@ -75,22 +84,31 @@ export class DataExporter {
   // Export as human-readable markdown
   exportAsMarkdown(): void {
     try {
-      const decks = storageManager.load<StoredDecks>(STORAGE_KEYS.DECKS);
-      if (!decks || !decks.decks) {
+      const stored = storageManager.load<any>(STORAGE_KEYS.DECKS);
+      let decks: any[] = [];
+      
+      // Handle both array format and object with decks array
+      if (Array.isArray(stored)) {
+        decks = stored;
+      } else if (stored?.decks && Array.isArray(stored.decks)) {
+        decks = stored.decks;
+      }
+      
+      if (decks.length === 0) {
         throw new Error('No decks found to export');
       }
 
       let markdown = '# FlashPlay Decks Export\n\n';
       markdown += `Exported on: ${new Date().toLocaleString()}\n\n`;
 
-      decks.decks.forEach(deck => {
+      decks.forEach(deck => {
         markdown += `## ${deck.emoji} ${deck.name}\n\n`;
         markdown += `${deck.description}\n\n`;
         
         // Group cards by category
         const categories = new Map<string, typeof deck.cards>();
         
-        deck.cards.forEach(card => {
+        deck.cards.forEach((card: any) => {
           const category = card.category || 'Uncategorized';
           if (!categories.has(category)) {
             categories.set(category, []);
@@ -102,12 +120,12 @@ export class DataExporter {
         categories.forEach((cards, category) => {
           markdown += `### ${category}\n\n`;
           
-          cards.forEach(card => {
+          cards.forEach((card: any) => {
             if (card.type === 'simple') {
               markdown += `- ${card.front} :: ${card.back}\n`;
             } else if (card.type === 'multiple-choice' && card.options) {
               markdown += `- ${card.front}\n`;
-              card.options.forEach(opt => {
+              card.options.forEach((opt: any) => {
                 markdown += `  * ${opt.text}${opt.isCorrect ? ' [correct]' : ''}\n`;
               });
             } else if (card.type === 'true-false') {

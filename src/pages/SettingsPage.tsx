@@ -12,7 +12,27 @@ export function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [preferences, setPreferences] = useLocalStorage<UserPreferences>(
     STORAGE_KEYS.PREFERENCES,
-    {} as UserPreferences
+    {
+      version: '1.0.0',
+      theme: 'auto',
+      colorScheme: 'rainbow',
+      soundEnabled: true,
+      animationsEnabled: true,
+      fontSize: 'medium',
+      language: 'en-US',
+      accessibility: {
+        highContrast: false,
+        reducedMotion: false,
+        screenReaderMode: false
+      },
+      gameSettings: {
+        defaultDifficulty: 'medium',
+        showHints: true,
+        autoAdvance: false,
+        timerWarning: true
+      },
+      lastUpdated: new Date().toISOString()
+    } as UserPreferences
   );
   
   const [exportStatus, setExportStatus] = useState<string>('');
@@ -177,7 +197,7 @@ export function SettingsPage() {
                     })}
                     className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                   >
-                    {preferences.soundEnabled ? (
+                    {preferences?.soundEnabled ? (
                       <Volume2 className="w-5 h-5 text-green-600" />
                     ) : (
                       <VolumeX className="w-5 h-5 text-gray-400" />
