@@ -1,4 +1,4 @@
-export type GameMode = 'study' | 'quiz' | 'speed' | 'memory';
+export type GameMode = 'study' | 'quiz' | 'speed' | 'memory' | 'falling';
 export type GameState = 'menu' | 'deck-selection' | 'mode-selection' | 'playing' | 'paused' | 'round-complete' | 'game-over';
 
 export interface GameSession {

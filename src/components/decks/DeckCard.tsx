@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BookOpen, Play, Settings, Trash2, Target, Zap, Brain, ChevronDown, ChevronRight } from 'lucide-react';
+import { BookOpen, Play, Settings, Trash2, Target, Zap, Brain, ChevronDown, ChevronRight, Layers } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from '@tanstack/react-router';
 import type { Deck, GameMode } from '@/types';
@@ -43,6 +43,13 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
       description: 'Match pairs',
       icon: Brain,
       color: 'purple'
+    },
+    {
+      id: 'falling',
+      name: 'Falling',
+      description: 'Answer falling quizzes',
+      icon: Layers,
+      color: 'indigo'
     }
   ];
 
@@ -161,7 +168,8 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
                     blue: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400',
                     green: 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400',
                     yellow: 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400',
-                    purple: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400'
+                    purple: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400',
+                    indigo: 'text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400'
                   }[mode.color];
 
                   return (

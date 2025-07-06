@@ -1,12 +1,13 @@
 import { useParams, useSearch } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
-import { Play, BookOpen, Zap, Target, Brain } from 'lucide-react';
+import { Play, BookOpen, Zap, Target, Brain, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDecks } from '@/hooks/useDecks';
 import { StudyMode } from '@/components/game/StudyMode';
 import { QuizMode } from '@/components/game/QuizMode';
 import { SpeedChallenge } from '@/components/game/SpeedChallenge';
 import { MemoryMatch } from '@/components/game/MemoryMatch';
+import { FallingQuizMode } from '@/components/game/FallingQuizMode';
 import { AchievementNotification } from '@/components/ui/AchievementNotification';
 import { achievementManager } from '@/utils/achievements';
 import type { GameMode, GameSession, Achievement } from '@/types';
@@ -23,7 +24,7 @@ export function PlayPage() {
 
   // Auto-select mode from search params
   useEffect(() => {
-    if (search?.mode && ['study', 'quiz', 'speed', 'memory'].includes(search.mode)) {
+    if (search?.mode && ['study', 'quiz', 'speed', 'memory', 'falling'].includes(search.mode)) {
       setSelectedMode(search.mode as GameMode);
       if (deck) {
         setIsPlaying(true);
@@ -94,6 +95,9 @@ export function PlayPage() {
     if (selectedMode === 'memory') {
       return <MemoryMatch deck={deck} difficulty="easy" onComplete={handleGameComplete} />;
     }
+    if (selectedMode === 'falling') {
+      return <FallingQuizMode deck={deck} onComplete={handleGameComplete} />;
+    }
   }
 
   const gameModes = [
@@ -124,6 +128,13 @@ export function PlayPage() {
       description: 'Match questions with their answers',
       icon: Brain,
       color: 'from-purple-500 to-pink-500'
+    },
+    {
+      id: 'falling',
+      name: 'Falling Quiz',
+      description: 'Answer falling quizzes in 3 lanes',
+      icon: Layers,
+      color: 'from-indigo-500 to-purple-500'
     }
   ];
 
