@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
 import { FlashCard } from '@/components/flashcard/FlashCard';
 import { ProgressBar, playSound } from '@/components/ui';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import type { Deck, GameSession } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -80,6 +81,12 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
     onComplete?.(session);
   };
 
+  // Swipe gestures
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: goNext,
+    onSwipeRight: goPrevious
+  });
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -135,7 +142,7 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto" ref={swipeRef as any}>
       {/* Progress Bar */}
       <div className="mb-8">
         <ProgressBar
