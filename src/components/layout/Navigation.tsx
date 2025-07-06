@@ -13,7 +13,7 @@ export function Navigation() {
     { path: '/' as const, label: 'Home', icon: Home },
     { path: '/create' as const, label: 'Create', icon: Plus },
     { path: '/decks' as const, label: 'My Decks', icon: BookOpen },
-    { path: '/scores' as const, label: 'Scores', icon: Trophy },
+    { path: '/achievements' as const, label: 'Achievements', icon: Trophy },
     { path: '/progress' as const, label: 'Progress', icon: TrendingUp },
     { path: '/settings' as const, label: 'Settings', icon: Settings }
   ];

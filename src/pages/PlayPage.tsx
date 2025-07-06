@@ -7,13 +7,16 @@ import { StudyMode } from '@/components/game/StudyMode';
 import { QuizMode } from '@/components/game/QuizMode';
 import { SpeedChallenge } from '@/components/game/SpeedChallenge';
 import { MemoryMatch } from '@/components/game/MemoryMatch';
-import type { GameMode, GameSession } from '@/types';
+import { AchievementNotification } from '@/components/ui/AchievementNotification';
+import { achievementManager } from '@/utils/achievements';
+import type { GameMode, GameSession, Achievement } from '@/types';
 
 export function PlayPage() {
   const { deckId } = useParams({ from: '/play/$deckId' });
   const search = useSearch({ from: '/play/$deckId' });
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
   
   const { getDeck } = useDecks();
   const deck = getDeck(deckId);
@@ -30,7 +33,20 @@ export function PlayPage() {
 
   const handleGameComplete = (session: GameSession) => {
     console.log('Game completed:', session);
-    // Here you could save the session to localStorage
+    
+    // Check for achievements
+    const newAchievements = achievementManager.checkAchievements(session);
+    
+    // Show achievement notification if any were unlocked
+    if (newAchievements.length > 0) {
+      setCurrentAchievement(newAchievements[0]); // Show first achievement
+    }
+    
+    // Save session to localStorage
+    const sessions = JSON.parse(localStorage.getItem('flashplay_sessions') || '[]');
+    sessions.push(session);
+    localStorage.setItem('flashplay_sessions', JSON.stringify(sessions));
+    
     setIsPlaying(false);
     setSelectedMode(null);
   };
@@ -103,6 +119,12 @@ export function PlayPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      {/* Achievement Notification */}
+      <AchievementNotification
+        achievement={currentAchievement}
+        onClose={() => setCurrentAchievement(null)}
+      />
+      
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

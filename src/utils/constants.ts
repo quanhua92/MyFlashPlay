@@ -10,48 +10,7 @@ export const STORAGE_KEYS = {
   VERSION: 'flashplay_version'
 } as const;
 
-export const ACHIEVEMENTS = [
-  {
-    id: 'first-deck',
-    name: 'Deck Master',
-    description: 'Complete your first deck',
-    icon: '🎯',
-    requirement: { type: 'games-played', value: 1 },
-    points: 100
-  },
-  {
-    id: 'speed-demon',
-    name: 'Speed Demon',
-    description: 'Complete a deck in under 2 minutes',
-    icon: '⚡',
-    requirement: { type: 'speed', value: 120 },
-    points: 200
-  },
-  {
-    id: 'perfect-score',
-    name: 'Perfectionist',
-    description: 'Get 100% on any quiz',
-    icon: '🌟',
-    requirement: { type: 'perfect-score', value: 100 },
-    points: 300
-  },
-  {
-    id: 'streak-master',
-    name: 'Streak Master',
-    description: 'Get 20 correct answers in a row',
-    icon: '🔥',
-    requirement: { type: 'streak', value: 20 },
-    points: 500
-  },
-  {
-    id: 'dedicated-learner',
-    name: 'Dedicated Learner',
-    description: 'Play for 7 days in a row',
-    icon: '📚',
-    requirement: { type: 'streak', value: 7 },
-    points: 400
-  }
-] as const;
+// Achievement definitions moved to src/utils/achievements.ts
 
 export const COLOR_SCHEMES = {
   rainbow: {

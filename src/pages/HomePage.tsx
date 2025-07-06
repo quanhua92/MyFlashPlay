@@ -2,9 +2,13 @@ import { Link } from '@tanstack/react-router';
 import { Plus, BookOpen, Sparkles, Target, Trophy, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDecks } from '@/hooks/useDecks';
+import { achievementManager } from '@/utils/achievements';
 
 export function HomePage() {
   const { decks } = useDecks();
+  const achievementStats = achievementManager.getStats();
+  achievementManager.checkDailyStreak(); // Check daily streak on home page visit
+  
   const features = [
     {
       icon: Target,
@@ -21,7 +25,7 @@ export function HomePage() {
     {
       icon: Trophy,
       title: 'Track Progress',
-      description: 'Earn achievements and see your improvement',
+      description: `Earn achievements and see your improvement (${achievementStats.totalUnlocked}/${achievementStats.totalAchievements} unlocked)`,
       color: 'from-green-500 to-emerald-500'
     },
     {
