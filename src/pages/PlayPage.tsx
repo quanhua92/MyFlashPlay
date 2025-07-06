@@ -2,13 +2,31 @@ import { useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { Play, BookOpen, Zap, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { sampleDecks } from '@/data/sample-decks';
+import { useDecks } from '@/hooks/useDecks';
+import { StudyMode } from '@/components/game/StudyMode';
+import { QuizMode } from '@/components/game/QuizMode';
+import type { GameMode, GameSession } from '@/types';
 
 export function PlayPage() {
   const { deckId } = useParams({ from: '/play/$deckId' });
-  const [selectedMode, setSelectedMode] = useState<string | null>(null);
+  const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   
-  const deck = sampleDecks.find(d => d.id === deckId);
+  const { getDeck } = useDecks();
+  const deck = getDeck(deckId);
+
+  const handleGameComplete = (session: GameSession) => {
+    console.log('Game completed:', session);
+    // Here you could save the session to localStorage
+    setIsPlaying(false);
+    setSelectedMode(null);
+  };
+
+  const startGame = () => {
+    if (selectedMode && deck) {
+      setIsPlaying(true);
+    }
+  };
 
   if (!deck) {
     return (
@@ -21,6 +39,20 @@ export function PlayPage() {
         </p>
       </div>
     );
+  }
+
+  // Render game interface
+  if (isPlaying && selectedMode) {
+    if (selectedMode === 'study') {
+      return <StudyMode deck={deck} onComplete={handleGameComplete} />;
+    }
+    if (selectedMode === 'quiz') {
+      return <QuizMode deck={deck} onComplete={handleGameComplete} />;
+    }
+    if (selectedMode === 'speed') {
+      // For now, use study mode for speed challenge
+      return <StudyMode deck={deck} onComplete={handleGameComplete} />;
+    }
   }
 
   const gameModes = [
@@ -83,7 +115,7 @@ export function PlayPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 * index }}
-                onClick={() => setSelectedMode(mode.id)}
+                onClick={() => setSelectedMode(mode.id as GameMode)}
                 className={`p-6 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
                   selectedMode === mode.id
                     ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
@@ -112,7 +144,10 @@ export function PlayPage() {
             transition={{ duration: 0.4 }}
             className="text-center"
           >
-            <button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2 mx-auto">
+            <button 
+              onClick={startGame}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2 mx-auto"
+            >
               <Play className="w-5 h-5" />
               <span>Start {gameModes.find(m => m.id === selectedMode)?.name}</span>
             </button>

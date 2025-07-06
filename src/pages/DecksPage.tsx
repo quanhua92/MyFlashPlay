@@ -1,9 +1,19 @@
 import { BookOpen, Play, Settings, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
-import { sampleDecks } from '@/data/sample-decks';
+import { useDecks } from '@/hooks/useDecks';
 
 export function DecksPage() {
+  const { decks, isLoading, deleteDeck } = useDecks();
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-16">
+        <div className="animate-spin w-8 h-8 border-2 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <p className="text-gray-600 dark:text-gray-300">Loading your decks...</p>
+      </div>
+    );
+  }
   return (
     <div className="max-w-6xl mx-auto">
       <motion.div
@@ -21,7 +31,7 @@ export function DecksPage() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sampleDecks.map((deck, index) => (
+          {decks.map((deck, index) => (
             <motion.div
               key={deck.id}
               initial={{ opacity: 0, y: 20 }}
@@ -45,7 +55,14 @@ export function DecksPage() {
                   <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                     <Settings className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                  <button 
+                    className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                    onClick={() => {
+                      if (confirm(`Are you sure you want to delete "${deck.name}"?`)) {
+                        deleteDeck(deck.id);
+                      }
+                    }}
+                  >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>

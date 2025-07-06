@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router';
 import { Plus, BookOpen, Sparkles, Target, Trophy, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { sampleDecks } from '@/data/sample-decks';
+import { useDecks } from '@/hooks/useDecks';
 
 export function HomePage() {
+  const { decks } = useDecks();
   const features = [
     {
       icon: Target,
@@ -114,7 +115,7 @@ export function HomePage() {
         </h2>
         
         <div className="grid md:grid-cols-3 gap-8">
-          {sampleDecks.map((deck, index) => (
+          {decks.slice(0, 3).map((deck, index) => (
             <motion.div
               key={deck.id}
               initial={{ opacity: 0, y: 20 }}
