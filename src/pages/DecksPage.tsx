@@ -81,6 +81,7 @@ export function DecksPage() {
                 <Link
                   to="/play/$deckId"
                   params={{ deckId: deck.id }}
+                  search={{ mode: undefined }}
                   className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-2 px-4 rounded-lg font-medium hover:shadow-md transition-shadow flex items-center justify-center space-x-2"
                 >
                   <Play className="w-4 h-4" />

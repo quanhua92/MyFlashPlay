@@ -58,7 +58,7 @@ export function CreatePage() {
     
     // Redirect after a short delay
     setTimeout(() => {
-      navigate({ to: '/play/$deckId', params: { deckId: newDeck.id } });
+      navigate({ to: '/play/$deckId', params: { deckId: newDeck.id }, search: { mode: undefined } });
     }, 1500);
   };
 

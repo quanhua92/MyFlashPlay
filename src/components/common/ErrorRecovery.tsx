@@ -9,7 +9,7 @@ interface ErrorRecoveryProps {
   onRecover?: () => void;
 }
 
-export function ErrorRecovery({ error, errorInfo, onRecover }: ErrorRecoveryProps) {
+export function ErrorRecovery({ error, errorInfo }: ErrorRecoveryProps) {
   const [isRecovering, setIsRecovering] = useState(false);
   const [recoveryStatus, setRecoveryStatus] = useState<string>('');
 

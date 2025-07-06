@@ -1,7 +1,7 @@
 import { STORAGE_KEYS } from './constants';
 import { storageManager, deckStorage } from './storage';
 import { v4 as uuidv4 } from 'uuid';
-import type { Deck, StoredDecks } from '@/types';
+import type { Deck } from '@/types';
 
 export type MergeStrategy = 'replace' | 'keep-both' | 'merge-cards' | 'skip';
 
@@ -223,7 +223,7 @@ export class DataImporter {
   }
 
   // Preview import changes
-  async previewImport(file: File, options: ImportOptions): Promise<{
+  async previewImport(file: File): Promise<{
     existing: number;
     new: number;
     duplicates: string[];

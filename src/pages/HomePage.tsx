@@ -141,6 +141,7 @@ export function HomePage() {
               <Link
                 to="/play/$deckId"
                 params={{ deckId: deck.id }}
+                search={{ mode: undefined }}
                 className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-3 rounded-xl font-semibold hover:shadow-lg transition-shadow"
               >
                 Start Playing

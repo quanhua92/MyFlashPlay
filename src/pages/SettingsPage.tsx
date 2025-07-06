@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, Upload, Settings as SettingsIcon, Moon, Sun, Monitor, Volume2, VolumeX, Save, AlertCircle } from 'lucide-react';
+import { Download, Upload, Moon, Sun, Monitor, Volume2, VolumeX, Save, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTheme } from '@/components/layout/ThemeProvider';
 import { dataExporter } from '@/utils/data-export';
@@ -63,7 +63,7 @@ export function SettingsPage() {
     setImportPreview(null);
 
     try {
-      const preview = await dataImporter.previewImport(file, { mergeStrategy });
+      const preview = await dataImporter.previewImport(file);
       setImportPreview(preview);
     } catch (error) {
       setImportStatus(`Preview failed: ${error}`);
