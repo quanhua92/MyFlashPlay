@@ -18,6 +18,13 @@ export function FlashCard({ card, onFlip, className, showBack = false }: FlashCa
     onFlip?.();
   };
   
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      handleFlip();
+    }
+  };
+  
   return (
     <div className={cn('perspective-1000 w-full h-80', className)}>
       <motion.div
@@ -25,6 +32,11 @@ export function FlashCard({ card, onFlip, className, showBack = false }: FlashCa
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.6, type: 'spring', stiffness: 260, damping: 20 }}
         onClick={handleFlip}
+        onKeyDown={handleKeyPress}
+        tabIndex={0}
+        role="button"
+        aria-label={`Flashcard: ${card.front}. ${isFlipped ? `Answer: ${card.back}.` : ''} Press space or enter to flip.`}
+        aria-pressed={isFlipped}
       >
         {/* Front */}
         <div className={cn(
@@ -47,7 +59,7 @@ export function FlashCard({ card, onFlip, className, showBack = false }: FlashCa
               </div>
             )}
           </div>
-          <div className="absolute bottom-4 right-4 text-sm opacity-60">
+          <div className="absolute bottom-4 right-4 text-sm opacity-60" aria-hidden="true">
             Click to flip
           </div>
         </div>
@@ -73,7 +85,7 @@ export function FlashCard({ card, onFlip, className, showBack = false }: FlashCa
               </div>
             )}
           </div>
-          <div className="absolute bottom-4 right-4 text-sm opacity-60">
+          <div className="absolute bottom-4 right-4 text-sm opacity-60" aria-hidden="true">
             Click to flip back
           </div>
         </div>

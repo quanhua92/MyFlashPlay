@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Download, Upload, Moon, Sun, Monitor, Volume2, VolumeX, Save, AlertCircle } from 'lucide-react';
+import { Download, Upload, Moon, Sun, Monitor, Volume2, VolumeX, Save, AlertCircle, Accessibility } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTheme } from '@/components/layout/ThemeProvider';
 import { dataExporter } from '@/utils/data-export';
 import { dataImporter, type MergeStrategy } from '@/utils/data-import';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS } from '@/utils/constants';
+import { AccessibilitySettings } from '@/components/common/AccessibilitySettings';
 import type { UserPreferences } from '@/types';
 
 export function SettingsPage() {
@@ -342,6 +343,15 @@ export function SettingsPage() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Accessibility Settings */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+              <Accessibility className="w-5 h-5 mr-2" />
+              Accessibility
+            </h2>
+            <AccessibilitySettings />
           </div>
         </div>
       </motion.div>
