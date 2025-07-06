@@ -1,9 +1,9 @@
-import { STORAGE_KEYS } from './constants';
-import { storageManager, deckStorage } from './storage';
+import { storageManager } from './storage';
 import { markdownStorage } from './markdown-storage';
 import { MarkdownParser } from './markdown-parser';
 import { v4 as uuidv4 } from 'uuid';
 import type { Deck } from '@/types';
+import JSZip from 'jszip';
 
 export type MergeStrategy = 'replace' | 'keep-both' | 'merge-cards' | 'skip';
 
@@ -22,8 +22,115 @@ interface ImportOptions {
 
 export class DataImporter {
   private readonly markdownParser = new MarkdownParser();
-  // Import full backup
-  async importFullBackup(file: File): Promise<ImportResult> {
+  
+  // Import markdown ZIP file (new primary import method)
+  async importMarkdownZip(file: File, options: ImportOptions): Promise<ImportResult> {
+    try {
+      const zip = new JSZip();
+      const zipData = await file.arrayBuffer();
+      const zipContents = await zip.loadAsync(zipData);
+      
+      const results: string[] = [];
+      const errors: string[] = [];
+      const importedDecks: Deck[] = [];
+      
+      // Process deck files
+      const decksFolder = zipContents.folder('decks');
+      if (decksFolder) {
+        const deckFiles = Object.keys(decksFolder.files).filter(name => 
+          name.endsWith('.md') && !decksFolder.files[name].dir
+        );
+        
+        for (const filename of deckFiles) {
+          try {
+            const content = await decksFolder.file(filename)?.async('text');
+            if (content) {
+              const deck = this.createDeckFromMarkdown(content, filename);
+              if (deck) {
+                importedDecks.push(deck);
+                results.push(`Imported deck: ${deck.name}`);
+              }
+            }
+          } catch (err) {
+            errors.push(`Failed to import deck ${filename}: ${err}`);
+          }
+        }
+      }
+      
+      // Process progress file
+      const progressFile = zipContents.file('progress.md');
+      if (progressFile) {
+        try {
+          await progressFile.async('text');
+          // Progress is informational only, we don't import it back
+          results.push('Progress data found (informational only)');
+        } catch (err) {
+          errors.push(`Failed to read progress: ${err}`);
+        }
+      }
+      
+      // Process achievements file
+      const achievementsFile = zipContents.file('achievements.md');
+      if (achievementsFile) {
+        try {
+          await achievementsFile.async('text');
+          // Achievements are informational only, we don't import them back
+          results.push('Achievements data found (informational only)');
+        } catch (err) {
+          errors.push(`Failed to read achievements: ${err}`);
+        }
+      }
+      
+      // Process preferences file
+      const preferencesFile = zipContents.file('preferences.md');
+      if (preferencesFile) {
+        try {
+          await preferencesFile.async('text');
+          // Preferences are informational only, we don't import them back
+          results.push('Preferences data found (informational only)');
+        } catch (err) {
+          errors.push(`Failed to read preferences: ${err}`);
+        }
+      }
+      
+      if (importedDecks.length === 0) {
+        throw new Error('No valid decks found in ZIP file');
+      }
+      
+      // Get existing decks from markdown storage
+      const { decks: existingDecks } = markdownStorage.loadAllDecks();
+      
+      // Preview or execute merge
+      const result = this.mergeDecksToMarkdownStorage(existingDecks, importedDecks, options);
+      
+      if (!options.dryRun) {
+        // Save merged decks to markdown storage
+        for (const deck of result.decks) {
+          const saveResult = markdownStorage.saveDeck(deck);
+          if (!saveResult.success) {
+            errors.push(`Failed to save deck ${deck.name}: ${saveResult.error}`);
+          }
+        }
+      }
+      
+      return {
+        success: errors.length === 0,
+        message: options.dryRun ? 'ZIP preview generated' : `ZIP import completed. ${result.imported} decks imported.`,
+        imported: result.imported,
+        skipped: result.skipped,
+        errors: errors.length > 0 ? errors : undefined
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `ZIP import failed: ${error}`,
+        errors: [String(error)]
+      };
+    }
+  }
+  
+  // Legacy import for old JSON backups (for migration only)
+  async importLegacyJsonBackup(file: File): Promise<ImportResult> {
     try {
       const text = await this.readFile(file);
       const data = JSON.parse(text);
@@ -33,93 +140,67 @@ export class DataImporter {
         throw new Error('Invalid backup file format');
       }
 
-      // Verify checksum if present
-      if (data.checksum) {
-        const calculatedChecksum = this.generateChecksum(JSON.stringify(data.data));
-        if (calculatedChecksum !== data.checksum) {
-          console.warn('Checksum mismatch - data may be corrupted');
-        }
-      }
-
-      // Import each data type
+      // Only migrate deck data, ignore old JSON storage keys
       const results: string[] = [];
       const errors: string[] = [];
-
-      Object.entries(data.data).forEach(([key, value]) => {
-        try {
-          const storageKey = STORAGE_KEYS[key.toUpperCase() as keyof typeof STORAGE_KEYS];
-          if (storageKey && value) {
-            storageManager.save(storageKey, value);
-            results.push(`Imported ${key}`);
-          }
-        } catch (err) {
-          errors.push(`Failed to import ${key}: ${err}`);
+      
+      // Convert old JSON decks to markdown storage
+      if (data.data.decks) {
+        let oldDecks: any[] = [];
+        
+        if (Array.isArray(data.data.decks)) {
+          oldDecks = data.data.decks;
+        } else if (data.data.decks.decks && Array.isArray(data.data.decks.decks)) {
+          oldDecks = data.data.decks.decks;
         }
-      });
-
+        
+        if (oldDecks.length > 0) {
+          // Convert each old deck to markdown and save
+          for (const oldDeck of oldDecks) {
+            try {
+              const markdownContent = this.convertDeckToMarkdown(oldDeck);
+              if (markdownContent) {
+                const saveResult = markdownStorage.saveDeckFromMarkdown(markdownContent, oldDeck.name);
+                if (saveResult.success) {
+                  results.push(`Migrated deck: ${oldDeck.name}`);
+                } else {
+                  errors.push(`Failed to migrate deck ${oldDeck.name}: ${saveResult.error}`);
+                }
+              }
+            } catch (err) {
+              errors.push(`Failed to convert deck ${oldDeck.name}: ${err}`);
+            }
+          }
+        }
+      }
+      
       return {
         success: errors.length === 0,
-        message: `Import completed. ${results.length} sections imported.`,
+        message: `Legacy import completed. ${results.length} decks migrated to markdown format.`,
         imported: results.length,
         errors: errors.length > 0 ? errors : undefined
       };
     } catch (error) {
       return {
         success: false,
-        message: `Import failed: ${error}`,
+        message: `Legacy import failed: ${error}`,
         errors: [String(error)]
       };
     }
   }
 
-  // Import decks with merge options
-  async importDecks(file: File, options: ImportOptions): Promise<ImportResult> {
+  // Universal import method - handles ZIP, markdown, and legacy JSON
+  async importFile(file: File, options: ImportOptions): Promise<ImportResult> {
     try {
-      const text = await this.readFile(file);
-      const data = JSON.parse(text);
-
-      let importedDecks: Deck[] = [];
-
-      // Handle different file formats
-      if (data.type === 'decks' && data.data) {
-        // Our export format
-        importedDecks = data.data.decks || [];
-      } else if (Array.isArray(data)) {
-        // Direct array of decks
-        importedDecks = data;
-      } else if (data.decks && Array.isArray(data.decks)) {
-        // Object with decks property
-        importedDecks = data.decks;
+      if (file.name.endsWith('.zip')) {
+        return this.importMarkdownZip(file, options);
+      } else if (file.name.endsWith('.md') || file.name.endsWith('.txt')) {
+        return this.importMarkdownFile(file, options);
+      } else if (file.name.endsWith('.json')) {
+        return this.importLegacyJsonBackup(file);
       } else {
-        throw new Error('Invalid deck file format');
+        throw new Error('Unsupported file format. Please use .zip, .md, or .json files.');
       }
-
-      // Validate decks
-      const validDecks = importedDecks.filter(deck => 
-        deck && deck.name && Array.isArray(deck.cards)
-      );
-
-      if (validDecks.length === 0) {
-        throw new Error('No valid decks found in file');
-      }
-
-      // Get existing decks
-      const existingDecks = deckStorage.load();
-      
-      // Preview or execute merge
-      const result = this.mergeDecks(existingDecks, validDecks, options);
-
-      if (!options.dryRun) {
-        // Save merged decks
-        deckStorage.save(result.decks);
-      }
-
-      return {
-        success: true,
-        message: options.dryRun ? 'Preview generated' : 'Decks imported successfully',
-        imported: result.imported,
-        skipped: result.skipped
-      };
     } catch (error) {
       return {
         success: false,
@@ -214,15 +295,61 @@ export class DataImporter {
     });
   }
 
-  // Checksum for validation
-  private generateChecksum(data: string): string {
-    let hash = 0;
-    for (let i = 0; i < data.length; i++) {
-      const char = data.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
+  // Convert old JSON deck to markdown format
+  private convertDeckToMarkdown(oldDeck: any): string | null {
+    try {
+      let markdown = `# ${oldDeck.emoji || '📚'} ${oldDeck.name}\n\n`;
+      
+      if (oldDeck.description) {
+        markdown += `${oldDeck.description}\n\n`;
+      }
+      
+      if (!oldDeck.cards || oldDeck.cards.length === 0) {
+        return null;
+      }
+      
+      // Group cards by category
+      const categories = new Map<string, any[]>();
+      oldDeck.cards.forEach((card: any) => {
+        const category = card.category || 'General';
+        if (!categories.has(category)) {
+          categories.set(category, []);
+        }
+        categories.get(category)!.push(card);
+      });
+      
+      // Convert cards to markdown
+      categories.forEach((cards, category) => {
+        if (category !== 'General') {
+          markdown += `## ${category}\n\n`;
+        }
+        
+        cards.forEach(card => {
+          if (card.type === 'simple') {
+            markdown += `- ${card.front} :: ${card.back}\n`;
+          } else if (card.type === 'multiple-choice' && card.options) {
+            markdown += `- ${card.front}\n`;
+            card.options.forEach((opt: any) => {
+              markdown += `  - ${opt.text}\n`;
+            });
+            // Find correct answer
+            const correctOption = card.options.find((opt: any) => opt.isCorrect);
+            if (correctOption) {
+              markdown += `  > ${correctOption.text}\n`;
+            }
+          } else if (card.type === 'true-false') {
+            markdown += `- ${card.front} :: ${card.back}\n`;
+          }
+        });
+        
+        markdown += '\n';
+      });
+      
+      return markdown;
+    } catch (error) {
+      console.error('Error converting deck to markdown:', error);
+      return null;
     }
-    return Math.abs(hash).toString(16);
   }
 
   // Import markdown file
@@ -468,18 +595,50 @@ export class DataImporter {
     duplicates: string[];
   }> {
     try {
-      const text = await this.readFile(file);
       let importedDecks: Deck[] = [];
       
-      // Check if it's markdown or JSON
-      if (file.name.endsWith('.md') || file.name.endsWith('.txt')) {
+      // Check if it's ZIP, markdown, or legacy JSON
+      if (file.name.endsWith('.zip')) {
+        // ZIP file
+        const zip = new JSZip();
+        const zipData = await file.arrayBuffer();
+        const zipContents = await zip.loadAsync(zipData);
+        
+        const decksFolder = zipContents.folder('decks');
+        if (decksFolder) {
+          const deckFiles = Object.keys(decksFolder.files).filter(name => 
+            name.endsWith('.md') && !decksFolder.files[name].dir
+          );
+          
+          for (const filename of deckFiles) {
+            const content = await decksFolder.file(filename)?.async('text');
+            if (content) {
+              const deck = this.createDeckFromMarkdown(content, filename);
+              if (deck) {
+                importedDecks.push(deck);
+              }
+            }
+          }
+        }
+      } else if (file.name.endsWith('.md') || file.name.endsWith('.txt')) {
+        // Single markdown file
+        const text = await this.readFile(file);
         importedDecks = this.parseMarkdownContent(text, file.name);
       } else {
-        // JSON format
+        // Legacy JSON format
+        const text = await this.readFile(file);
         const data = JSON.parse(text);
         
         if (data.type === 'decks' && data.data) {
-          importedDecks = data.data.decks || [];
+          // Convert old JSON decks to preview format
+          const oldDecks = data.data.decks || [];
+          importedDecks = oldDecks.map((oldDeck: any) => ({
+            id: oldDeck.id,
+            name: oldDeck.name,
+            description: oldDeck.description || '',
+            emoji: oldDeck.emoji || '📚',
+            cards: oldDeck.cards || []
+          }));
         } else if (Array.isArray(data)) {
           importedDecks = data;
         } else if (data.decks) {
@@ -487,10 +646,8 @@ export class DataImporter {
         }
       }
 
-      // Get existing decks from both storages
-      const jsonDecks = deckStorage.load();
-      const { decks: markdownDecks } = markdownStorage.loadAllDecks();
-      const existingDecks = [...jsonDecks, ...markdownDecks];
+      // Get existing decks from markdown storage (only source of truth now)
+      const { decks: existingDecks } = markdownStorage.loadAllDecks();
       
       const existingNames = new Set(existingDecks.map(d => d.name));
       

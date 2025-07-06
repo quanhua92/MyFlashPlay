@@ -1,81 +1,117 @@
 import { STORAGE_KEYS, APP_VERSION } from './constants';
 import { storageManager } from './storage';
 import { markdownStorage } from './markdown-storage';
-import type { StoredDecks, StoredScores, StoredProgress, UserPreferences, Deck } from '@/types';
+import type { StoredDecks, StoredScores, StoredProgress, UserPreferences } from '@/types';
+import JSZip from 'jszip';
 
-interface ExportData {
-  version: string;
-  appVersion: string;
-  exportDate: string;
-  data: {
-    preferences?: UserPreferences;
-    decks?: StoredDecks;
-    scores?: StoredScores;
-    progress?: StoredProgress;
-    achievements?: any;
-  };
-  checksum?: string;
-}
+// Legacy interface - no longer used
+// interface ExportData {
+//   version: string;
+//   appVersion: string;
+//   exportDate: string;
+//   data: {
+//     preferences?: UserPreferences;
+//     decks?: StoredDecks;
+//     scores?: StoredScores;
+//     progress?: StoredProgress;
+//     achievements?: any;
+//   };
+//   checksum?: string;
+// }
 
 export class DataExporter {
-  // Export all localStorage data
-  exportAllData(): void {
+  // Export all data as markdown ZIP file
+  async exportAllDataAsMarkdownZip(): Promise<void> {
     try {
-      const exportData: ExportData = {
-        version: '1.0.0',
-        appVersion: APP_VERSION,
-        exportDate: new Date().toISOString(),
-        data: {}
-      };
-
-      // Collect all FlashPlay data
-      Object.entries(STORAGE_KEYS).forEach(([name, key]) => {
-        try {
-          const data = storageManager.load(key);
-          if (data) {
-            exportData.data[name.toLowerCase() as keyof ExportData['data']] = data;
-          }
-        } catch (err) {
-          console.error(`Error exporting ${name}:`, err);
+      const zip = new JSZip();
+      const timestamp = this.getTimestamp();
+      
+      // Get all decks from markdown storage
+      const { decks } = markdownStorage.loadAllDecks();
+      
+      if (decks.length === 0) {
+        throw new Error('No decks found to export');
+      }
+      
+      // Create decks folder and add each deck as a markdown file
+      const decksFolder = zip.folder('decks');
+      if (!decksFolder) throw new Error('Failed to create decks folder');
+      
+      decks.forEach(deck => {
+        const rawMarkdown = localStorage.getItem(`mdoc_${deck.id}`);
+        if (rawMarkdown) {
+          const filename = `${deck.name.replace(/[^a-zA-Z0-9]/g, '-')}.md`;
+          decksFolder.file(filename, rawMarkdown);
         }
       });
-
-      // Generate checksum for data integrity
-      exportData.checksum = this.generateChecksum(JSON.stringify(exportData.data));
-
-      // Convert to JSON and download
-      this.downloadJSON(exportData, `flashplay-backup-${this.getTimestamp()}.json`);
+      
+      // Export progress data as markdown
+      const progressData = this.exportProgressAsMarkdown();
+      if (progressData) {
+        zip.file('progress.md', progressData);
+      }
+      
+      // Export achievements as markdown
+      const achievementsData = this.exportAchievementsAsMarkdown();
+      if (achievementsData) {
+        zip.file('achievements.md', achievementsData);
+      }
+      
+      // Export preferences as markdown
+      const preferencesData = this.exportPreferencesAsMarkdown();
+      if (preferencesData) {
+        zip.file('preferences.md', preferencesData);
+      }
+      
+      // Add export info
+      const exportInfo = `# FlashPlay Export\n\nExported on: ${new Date().toLocaleString()}\nVersion: ${APP_VERSION}\nTotal decks: ${decks.length}\n\n## Contents\n\n- **decks/**: Individual deck files in markdown format\n- **progress.md**: Learning progress and statistics\n- **achievements.md**: Unlocked achievements\n- **preferences.md**: User preferences and settings\n\n## Import Instructions\n\n1. Extract this ZIP file\n2. Use FlashPlay's import feature to select the ZIP file\n3. Choose merge strategy for existing decks\n\n---\n\n*This export contains only markdown files for maximum compatibility*`;
+      
+      zip.file('README.md', exportInfo);
+      
+      // Generate and download ZIP
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      this.downloadBlob(zipBlob, `flashplay-export-${timestamp}.zip`);
+      
     } catch (error) {
       console.error('Export failed:', error);
       throw new Error('Failed to export data. Please try again.');
     }
   }
 
-  // Export specific data types
-  exportDecks(): void {
+  // Export decks as markdown ZIP file
+  async exportDecksAsMarkdownZip(): Promise<void> {
     try {
-      const stored = storageManager.load<any>(STORAGE_KEYS.DECKS);
-      let decks: any[] = [];
+      const zip = new JSZip();
+      const timestamp = this.getTimestamp();
       
-      // Handle both array format and object with decks array
-      if (Array.isArray(stored)) {
-        decks = stored;
-      } else if (stored?.decks && Array.isArray(stored.decks)) {
-        decks = stored.decks;
-      }
+      // Get all decks from markdown storage
+      const { decks } = markdownStorage.loadAllDecks();
       
       if (decks.length === 0) {
         throw new Error('No decks found to export');
       }
-
-      const exportData = {
-        version: '1.0.0',
-        type: 'decks',
-        exportDate: new Date().toISOString(),
-        data: { decks }
-      };
-
-      this.downloadJSON(exportData, `flashplay-decks-${this.getTimestamp()}.json`);
+      
+      // Create decks folder and add each deck as a markdown file
+      const decksFolder = zip.folder('decks');
+      if (!decksFolder) throw new Error('Failed to create decks folder');
+      
+      decks.forEach(deck => {
+        const rawMarkdown = localStorage.getItem(`mdoc_${deck.id}`);
+        if (rawMarkdown) {
+          const filename = `${deck.name.replace(/[^a-zA-Z0-9]/g, '-')}.md`;
+          decksFolder.file(filename, rawMarkdown);
+        }
+      });
+      
+      // Add export info
+      const exportInfo = `# FlashPlay Decks Export\n\nExported on: ${new Date().toLocaleString()}\nVersion: ${APP_VERSION}\nTotal decks: ${decks.length}\n\n## Contents\n\n- **decks/**: Individual deck files in markdown format\n\n## Import Instructions\n\n1. Extract this ZIP file\n2. Use FlashPlay's import feature to select the ZIP file or individual markdown files\n3. Choose merge strategy for existing decks\n\n---\n\n*This export contains only markdown files for maximum compatibility*`;
+      
+      zip.file('README.md', exportInfo);
+      
+      // Generate and download ZIP
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      this.downloadBlob(zipBlob, `flashplay-decks-${timestamp}.zip`);
+      
     } catch (error) {
       console.error('Deck export failed:', error);
       throw error;
@@ -85,7 +121,7 @@ export class DataExporter {
   // Export as human-readable markdown (from new storage)
   exportAsMarkdown(): void {
     try {
-      const { decks, errors } = markdownStorage.loadAllDecks();
+      const { decks } = markdownStorage.loadAllDecks();
       
       if (decks.length === 0 && errors.length === 0) {
         throw new Error('No decks found to export');
@@ -295,12 +331,125 @@ export class DataExporter {
     }
   }
 
-  // Helper to download JSON file
-  private downloadJSON(data: any, filename: string): void {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { 
-      type: 'application/json' 
-    });
-    this.downloadBlob(blob, filename);
+  // Export progress data as markdown
+  private exportProgressAsMarkdown(): string | null {
+    try {
+      const progress = storageManager.load<StoredProgress>(STORAGE_KEYS.PROGRESS);
+      const scores = storageManager.load<StoredScores>(STORAGE_KEYS.SCORES);
+      
+      if (!progress && !scores) return null;
+      
+      let markdown = '# Learning Progress\n\n';
+      markdown += `Exported on: ${new Date().toLocaleString()}\n\n`;
+      
+      // Statistics
+      if (scores?.statistics) {
+        const stats = scores.statistics;
+        markdown += '## Statistics\n\n';
+        markdown += `- Total games played: ${stats.totalGamesPlayed}\n`;
+        markdown += `- Total time spent: ${Math.round(stats.totalTimeSpent / 60)} minutes\n`;
+        markdown += `- Average accuracy: ${Math.round(stats.averageAccuracy)}%\n`;
+        markdown += `- Total points: ${stats.totalPoints}\n`;
+        markdown += `- Daily streak: ${stats.dailyStreak} days\n`;
+        markdown += `- Last played: ${new Date(stats.lastPlayedDate).toLocaleDateString()}\n\n`;
+      }
+      
+      // Card progress
+      if (progress?.cardProgress) {
+        markdown += '## Card Progress\n\n';
+        const cardEntries = Object.entries(progress.cardProgress);
+        if (cardEntries.length > 0) {
+          cardEntries.forEach(([cardId, cardProg]) => {
+            markdown += `### Card ${cardId}\n\n`;
+            markdown += `- Times seen: ${cardProg.stats.views}\n`;
+            markdown += `- Correct answers: ${cardProg.stats.correctCount}\n`;
+            markdown += `- Accuracy: ${Math.round((cardProg.stats.correctCount / cardProg.stats.views) * 100)}%\n`;
+            markdown += `- Last seen: ${new Date(cardProg.stats.lastSeen).toLocaleDateString()}\n`;
+            markdown += `- Confidence: ${cardProg.stats.confidence}\n\n`;
+          });
+        }
+      }
+      
+      // Recent sessions
+      if (scores?.sessions && scores.sessions.length > 0) {
+        markdown += '## Recent Sessions\n\n';
+        const recentSessions = scores.sessions.slice(-10); // Last 10 sessions
+        recentSessions.forEach((session, index) => {
+          markdown += `### Session ${recentSessions.length - index}\n\n`;
+          markdown += `- Date: ${new Date(session.startTime).toLocaleDateString()}\n`;
+          markdown += `- Duration: ${Math.round((session.duration || 0) / 60)} minutes\n`;
+          markdown += `- Score: ${session.score.points} points\n`;
+          markdown += `- Accuracy: ${Math.round(session.score.accuracy)}%\n`;
+          markdown += `- Cards: ${session.score.correctAnswers}/${session.score.totalQuestions}\n\n`;
+        });
+      }
+      
+      return markdown;
+    } catch (error) {
+      console.error('Error exporting progress:', error);
+      return null;
+    }
+  }
+  
+  // Export achievements as markdown
+  private exportAchievementsAsMarkdown(): string | null {
+    try {
+      const achievements = storageManager.load<any>(STORAGE_KEYS.ACHIEVEMENTS);
+      if (!achievements) return null;
+      
+      let markdown = '# Achievements\n\n';
+      markdown += `Exported on: ${new Date().toLocaleString()}\n\n`;
+      
+      if (Array.isArray(achievements)) {
+        achievements.forEach(achievement => {
+          markdown += `## ${achievement.name}\n\n`;
+          markdown += `- Description: ${achievement.description}\n`;
+          markdown += `- Unlocked: ${new Date(achievement.unlockedAt).toLocaleDateString()}\n`;
+          markdown += `- Points: ${achievement.points || 0}\n\n`;
+        });
+      }
+      
+      return markdown;
+    } catch (error) {
+      console.error('Error exporting achievements:', error);
+      return null;
+    }
+  }
+  
+  // Export preferences as markdown
+  private exportPreferencesAsMarkdown(): string | null {
+    try {
+      const preferences = storageManager.load<UserPreferences>(STORAGE_KEYS.PREFERENCES);
+      if (!preferences) return null;
+      
+      let markdown = '# User Preferences\n\n';
+      markdown += `Exported on: ${new Date().toLocaleString()}\n\n`;
+      
+      markdown += `## Display Settings\n\n`;
+      markdown += `- Theme: ${preferences.theme}\n`;
+      markdown += `- Color scheme: ${preferences.colorScheme}\n`;
+      markdown += `- Font size: ${preferences.fontSize}\n`;
+      markdown += `- Language: ${preferences.language}\n\n`;
+      
+      markdown += `## Game Settings\n\n`;
+      markdown += `- Sound enabled: ${preferences.soundEnabled}\n`;
+      markdown += `- Animations enabled: ${preferences.animationsEnabled}\n`;
+      markdown += `- Default difficulty: ${preferences.gameSettings?.defaultDifficulty || 'medium'}\n`;
+      markdown += `- Show hints: ${preferences.gameSettings?.showHints || true}\n`;
+      markdown += `- Auto advance: ${preferences.gameSettings?.autoAdvance || false}\n\n`;
+      
+      if (preferences.accessibility) {
+        markdown += `## Accessibility\n\n`;
+        markdown += `- High contrast: ${preferences.accessibility.highContrast}\n`;
+        markdown += `- Reduced motion: ${preferences.accessibility.reducedMotion}\n`;
+        markdown += `- Screen reader mode: ${preferences.accessibility.screenReaderMode}\n\n`;
+      }
+      
+      return markdown;
+    } catch (error) {
+      console.error('Error exporting preferences:', error);
+      return null;
+    }
   }
 
   // Helper to download text file

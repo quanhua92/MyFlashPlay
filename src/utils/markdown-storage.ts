@@ -1,6 +1,6 @@
 import { storageManager } from './storage';
 import { MarkdownParser } from './markdown-parser';
-import type { Deck, Card } from '@/types';
+import type { Deck } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface MarkdownStorageResult {
@@ -35,6 +35,44 @@ export class MarkdownStorage {
       return {
         success: false,
         error: `Failed to save deck: ${error}`,
+        recoverable: true
+      };
+    }
+  }
+
+  // Save deck from markdown content directly
+  saveDeckFromMarkdown(markdown: string, deckName?: string): MarkdownStorageResult {
+    try {
+      const deckId = uuidv4();
+      const key = `${this.PREFIX}${deckId}`;
+      
+      // Validate markdown
+      if (!this.validateMarkdown(markdown)) {
+        return {
+          success: false,
+          error: 'Invalid markdown format',
+          recoverable: true
+        };
+      }
+      
+      // Extract deck info from markdown
+      const lines = markdown.split('\n');
+      const titleLine = lines.find(line => line.startsWith('# '));
+      const fullTitle = titleLine ? titleLine.substring(2).trim() : (deckName || 'Untitled Deck');
+      const emoji = this.extractEmoji(fullTitle) || '📚';
+      const name = fullTitle.replace(/^[^\w]+\s*/, ''); // Remove emoji
+      
+      // Save markdown content
+      localStorage.setItem(key, markdown);
+      
+      // Update index
+      this.updateIndex(deckId, name, emoji);
+      
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to save deck from markdown: ${error}`,
         recoverable: true
       };
     }
@@ -239,8 +277,8 @@ export class MarkdownStorage {
       markdown += `${deck.description}\n\n`;
     }
     
-    // Group cards by category
-    const categoryMap = new Map<string, Card[]>();
+    // Group cards by category  
+    const categoryMap = new Map<string, typeof deck.cards>();
     
     deck.cards.forEach(card => {
       const category = card.category || 'General';
@@ -261,7 +299,7 @@ export class MarkdownStorage {
           markdown += `- ${card.front} :: ${card.back}\n`;
         } else if (card.type === 'multiple-choice' && card.options) {
           markdown += `- ${card.front}\n`;
-          card.options.forEach(option => {
+          card.options.forEach((option: any) => {
             markdown += `  * ${option.text}${option.isCorrect ? ' [correct]' : ''}\n`;
           });
         } else if (card.type === 'true-false') {
@@ -316,7 +354,7 @@ export class MarkdownStorage {
           createdAt: new Date().toISOString(),
           lastModified: new Date().toISOString(),
           playCount: 0,
-          source: 'markdown',
+          source: 'imported',
           originalMarkdown: markdown,
           tags: [],
           difficulty: 'beginner',

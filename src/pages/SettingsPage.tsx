@@ -44,9 +44,9 @@ export function SettingsPage() {
   const [isImporting, setIsImporting] = useState(false);
 
   // Export handlers
-  const handleExportAll = () => {
+  const handleExportAll = async () => {
     try {
-      dataExporter.exportAllData();
+      await dataExporter.exportAllDataAsMarkdownZip();
       setExportStatus('Full backup exported successfully!');
       setTimeout(() => setExportStatus(''), 3000);
     } catch (error) {
@@ -54,9 +54,9 @@ export function SettingsPage() {
     }
   };
 
-  const handleExportDecks = () => {
+  const handleExportDecks = async () => {
     try {
-      dataExporter.exportDecks();
+      await dataExporter.exportDecksAsMarkdownZip();
       setExportStatus('Decks exported successfully!');
       setTimeout(() => setExportStatus(''), 3000);
     } catch (error) {
@@ -96,7 +96,7 @@ export function SettingsPage() {
 
     setIsImporting(true);
     try {
-      const result = await dataImporter.importDecks(selectedFile, { mergeStrategy });
+      const result = await dataImporter.importFile(selectedFile, { mergeStrategy });
       
       if (result.success) {
         setImportStatus(`Success! Imported ${result.imported} decks.`);
@@ -121,7 +121,7 @@ export function SettingsPage() {
 
     setIsImporting(true);
     try {
-      const result = await dataImporter.importFullBackup(selectedFile);
+      const result = await dataImporter.importLegacyJsonBackup(selectedFile);
       
       if (result.success) {
         setImportStatus('Full backup imported successfully!');
@@ -222,7 +222,7 @@ export function SettingsPage() {
                 className="w-full flex items-center justify-center space-x-2 p-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
               >
                 <Save className="w-5 h-5" />
-                <span>Export Full Backup</span>
+                <span>Export Complete Backup (ZIP)</span>
               </button>
               
               <div className="grid grid-cols-2 gap-3">
