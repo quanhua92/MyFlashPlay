@@ -64,7 +64,7 @@ export class DataExporter {
       }
       
       // Add export info
-      const exportInfo = `# FlashPlay Export\n\nExported on: ${new Date().toLocaleString()}\nVersion: ${APP_VERSION}\nTotal decks: ${decks.length}\n\n## Contents\n\n- **decks/**: Individual deck files in markdown format\n- **progress.md**: Learning progress and statistics\n- **achievements.md**: Unlocked achievements\n- **preferences.md**: User preferences and settings\n\n## Import Instructions\n\n1. Extract this ZIP file\n2. Use FlashPlay's import feature to select the ZIP file\n3. Choose merge strategy for existing decks\n\n---\n\n*This export contains only markdown files for maximum compatibility*`;
+      const exportInfo = `# MyFlashPlay Export\n\nExported on: ${new Date().toLocaleString()}\nVersion: ${APP_VERSION}\nTotal decks: ${decks.length}\n\n## Contents\n\n- **decks/**: Individual deck files in markdown format\n- **progress.md**: Learning progress and statistics\n- **achievements.md**: Unlocked achievements\n- **preferences.md**: User preferences and settings\n\n## Import Instructions\n\n1. Extract this ZIP file\n2. Use MyFlashPlay's import feature to select the ZIP file\n3. Choose merge strategy for existing decks\n\n---\n\n*This export contains only markdown files for maximum compatibility*`;
       
       zip.file('README.md', exportInfo);
       
@@ -104,7 +104,7 @@ export class DataExporter {
       });
       
       // Add export info
-      const exportInfo = `# FlashPlay Decks Export\n\nExported on: ${new Date().toLocaleString()}\nVersion: ${APP_VERSION}\nTotal decks: ${decks.length}\n\n## Contents\n\n- **decks/**: Individual deck files in markdown format\n\n## Import Instructions\n\n1. Extract this ZIP file\n2. Use FlashPlay's import feature to select the ZIP file or individual markdown files\n3. Choose merge strategy for existing decks\n\n---\n\n*This export contains only markdown files for maximum compatibility*`;
+      const exportInfo = `# MyFlashPlay Decks Export\n\nExported on: ${new Date().toLocaleString()}\nVersion: ${APP_VERSION}\nTotal decks: ${decks.length}\n\n## Contents\n\n- **decks/**: Individual deck files in markdown format\n\n## Import Instructions\n\n1. Extract this ZIP file\n2. Use MyFlashPlay's import feature to select the ZIP file or individual markdown files\n3. Choose merge strategy for existing decks\n\n---\n\n*This export contains only markdown files for maximum compatibility*`;
       
       zip.file('README.md', exportInfo);
       
@@ -127,7 +127,7 @@ export class DataExporter {
         throw new Error('No decks found to export');
       }
 
-      let markdown = '# FlashPlay Decks Export\n\n';
+      let markdown = '# MyFlashPlay Decks Export\n\n';
       markdown += `Exported on: ${new Date().toLocaleString()}\n`;
       markdown += `Total decks: ${decks.length}\n`;
       if (errors.length > 0) {
@@ -247,7 +247,7 @@ export class DataExporter {
       });
 
       if (archiveContent) {
-        const header = `# FlashPlay Individual Deck Files\n\nExported on: ${new Date().toLocaleString()}\nTotal decks: ${decks.length}\n\nEach deck is separated by headers below. Copy the content between headers to create individual .md files.\n\n`;
+        const header = `# MyFlashPlay Individual Deck Files\n\nExported on: ${new Date().toLocaleString()}\nTotal decks: ${decks.length}\n\nEach deck is separated by headers below. Copy the content between headers to create individual .md files.\n\n`;
         this.downloadText(header + archiveContent, `flashplay-all-decks-${this.getTimestamp()}.md`);
       } else {
         throw new Error('No deck content found');
@@ -275,7 +275,7 @@ export class DataExporter {
         throw new Error('No decks found to export');
       }
 
-      let markdown = '# FlashPlay Decks Export (Legacy)\n\n';
+      let markdown = '# MyFlashPlay Decks Export (Legacy)\n\n';
       markdown += `Exported on: ${new Date().toLocaleString()}\n\n`;
 
       decks.forEach(deck => {

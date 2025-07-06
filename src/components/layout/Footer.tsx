@@ -11,7 +11,7 @@ export function Footer() {
             <span>for young learners</span>
           </div>
           <div className="mt-2 sm:mt-0 text-sm text-gray-500 dark:text-gray-500">
-            © 2024 FlashPlay - Learn, Play, Grow!
+            © 2024 MyFlashPlay - Learn, Play, Grow!
           </div>
         </div>
       </div>

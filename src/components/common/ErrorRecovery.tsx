@@ -32,7 +32,7 @@ export function ErrorRecovery({ error, errorInfo }: ErrorRecoveryProps) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `flashplay-corrupted-data-${new Date().toISOString()}.json`;
+      a.download = `myflashplay-corrupted-data-${new Date().toISOString()}.json`;
       a.click();
       URL.revokeObjectURL(url);
       
@@ -59,7 +59,7 @@ export function ErrorRecovery({ error, errorInfo }: ErrorRecoveryProps) {
   const resetToDefaults = () => {
     setIsRecovering(true);
     try {
-      // Clear all FlashPlay data
+      // Clear all MyFlashPlay data
       Object.values(STORAGE_KEYS).forEach(key => {
         localStorage.removeItem(key);
       });
@@ -75,7 +75,7 @@ export function ErrorRecovery({ error, errorInfo }: ErrorRecoveryProps) {
   };
 
   const clearAllData = () => {
-    if (confirm('This will delete ALL FlashPlay data. Are you sure?')) {
+    if (confirm('This will delete ALL MyFlashPlay data. Are you sure?')) {
       setIsRecovering(true);
       try {
         localStorage.clear();
@@ -151,7 +151,7 @@ export function ErrorRecovery({ error, errorInfo }: ErrorRecoveryProps) {
     setIsRecovering(true);
     try {
       const storageInfo = markdownStorage.getStorageInfo();
-      let allMarkdown = '# FlashPlay Data Export\n\n';
+      let allMarkdown = '# MyFlashPlay Data Export\n\n';
       allMarkdown += `Exported on: ${new Date().toLocaleString()}\n`;
       allMarkdown += `Total decks: ${storageInfo.deckCount}\n\n`;
       
@@ -177,7 +177,7 @@ export function ErrorRecovery({ error, errorInfo }: ErrorRecoveryProps) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `flashplay-all-decks-${Date.now()}.md`;
+      a.download = `myflashplay-all-decks-${Date.now()}.md`;
       a.click();
       URL.revokeObjectURL(url);
       
@@ -328,7 +328,7 @@ export function ErrorRecovery({ error, errorInfo }: ErrorRecoveryProps) {
                   className="w-full flex items-center justify-center space-x-3 p-4 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
                 >
                   <RefreshCw className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                  <span className="text-blue-800 dark:text-blue-200">Reset FlashPlay to defaults</span>
+                  <span className="text-blue-800 dark:text-blue-200">Reset MyFlashPlay to defaults</span>
                 </button>
 
                 <div className="grid grid-cols-2 gap-3">

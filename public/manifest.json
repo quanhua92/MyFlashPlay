@@ -1,6 +1,6 @@
 {
-  "name": "FlashPlay - Fun Learning Games",
-  "short_name": "FlashPlay",
+  "name": "MyFlashPlay - Fun Learning Games",
+  "short_name": "MyFlashPlay",
   "description": "Create and play with interactive flashcards for kids",
   "start_url": "/",
   "display": "standalone",

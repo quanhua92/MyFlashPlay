@@ -14,10 +14,10 @@ describe('Navigation Component', () => {
     expect(screen.getByText('Settings')).toBeInTheDocument();
   });
 
-  it('should render FlashPlay logo', () => {
+  it('should render MyFlashPlay logo', () => {
     render(<Navigation />);
     
-    expect(screen.getByText('FlashPlay')).toBeInTheDocument();
+    expect(screen.getByText('MyFlashPlay')).toBeInTheDocument();
     expect(screen.getByText('🎯')).toBeInTheDocument();
   });
 

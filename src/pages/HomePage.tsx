@@ -47,7 +47,7 @@ export function HomePage() {
       >
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
           <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-            FlashPlay
+            MyFlashPlay
           </span>
         </h1>
         <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
@@ -81,7 +81,7 @@ export function HomePage() {
         className="py-16"
       >
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-          Why Kids Love FlashPlay
+          Why Kids Love MyFlashPlay
         </h2>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">

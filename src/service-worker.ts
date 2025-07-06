@@ -2,7 +2,7 @@
 
 declare const self: ServiceWorkerGlobalScope;
 
-const CACHE_NAME = 'flashplay-v1';
+const CACHE_NAME = 'myflashplay-v1';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -118,7 +118,7 @@ self.addEventListener('push', (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification('FlashPlay Reminder', options)
+    self.registration.showNotification('MyFlashPlay Reminder', options)
   );
 });
 

@@ -147,7 +147,7 @@ export function SettingsPage() {
             Settings
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            Customize your FlashPlay experience
+            Customize your MyFlashPlay experience
           </p>
         </div>
 

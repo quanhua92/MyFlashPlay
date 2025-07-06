@@ -1,13 +1,13 @@
 export const APP_VERSION = '1.0.0';
 
 export const STORAGE_KEYS = {
-  PREFERENCES: 'flashplay_preferences',
-  DECKS: 'flashplay_decks',
-  SCORES: 'flashplay_scores',
-  PROGRESS: 'flashplay_progress',
-  ACHIEVEMENTS: 'flashplay_achievements',
-  CACHE: 'flashplay_cache',
-  VERSION: 'flashplay_version'
+  PREFERENCES: 'myflashplay_preferences',
+  DECKS: 'myflashplay_decks',
+  SCORES: 'myflashplay_scores',
+  PROGRESS: 'myflashplay_progress',
+  ACHIEVEMENTS: 'myflashplay_achievements',
+  CACHE: 'myflashplay_cache',
+  VERSION: 'myflashplay_version'
 } as const;
 
 // Achievement definitions moved to src/utils/achievements.ts
