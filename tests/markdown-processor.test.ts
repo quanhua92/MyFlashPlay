@@ -38,7 +38,7 @@ function logTest(name: string, passed: boolean, details?: string) {
 
 // Test cases
 async function runTests() {
-  logSection('FlashPlay Markdown Processor Test Suite');
+  logSection('MyFlashPlay Markdown Processor Test Suite');
   
   let totalTests = 0;
   let passedTests = 0;

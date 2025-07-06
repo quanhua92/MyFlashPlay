@@ -1,7 +1,7 @@
-# FlashPlay Tasks & Features
+# MyFlashPlay Tasks & Features
 
 ## Overview
-This directory contains all tasks and feature plans for FlashPlay development.
+This directory contains all tasks and feature plans for MyFlashPlay development.
 
 ## Directory Structure
 - `completed/` - Finished tasks and features

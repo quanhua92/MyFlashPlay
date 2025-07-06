@@ -252,19 +252,19 @@ export class AchievementManager {
 
   // Check daily streak
   checkDailyStreak(): void {
-    const lastPlayed = localStorage.getItem('flashplay_last_played');
+    const lastPlayed = localStorage.getItem('myflashplay_last_played');
     const today = new Date().toDateString();
     
     if (lastPlayed !== today) {
-      localStorage.setItem('flashplay_last_played', today);
+      localStorage.setItem('myflashplay_last_played', today);
       
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       
       if (lastPlayed === yesterday.toDateString()) {
         // Continue streak
-        const currentStreak = parseInt(localStorage.getItem('flashplay_daily_streak') || '0') + 1;
-        localStorage.setItem('flashplay_daily_streak', currentStreak.toString());
+        const currentStreak = parseInt(localStorage.getItem('myflashplay_daily_streak') || '0') + 1;
+        localStorage.setItem('myflashplay_daily_streak', currentStreak.toString());
         
         if (currentStreak <= 7) {
           this.setProgress('daily-player', currentStreak);
@@ -272,7 +272,7 @@ export class AchievementManager {
         }
       } else {
         // Reset streak
-        localStorage.setItem('flashplay_daily_streak', '1');
+        localStorage.setItem('myflashplay_daily_streak', '1');
         this.setProgress('daily-player', 1);
         this.saveAchievements();
       }

@@ -1,8 +1,8 @@
-# Claude Development Guide for FlashPlay
+# Claude Development Guide for MyFlashPlay
 
 ## 🎯 Project Overview
 
-**FlashPlay** is a modern flashcard application built with React 19, TypeScript, and Vite. It features a simplified markdown-based deck creation system with support for multiple languages (UTF-8), various game modes, and comprehensive testing.
+**MyFlashPlay** is a modern flashcard application built with React 19, TypeScript, and Vite. It features a simplified markdown-based deck creation system with support for multiple languages (UTF-8), various game modes, and comprehensive testing.
 
 **Live Site**: https://myflashplay.vercel.app
 
@@ -20,7 +20,7 @@ The TEST.md file contains:
 
 ### Integration Testing Suite
 
-I have built a comprehensive integration testing system that can verify FlashPlay's functionality on any deployed URL.
+I have built a comprehensive integration testing system that can verify MyFlashPlay's functionality on any deployed URL.
 
 #### Proper Testing Workflow
 
@@ -85,7 +85,7 @@ pnpm test:self
 ✅ Error Handling                   876ms
 ==================================================
 📈 7/7 tests passed (7955ms total)
-🎉 All tests passed! FlashPlay is working correctly.
+🎉 All tests passed! MyFlashPlay is working correctly.
 ```
 
 ## 📝 Markdown Format
@@ -123,7 +123,7 @@ What is H2O? :: Water
 
 ## 🌍 UTF-8 Language Support
 
-FlashPlay showcases international language support with Vietnamese sample decks:
+MyFlashPlay showcases international language support with Vietnamese sample decks:
 
 - **Động Vật Việt Nam** (Vietnamese Animals)
 - **Màu Sắc Việt Nam** (Vietnamese Colors)  
@@ -178,7 +178,7 @@ pnpm test:integration https://myflashplay.vercel.app
 
 ## 🎮 Game Modes
 
-FlashPlay supports multiple learning modes:
+MyFlashPlay supports multiple learning modes:
 
 1. **Study Mode** - Traditional flashcard review
 2. **Quiz Mode** - Multiple choice questions

@@ -6,7 +6,7 @@ export const publicMarkdownDecks = [
     id: 'public-english-vietnamese-basic',
     name: '🇺🇸🇻🇳 English-Vietnamese Basic Words',
     description: 'Essential English vocabulary with Vietnamese translations',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'easy',
     tags: ['english', 'vietnamese', 'basic', 'vocabulary'],
     markdown: `# Greetings
@@ -36,7 +36,7 @@ Time :: Thời gian`
     id: 'public-english-vietnamese-family',
     name: '👨‍👩‍👧‍👦 English-Vietnamese Family Words',
     description: 'Learn family terms in English and Vietnamese',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'easy',
     tags: ['english', 'vietnamese', 'family', 'vocabulary'],
     markdown: `# Immediate Family
@@ -65,7 +65,7 @@ Teenager :: Thiếu niên`
     id: 'public-english-vietnamese-colors',
     name: '🌈 English-Vietnamese Colors',
     description: 'Learn color names in English and Vietnamese',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'easy',
     tags: ['english', 'vietnamese', 'colors', 'vocabulary'],
     markdown: `# Primary Colors
@@ -95,7 +95,7 @@ Golden :: Vàng kim`
     id: 'public-english-vietnamese-animals',
     name: '🦁 English-Vietnamese Animals',
     description: 'Animal names in English and Vietnamese',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'easy',
     tags: ['english', 'vietnamese', 'animals', 'vocabulary'],
     markdown: `# Pets
@@ -125,7 +125,7 @@ Snake :: Rắn`
     id: 'public-english-vietnamese-food',
     name: '🍜 English-Vietnamese Food',
     description: 'Learn food vocabulary in English and Vietnamese',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'easy',
     tags: ['english', 'vietnamese', 'food', 'vocabulary'],
     markdown: `# Staples
@@ -158,7 +158,7 @@ Juice :: Nước ép`
     id: 'public-english-vietnamese-numbers',
     name: '🔢 English-Vietnamese Numbers',
     description: 'Learn numbers in English and Vietnamese',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'easy',
     tags: ['english', 'vietnamese', 'numbers', 'vocabulary'],
     markdown: `# Basic Numbers 1-10
@@ -189,7 +189,7 @@ One million :: Một triệu`
     id: 'public-english-vietnamese-verbs',
     name: '⚡ English-Vietnamese Common Verbs',
     description: 'Essential verbs in English and Vietnamese',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'medium',
     tags: ['english', 'vietnamese', 'verbs', 'vocabulary'],
     markdown: `# Movement Verbs
@@ -225,7 +225,7 @@ Sell :: Bán`
     id: 'public-english-vietnamese-time',
     name: '📅 English-Vietnamese Time & Days',
     description: 'Time expressions and days of the week',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'medium',
     tags: ['english', 'vietnamese', 'time', 'days', 'vocabulary'],
     markdown: `# Days of the Week
@@ -257,7 +257,7 @@ Noon :: Trưa`
     id: 'public-english-vietnamese-body',
     name: '👤 English-Vietnamese Body Parts',
     description: 'Learn body parts in English and Vietnamese',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'easy',
     tags: ['english', 'vietnamese', 'body', 'vocabulary'],
     markdown: `# Head and Face
@@ -289,7 +289,7 @@ Toe :: Ngón chân`
     id: 'public-english-vietnamese-school',
     name: '🎓 English-Vietnamese School Vocabulary',
     description: 'Essential school and learning vocabulary',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'medium',
     tags: ['english', 'vietnamese', 'school', 'education', 'vocabulary'],
     markdown: `# School Places
@@ -326,7 +326,7 @@ Art :: Mỹ thuật`
     id: 'public-english-vietnamese-weather',
     name: '🌤️ English-Vietnamese Weather',
     description: 'Weather and climate vocabulary',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'medium',
     tags: ['english', 'vietnamese', 'weather', 'vocabulary'],
     markdown: `# Weather Conditions
@@ -363,7 +363,7 @@ It's very hot :: Trời rất nóng`
     id: 'public-english-vietnamese-emotions',
     name: '😊 English-Vietnamese Emotions',
     description: 'Express feelings and emotions in both languages',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'medium',
     tags: ['english', 'vietnamese', 'emotions', 'feelings', 'vocabulary'],
     markdown: `# Basic Emotions
@@ -400,7 +400,7 @@ I miss you :: Tôi nhớ bạn`
     id: 'public-english-vietnamese-clothing',
     name: '👕 English-Vietnamese Clothing',
     description: 'Clothing and accessories vocabulary',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'easy',
     tags: ['english', 'vietnamese', 'clothing', 'fashion', 'vocabulary'],
     markdown: `# Basic Clothing
@@ -436,7 +436,7 @@ Swimsuit :: Đồ bơi`
     id: 'public-english-vietnamese-transportation',
     name: '🚗 English-Vietnamese Transportation',
     description: 'Vehicles and travel vocabulary',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'medium',
     tags: ['english', 'vietnamese', 'transportation', 'travel', 'vocabulary'],
     markdown: `# Land Vehicles
@@ -472,7 +472,7 @@ Luggage :: Hành lý`
     id: 'public-english-vietnamese-technology',
     name: '📱 English-Vietnamese Technology',
     description: 'Modern technology and digital vocabulary',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'medium',
     tags: ['english', 'vietnamese', 'technology', 'digital', 'vocabulary'],
     markdown: `# Devices
@@ -512,7 +512,7 @@ Comment :: Bình luận`
     id: 'public-english-vietnamese-hobbies',
     name: '🎨 English-Vietnamese Hobbies',
     description: 'Free time activities and hobbies',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'medium',
     tags: ['english', 'vietnamese', 'hobbies', 'activities', 'vocabulary'],
     markdown: `# Sports
@@ -549,7 +549,7 @@ Traveling :: Du lịch`
     id: 'public-english-vietnamese-health',
     name: '🏥 English-Vietnamese Health',
     description: 'Health, medical, and wellness vocabulary',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'medium',
     tags: ['english', 'vietnamese', 'health', 'medical', 'vocabulary'],
     markdown: `# Health Professionals
@@ -591,7 +591,7 @@ Diet :: Chế độ ăn`
     id: 'public-english-vietnamese-nature',
     name: '🌳 English-Vietnamese Nature',
     description: 'Nature, environment, and outdoor vocabulary',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'easy',
     tags: ['english', 'vietnamese', 'nature', 'environment', 'vocabulary'],
     markdown: `# Landscapes
@@ -632,7 +632,7 @@ Fresh air :: Không khí trong lành`
     id: 'public-english-vietnamese-shopping',
     name: '🛒 English-Vietnamese Shopping',
     description: 'Shopping and market vocabulary',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'medium',
     tags: ['english', 'vietnamese', 'shopping', 'market', 'vocabulary'],
     markdown: `# Shopping Places
@@ -676,7 +676,7 @@ Do you have a smaller size? :: Bạn có size nhỏ hơn không?`
     id: 'public-english-vietnamese-work',
     name: '💼 English-Vietnamese Work & Jobs',
     description: 'Professional and workplace vocabulary',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'medium',
     tags: ['english', 'vietnamese', 'work', 'jobs', 'career', 'vocabulary'],
     markdown: `# Common Jobs
@@ -719,7 +719,7 @@ Report :: Báo cáo`
     id: 'public-english-vietnamese-travel',
     name: '✈️ English-Vietnamese Travel',
     description: 'Travel and tourism vocabulary',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'medium',
     tags: ['english', 'vietnamese', 'travel', 'tourism', 'vacation', 'vocabulary'],
     markdown: `# Travel Planning
@@ -764,7 +764,7 @@ Can you help me? :: Bạn có thể giúp tôi không?`
     id: 'public-english-vietnamese-food-advanced',
     name: '🍽️ English-Vietnamese Advanced Food',
     description: 'Cooking methods and advanced food vocabulary',
-    author: 'FlashPlay Team',
+    author: 'MyFlashPlay Team',
     difficulty: 'hard',
     tags: ['english', 'vietnamese', 'food', 'cooking', 'advanced', 'vocabulary'],
     markdown: `# Cooking Methods

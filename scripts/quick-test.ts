@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Quick Integration Test for FlashPlay
+ * Quick Integration Test for MyFlashPlay
  * 
  * A lightweight test that checks basic functionality
  * Usage: pnpm test:quick [URL]
@@ -10,7 +10,7 @@
 import { chromium } from 'playwright';
 
 async function quickTest(url: string) {
-  console.log('🚀 Quick FlashPlay Test');
+  console.log('🚀 Quick MyFlashPlay Test');
   console.log(`🌐 Testing: ${url}`);
   
   const browser = await chromium.launch({ headless: true });

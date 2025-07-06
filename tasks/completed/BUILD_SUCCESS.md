@@ -1,8 +1,8 @@
-# ✅ FlashPlay Build Success
+# ✅ MyFlashPlay Build Success
 
 ## Build Status: **WORKING** ✅
 
-The FlashPlay application has been successfully built and is ready for production deployment.
+The MyFlashPlay application has been successfully built and is ready for production deployment.
 
 ### Build Output:
 ```bash

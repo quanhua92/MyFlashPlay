@@ -1,8 +1,8 @@
-# FlashPlay Markdown Specification
+# MyFlashPlay Markdown Specification
 
 ## Overview
 
-FlashPlay uses a simplified markdown format for creating flashcards. This document defines the complete specification for the markdown format.
+MyFlashPlay uses a simplified markdown format for creating flashcards. This document defines the complete specification for the markdown format.
 
 ## Basic Format
 

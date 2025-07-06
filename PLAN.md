@@ -1,7 +1,7 @@
-# FlashPlay Development Plan
+# MyFlashPlay Development Plan
 
 ## Project Overview
-FlashPlay is a kid-friendly, client-side flashcard game web app that parses Markdown content to create interactive learning experiences with quiz modes, animations, and progress tracking.
+MyFlashPlay is a kid-friendly, client-side flashcard game web app that parses Markdown content to create interactive learning experiences with quiz modes, animations, and progress tracking.
 
 ## Tech Stack
 - React (latest version - v18.3.1)

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * FlashPlay Integration Test Suite
+ * MyFlashPlay Integration Test Suite
  * 
  * Tests core functionality against any deployed URL
  * Usage: pnpm test:integration [URL]
@@ -29,7 +29,7 @@ class IntegrationTester {
   }
 
   private async setup() {
-    console.log('🚀 Starting FlashPlay Integration Tests...');
+    console.log('🚀 Starting MyFlashPlay Integration Tests...');
     console.log(`🌐 Target URL: ${this.baseUrl}`);
     
     this.browser = await chromium.launch({ 
@@ -320,7 +320,7 @@ What is the largest planet?
     console.log(`📈 ${passed}/${this.results.length} tests passed (${totalTime}ms total)`);
     
     if (failed === 0) {
-      console.log('🎉 All tests passed! FlashPlay is working correctly.');
+      console.log('🎉 All tests passed! MyFlashPlay is working correctly.');
       process.exit(0);
     } else {
       console.log(`💥 ${failed} test(s) failed. Please check the issues above.`);

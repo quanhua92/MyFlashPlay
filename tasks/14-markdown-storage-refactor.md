@@ -224,7 +224,7 @@ Users can trigger migration through:
 5. **Batch Operations**: Bulk edit multiple decks
 
 ### Tool Integrations
-1. **Obsidian Plugin**: Direct FlashPlay integration
+1. **Obsidian Plugin**: Direct MyFlashPlay integration
 2. **Anki Import**: Convert from Anki format
 3. **CSV Support**: Import from spreadsheets
 4. **API Access**: Programmatic deck management

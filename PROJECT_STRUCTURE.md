@@ -1,4 +1,4 @@
-# FlashPlay Project Structure
+# MyFlashPlay Project Structure
 
 ## Directory Layout
 

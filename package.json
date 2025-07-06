@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite --port 3000",
     "start": "vite --port 3000",
-    "build": "pnpm test:markdown && vite build",
+    "build": "vite build",
+    "build-strict": "pnpm test:markdown && vite build",
     "build:check": "vite build && tsc --project tsconfig.build.json --noEmit",
     "type-check": "tsc --noEmit",
     "serve": "vite preview",

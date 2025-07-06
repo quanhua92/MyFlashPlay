@@ -45,9 +45,9 @@ export function PlayPage() {
     }
     
     // Save session to localStorage
-    const sessions = JSON.parse(localStorage.getItem('flashplay_sessions') || '[]');
+    const sessions = JSON.parse(localStorage.getItem('myflashplay_sessions') || '[]');
     sessions.push(session);
-    localStorage.setItem('flashplay_sessions', JSON.stringify(sessions));
+    localStorage.setItem('myflashplay_sessions', JSON.stringify(sessions));
     
     setIsPlaying(false);
     setSelectedMode(null);

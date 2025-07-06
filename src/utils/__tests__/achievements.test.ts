@@ -130,35 +130,35 @@ describe('Achievement Manager', () => {
 
   it('should handle daily streak', () => {
     const today = new Date().toDateString();
-    localStorage.setItem('flashplay_last_played', today);
+    localStorage.setItem('myflashplay_last_played', today);
     
     achievementManager.checkDailyStreak();
     
-    const dailyStreak = localStorage.getItem('flashplay_daily_streak');
+    const dailyStreak = localStorage.getItem('myflashplay_daily_streak');
     expect(dailyStreak).toBe('1');
   });
 
   it('should continue daily streak', () => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    localStorage.setItem('flashplay_last_played', yesterday.toDateString());
-    localStorage.setItem('flashplay_daily_streak', '5');
+    localStorage.setItem('myflashplay_last_played', yesterday.toDateString());
+    localStorage.setItem('myflashplay_daily_streak', '5');
     
     achievementManager.checkDailyStreak();
     
-    const dailyStreak = localStorage.getItem('flashplay_daily_streak');
+    const dailyStreak = localStorage.getItem('myflashplay_daily_streak');
     expect(dailyStreak).toBe('6');
   });
 
   it('should reset daily streak for non-consecutive days', () => {
     const twoDaysAgo = new Date();
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-    localStorage.setItem('flashplay_last_played', twoDaysAgo.toDateString());
-    localStorage.setItem('flashplay_daily_streak', '5');
+    localStorage.setItem('myflashplay_last_played', twoDaysAgo.toDateString());
+    localStorage.setItem('myflashplay_daily_streak', '5');
     
     achievementManager.checkDailyStreak();
     
-    const dailyStreak = localStorage.getItem('flashplay_daily_streak');
+    const dailyStreak = localStorage.getItem('myflashplay_daily_streak');
     expect(dailyStreak).toBe('1');
   });
 });

@@ -1,4 +1,4 @@
-# FlashPlay Implementation Guide
+# MyFlashPlay Implementation Guide
 
 ## Quick Start Commands
 
@@ -452,8 +452,8 @@ vercel
 ```json
 // public/manifest.json
 {
-  "name": "FlashPlay - Fun Learning Cards",
-  "short_name": "FlashPlay",
+  "name": "MyFlashPlay - Fun Learning Cards",
+  "short_name": "MyFlashPlay",
   "description": "Kid-friendly flashcard learning game",
   "theme_color": "#4F46E5",
   "background_color": "#ffffff",

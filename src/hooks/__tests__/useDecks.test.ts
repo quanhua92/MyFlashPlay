@@ -85,14 +85,14 @@ describe('useDecks Hook', () => {
     });
     
     expect(localStorage.setItem).toHaveBeenCalledWith(
-      'flashplay_decks',
+      'myflashplay_decks',
       JSON.stringify([mockDeck])
     );
   });
 
   it('should load decks from localStorage', () => {
     // Pre-populate localStorage
-    localStorage.setItem('flashplay_decks', JSON.stringify([mockDeck]));
+    localStorage.setItem('myflashplay_decks', JSON.stringify([mockDeck]));
     
     const { result } = renderHook(() => useDecks());
     
@@ -101,7 +101,7 @@ describe('useDecks Hook', () => {
   });
 
   it('should handle invalid localStorage data', () => {
-    localStorage.setItem('flashplay_decks', 'invalid json');
+    localStorage.setItem('myflashplay_decks', 'invalid json');
     
     const { result } = renderHook(() => useDecks());
     

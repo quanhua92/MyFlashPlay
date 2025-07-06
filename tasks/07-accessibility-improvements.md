@@ -3,7 +3,7 @@
 ## Status: TODO
 
 ### Description:
-Enhance accessibility to ensure FlashPlay is usable by everyone, including users with disabilities.
+Enhance accessibility to ensure MyFlashPlay is usable by everyone, including users with disabilities.
 
 ### Requirements:
 1. **Screen Reader Support**

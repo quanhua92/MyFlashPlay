@@ -1,4 +1,4 @@
-# FlashPlay Game Mechanics
+# MyFlashPlay Game Mechanics
 
 ## Game Modes
 

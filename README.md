@@ -1,4 +1,4 @@
-# FlashPlay 🎯
+# MyFlashPlay 🎯
 
 A kid-friendly, interactive flashcard game web application that transforms Markdown content into engaging learning experiences. Features simplified markdown format and UTF-8 language support.
 
@@ -57,7 +57,7 @@ pnpm test        # Run tests
 
 ## Markdown Format 📝
 
-FlashPlay supports flexible Markdown formats for creating flashcards:
+MyFlashPlay supports flexible Markdown formats for creating flashcards:
 
 ### Simple Q&A
 ```markdown
@@ -141,7 +141,7 @@ src/
 ## Customization 🎨
 
 ### Color Schemes
-FlashPlay includes multiple kid-friendly color schemes:
+MyFlashPlay includes multiple kid-friendly color schemes:
 - **Rainbow**: Purple, pink, and blue gradients
 - **Ocean**: Blue and cyan tones
 - **Space**: Dark purples and cosmic colors

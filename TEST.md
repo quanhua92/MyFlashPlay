@@ -1,7 +1,7 @@
-# FlashPlay Test Plan
+# MyFlashPlay Test Plan
 
 ## Overview
-This document outlines the testing methodology for FlashPlay, focusing on verifying that sample decks (especially Vietnamese UTF-8 decks) load correctly and all features work as expected.
+This document outlines the testing methodology for MyFlashPlay, focusing on verifying that sample decks (especially Vietnamese UTF-8 decks) load correctly and all features work as expected.
 
 ## Test Environment Setup
 

@@ -1329,7 +1329,7 @@ Task completed :check: :: true`;
   
   // Run all tests
   async runAll() {
-    this.log('🧪 FlashPlay Markdown Testing Suite', colors.magenta);
+    this.log('🧪 MyFlashPlay Markdown Testing Suite', colors.magenta);
     this.log('This test MUST pass before any build\n', colors.yellow);
     
     const startTime = performance.now();

@@ -349,7 +349,7 @@ export function PublicDecksPage() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          <p>All public decks are free to use and created by the FlashPlay community.</p>
+          <p>All public decks are free to use and created by the MyFlashPlay community.</p>
           <p className="mt-1">Save any deck to your collection and start learning immediately!</p>
         </motion.div>
       </div>

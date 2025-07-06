@@ -1,4 +1,4 @@
-# FlashPlay Integration Tests
+# MyFlashPlay Integration Tests
 
 ## 🚀 Quick Usage
 
@@ -57,7 +57,7 @@ Tests show **green ✅** or **red ❌** status with timing:
 ✅ Error Handling                    876ms
 ==================================================
 📈 7/7 tests passed (7955ms total)
-🎉 All tests passed! FlashPlay is working correctly.
+🎉 All tests passed! MyFlashPlay is working correctly.
 ```
 
 ## 🛠️ For Development

@@ -1,7 +1,7 @@
-# FlashPlay Project Status
+# MyFlashPlay Project Status
 
 ## 🎯 Project Overview
-FlashPlay is a kid-friendly flashcard game web application that transforms Markdown into interactive learning experiences.
+MyFlashPlay is a kid-friendly flashcard game web application that transforms Markdown into interactive learning experiences.
 
 ## ✅ Completed Features (Core MVP)
 

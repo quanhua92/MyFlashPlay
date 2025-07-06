@@ -1,7 +1,7 @@
-# FlashPlay Markdown Format Guide
+# MyFlashPlay Markdown Format Guide
 
 ## Overview
-FlashPlay uses a flexible Markdown format to create flashcards. The parser intelligently converts different Markdown structures into interactive flashcards and quiz questions.
+MyFlashPlay uses a flexible Markdown format to create flashcards. The parser intelligently converts different Markdown structures into interactive flashcards and quiz questions.
 
 ## Basic Format
 

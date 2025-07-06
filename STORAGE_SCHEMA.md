@@ -1,7 +1,7 @@
-# FlashPlay LocalStorage Schema
+# MyFlashPlay LocalStorage Schema
 
 ## Overview
-FlashPlay uses localStorage to persist user data including flashcard decks, scores, preferences, and progress. All data is stored as JSON strings with versioning for migration support.
+MyFlashPlay uses localStorage to persist user data including flashcard decks, scores, preferences, and progress. All data is stored as JSON strings with versioning for migration support.
 
 ## Storage Keys and Structure
 

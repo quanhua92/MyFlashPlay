@@ -1,4 +1,4 @@
-# ✅ FlashPlay - Fully Functional!
+# ✅ MyFlashPlay - Fully Functional!
 
 ## 🎉 ALL FEATURES NOW WORKING!
 
