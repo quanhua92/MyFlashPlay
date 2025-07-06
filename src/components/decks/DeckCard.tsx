@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { BookOpen, Play, Settings, Trash2, Target, Zap, Brain, ChevronDown, ChevronRight, Layers } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { BookOpen, Play, Settings, Trash2, Target, Zap, Brain, ChevronDown, ChevronRight, Layers, MoreVertical, Download, Edit } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from '@tanstack/react-router';
 import type { Deck, GameMode } from '@/types';
@@ -13,7 +13,23 @@ interface DeckCardProps {
 export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
   const [showModes, setShowModes] = useState(false);
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showMenu]);
 
   const gameModes = [
     {
@@ -72,6 +88,76 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
     setShowModes(!showModes);
   };
 
+  const handleDownload = () => {
+    try {
+      // Get the raw markdown from localStorage
+      const rawMarkdown = localStorage.getItem(`mdoc_${deck.id}`);
+      
+      if (rawMarkdown) {
+        const blob = new Blob([rawMarkdown], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${deck.name.replace(/[^a-zA-Z0-9]/g, '-')}.md`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else {
+        // Fallback: create markdown from deck data
+        let markdown = `# ${deck.emoji} ${deck.name}\n\n`;
+        if (deck.description) {
+          markdown += `${deck.description}\n\n`;
+        }
+        
+        deck.cards.forEach(card => {
+          if (card.type === 'simple') {
+            markdown += `- ${card.front} :: ${card.back}\n`;
+          } else if (card.type === 'multiple-choice' && card.options) {
+            markdown += `- ${card.front}\n`;
+            card.options.forEach(option => {
+              markdown += `  - ${option.text}\n`;
+            });
+            const correctOption = card.options.find(opt => opt.isCorrect);
+            if (correctOption) {
+              markdown += `  > ${correctOption.text}\n`;
+            }
+          } else if (card.type === 'true-false') {
+            markdown += `- ${card.front} :: ${card.back}\n`;
+          }
+          markdown += '\n';
+        });
+        
+        const blob = new Blob([markdown], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${deck.name.replace(/[^a-zA-Z0-9]/g, '-')}.md`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+      
+      setShowMenu(false);
+    } catch (error) {
+      console.error('Failed to download deck:', error);
+      alert('Failed to download deck. Please try again.');
+    }
+  };
+
+  const handleEdit = () => {
+    setShowMenu(false);
+    navigate({ to: '/create', search: { editDeck: deck.id } });
+  };
+
+  const handleDelete = () => {
+    setShowMenu(false);
+    if (confirm(`Are you sure you want to delete "${deck.name}"?`)) {
+      onDelete(deck.id);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -92,25 +178,56 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
             </p>
           </div>
         </div>
-        <div className="flex space-x-2">
-          <Link
-            to="/create"
-            search={{ editDeck: deck.id }}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            title="Edit deck"
+        
+        {/* 3-Dot Menu */}
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            title="Deck options"
           >
-            <Settings className="w-4 h-4" />
-          </Link>
-          <button 
-            className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-            onClick={() => {
-              if (confirm(`Are you sure you want to delete "${deck.name}"?`)) {
-                onDelete(deck.id);
-              }
-            }}
-          >
-            <Trash2 className="w-4 h-4" />
+            <MoreVertical className="w-4 h-4" />
           </button>
+          
+          <AnimatePresence>
+            {showMenu && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                transition={{ duration: 0.15 }}
+                className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10"
+              >
+                <div className="py-1">
+                  <button
+                    onClick={handleEdit}
+                    className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <Edit className="w-4 h-4" />
+                    <span>Edit Deck</span>
+                  </button>
+                  
+                  <button
+                    onClick={handleDownload}
+                    className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download Markdown</span>
+                  </button>
+                  
+                  <div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
+                  
+                  <button
+                    onClick={handleDelete}
+                    className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete Deck</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
