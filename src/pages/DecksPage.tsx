@@ -86,9 +86,14 @@ export function DecksPage() {
                   <Play className="w-4 h-4" />
                   <span>Play</span>
                 </Link>
-                <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <Link
+                  to="/play/$deckId"
+                  params={{ deckId: deck.id }}
+                  search={{ mode: 'study' }}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors inline-flex items-center"
+                >
                   <BookOpen className="w-4 h-4" />
-                </button>
+                </Link>
               </div>
             </motion.div>
           ))}

@@ -1,5 +1,5 @@
-import { useParams } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useParams, useSearch } from '@tanstack/react-router';
+import { useState, useEffect } from 'react';
 import { Play, BookOpen, Zap, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDecks } from '@/hooks/useDecks';
@@ -9,11 +9,22 @@ import type { GameMode, GameSession } from '@/types';
 
 export function PlayPage() {
   const { deckId } = useParams({ from: '/play/$deckId' });
+  const search = useSearch({ from: '/play/$deckId' });
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   
   const { getDeck } = useDecks();
   const deck = getDeck(deckId);
+
+  // Auto-select mode from search params
+  useEffect(() => {
+    if (search?.mode && ['study', 'quiz', 'speed'].includes(search.mode)) {
+      setSelectedMode(search.mode as GameMode);
+      if (deck) {
+        setIsPlaying(true);
+      }
+    }
+  }, [search?.mode, deck]);
 
   const handleGameComplete = (session: GameSession) => {
     console.log('Game completed:', session);
