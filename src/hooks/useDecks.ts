@@ -1,22 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useLocalStorage } from './useLocalStorage';
-import { deckStorage } from '@/utils/storage';
 import { markdownStorage } from '@/utils/markdown-storage';
-import { sampleDecks } from '@/data/sample-decks';
+import { sampleMarkdownDecks } from '@/data/sample-decks';
 import type { Deck } from '@/types';
 
 export function useDecks() {
   const [decks, setDecks] = useState<Deck[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [migrationStatus, setMigrationStatus] = useState<string | null>(null);
-
-  // Initialize decks from markdown storage with migration support
+  // Initialize decks from markdown storage
   useEffect(() => {
     const initializeDecks = async () => {
       setIsLoading(true);
       try {
-        // Try to load from markdown storage first
+        // Load from markdown storage
         const { decks: markdownDecks, errors } = markdownStorage.loadAllDecks();
         
         if (markdownDecks.length > 0) {
@@ -26,46 +22,32 @@ export function useDecks() {
             setError(`Loaded ${markdownDecks.length} decks, but ${errors.length} had errors`);
           }
         } else {
-          // No markdown decks, check for JSON decks to migrate
-          const jsonDecks = deckStorage.load();
-          
-          if (jsonDecks.length > 0) {
-            // Migrate from JSON to markdown
-            setMigrationStatus('Migrating decks to new storage format...');
-            const migrationResult = await markdownStorage.migrateFromJSON();
-            
-            if (migrationResult.success) {
-              setMigrationStatus(`Successfully migrated ${migrationResult.migrated} decks`);
+          // No decks at all, use samples
+          console.log('No existing decks found, initializing with sample decks');
+          const migratedSamples = await Promise.all(
+            sampleMarkdownDecks.map(async (sampleDeck) => {
+              // Save the markdown directly to localStorage
+              const markdownKey = `mdoc_${sampleDeck.id}`;
+              localStorage.setItem(markdownKey, sampleDeck.markdown);
               
-              // Load the migrated decks
-              const { decks: migratedDecks } = markdownStorage.loadAllDecks();
-              setDecks(migratedDecks);
-            } else {
-              setError(`Migration failed: ${migrationResult.errors.join(', ')}`);
-              setDecks(jsonDecks); // Fallback to JSON decks
-            }
-            
-            setTimeout(() => setMigrationStatus(null), 3000);
-          } else {
-            // No decks at all, use samples
-            console.log('No existing decks found, initializing with sample decks');
-            const migratedSamples = await Promise.all(
-              sampleDecks.map(async (deck) => {
-                const result = markdownStorage.saveDeck(deck);
-                return result.success ? deck : null;
-              })
-            );
-            
-            const successfulSamples = migratedSamples.filter(Boolean) as Deck[];
-            setDecks(successfulSamples);
-            setMigrationStatus(`Initialized with ${successfulSamples.length} sample decks`);
-            setTimeout(() => setMigrationStatus(null), 3000);
-          }
+              // Parse the markdown to create deck object
+              const { deck } = markdownStorage.loadDeck(sampleDeck.id);
+              if (deck) {
+                // Update the deck name to match our sample
+                deck.name = sampleDeck.name;
+                return deck;
+              }
+              return null;
+            })
+          );
+          
+          const successfulSamples = migratedSamples.filter(Boolean) as Deck[];
+          setDecks(successfulSamples);
         }
       } catch (err) {
         console.error('Error initializing decks:', err);
-        setError('Error loading decks, using fallback');
-        setDecks(sampleDecks);
+        setError('Error loading decks');
+        setDecks([]);
       }
       setIsLoading(false);
     };
@@ -159,7 +141,6 @@ export function useDecks() {
     decks,
     isLoading,
     error,
-    migrationStatus,
     addDeck,
     updateDeck,
     deleteDeck,

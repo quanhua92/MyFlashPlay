@@ -1,259 +1,188 @@
-import { v4 as uuidv4 } from 'uuid';
-import type { Deck } from '@/types';
-
-export const sampleDecks: Deck[] = [
+// Sample decks defined as markdown - much cleaner and consistent with our markdown-based architecture
+export const sampleMarkdownDecks = [
   {
     id: 'math-basics',
     name: 'Elementary Math Fun',
-    description: 'Learn basic math with fun questions!',
-    emoji: '🔢',
-    cards: [
-      {
-        id: uuidv4(),
-        type: 'simple',
-        front: 'What is 2 + 2?',
-        back: '4',
-        category: 'Addition',
-        metadata: {
-          difficulty: 'easy',
-          tags: ['math', 'addition', 'basic'],
-          hint: 'Count on your fingers!'
-        }
-      },
-      {
-        id: uuidv4(),
-        type: 'simple',
-        front: 'What is 5 × 3?',
-        back: '15',
-        category: 'Multiplication',
-        metadata: {
-          difficulty: 'medium',
-          tags: ['math', 'multiplication'],
-          hint: 'Add 5 three times'
-        }
-      },
-      {
-        id: uuidv4(),
-        type: 'multiple-choice',
-        front: 'Which number is bigger?',
-        back: '10',
-        category: 'Comparison',
-        options: [
-          { id: uuidv4(), text: '5', isCorrect: false },
-          { id: uuidv4(), text: '10', isCorrect: true },
-          { id: uuidv4(), text: '3', isCorrect: false },
-          { id: uuidv4(), text: '7', isCorrect: false }
-        ],
-        metadata: {
-          difficulty: 'easy',
-          tags: ['math', 'comparison']
-        }
-      },
-      {
-        id: uuidv4(),
-        type: 'true-false',
-        front: '3 + 4 equals 7',
-        back: 'true',
-        category: 'Addition',
-        metadata: {
-          difficulty: 'easy',
-          tags: ['math', 'addition', 'true-false']
-        }
-      }
-    ],
-    metadata: {
-      createdAt: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-      playCount: 0,
-      source: 'template',
-      tags: ['math', 'elementary', 'basic'],
-      difficulty: 'beginner',
-      estimatedTime: 5
-    },
-    settings: {
-      shuffleCards: true,
-      repeatIncorrect: true,
-      studyMode: 'random'
-    }
+    markdown: `What is 2 + 2? :: 4
+What is 6 + 7? :: 13
+What is 7 + 8? :: 15
+What is 9 - 4? :: 5
+What is 15 - 8? :: 7
+What is 5 × 3? :: 15
+What is 4 × 2? :: 8
+What is 12 ÷ 3? :: 4
+3 + 4 equals 7 :: true
+6 × 2 equals 12 :: true
+
+# Optional: Add multiple choice when needed
+What is 3 × 4?
+- 10
+- 11
+- 12
+> 12
+
+Which number is bigger?
+- 5
+- 10
+- 3
+- 7
+> 10`
   },
   {
     id: 'science-animals',
     name: 'Amazing Animals',
-    description: 'Discover fun facts about animals!',
-    emoji: '🦁',
-    cards: [
-      {
-        id: uuidv4(),
-        type: 'simple',
-        front: 'What is the largest mammal?',
-        back: 'The blue whale',
-        category: 'Ocean Animals',
-        metadata: {
-          difficulty: 'medium',
-          tags: ['science', 'animals', 'ocean'],
-          hint: 'It lives in the ocean',
-          explanation: 'Blue whales can grow up to 100 feet long!'
-        }
-      },
-      {
-        id: uuidv4(),
-        type: 'simple',
-        front: 'How many legs does a spider have?',
-        back: 'Eight legs',
-        category: 'Insects & Arachnids',
-        metadata: {
-          difficulty: 'easy',
-          tags: ['science', 'animals', 'spiders']
-        }
-      },
-      {
-        id: uuidv4(),
-        type: 'multiple-choice',
-        front: 'What do pandas eat?',
-        back: 'Bamboo',
-        category: 'Mammals',
-        options: [
-          { id: uuidv4(), text: 'Fish', isCorrect: false },
-          { id: uuidv4(), text: 'Bamboo', isCorrect: true },
-          { id: uuidv4(), text: 'Meat', isCorrect: false },
-          { id: uuidv4(), text: 'Berries', isCorrect: false }
-        ],
-        metadata: {
-          difficulty: 'easy',
-          tags: ['science', 'animals', 'diet'],
-          explanation: 'Pandas spend 12-16 hours a day eating bamboo!'
-        }
-      },
-      {
-        id: uuidv4(),
-        type: 'true-false',
-        front: 'Penguins can fly',
-        back: 'false',
-        category: 'Birds',
-        metadata: {
-          difficulty: 'easy',
-          tags: ['science', 'animals', 'birds'],
-          explanation: 'Penguins are flightless birds that swim instead!'
-        }
-      }
-    ],
-    metadata: {
-      createdAt: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-      playCount: 0,
-      source: 'template',
-      tags: ['science', 'animals', 'nature'],
-      difficulty: 'beginner',
-      estimatedTime: 5
-    },
-    settings: {
-      shuffleCards: true,
-      repeatIncorrect: true,
-      studyMode: 'sequential'
-    }
+    markdown: `What is the largest mammal? :: The blue whale
+How many hearts does an octopus have? :: Three hearts
+What sound does a lion make? :: Roar
+What is a baby kangaroo called? :: Joey
+What color is a polar bear's skin? :: Black
+How many legs does a spider have? :: Eight legs
+What do bees make? :: Honey
+Penguins can fly :: false
+Elephants are afraid of mice :: false
+
+# Multiple choice examples
+What do pandas eat?
+- Fish
+- Bamboo
+- Meat
+- Berries
+> Bamboo
+
+Which animal is known for its black and white stripes?
+- Horse
+- Zebra
+- Cow
+- Dog
+> Zebra
+
+Which bird cannot fly but can swim very well?
+- Eagle
+- Penguin
+- Sparrow
+- Owl
+> Penguin`
   },
   {
     id: 'space-exploration',
     name: 'Space Adventure',
-    description: 'Explore the wonders of space!',
-    emoji: '🚀',
-    cards: [
-      {
-        id: uuidv4(),
-        type: 'simple',
-        front: 'What is the closest star to Earth?',
-        back: 'The Sun',
-        category: 'Stars',
-        metadata: {
-          difficulty: 'easy',
-          tags: ['space', 'stars', 'solar-system']
-        }
-      },
-      {
-        id: uuidv4(),
-        type: 'multiple-choice',
-        front: 'Which planet is known as the Red Planet?',
-        back: 'Mars',
-        category: 'Planets',
-        options: [
-          { id: uuidv4(), text: 'Venus', isCorrect: false },
-          { id: uuidv4(), text: 'Mars', isCorrect: true },
-          { id: uuidv4(), text: 'Jupiter', isCorrect: false },
-          { id: uuidv4(), text: 'Mercury', isCorrect: false }
-        ],
-        metadata: {
-          difficulty: 'easy',
-          tags: ['space', 'planets', 'solar-system'],
-          explanation: 'Mars appears red due to iron oxide on its surface!'
-        }
-      },
-      {
-        id: uuidv4(),
-        type: 'simple',
-        front: 'How many moons does Earth have?',
-        back: 'One moon',
-        category: 'Earth',
-        metadata: {
-          difficulty: 'easy',
-          tags: ['space', 'earth', 'moon']
-        }
-      },
-      {
-        id: uuidv4(),
-        type: 'true-false',
-        front: 'The sun is a planet',
-        back: 'false',
-        category: 'Solar System',
-        metadata: {
-          difficulty: 'easy',
-          tags: ['space', 'sun', 'stars'],
-          explanation: 'The sun is a star, not a planet!'
-        }
-      }
-    ],
-    metadata: {
-      createdAt: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-      playCount: 0,
-      source: 'template',
-      tags: ['science', 'space', 'astronomy'],
-      difficulty: 'beginner',
-      estimatedTime: 5
-    },
-    settings: {
-      shuffleCards: true,
-      repeatIncorrect: false,
-      studyMode: 'random'
-    }
+    markdown: `What is the closest star to Earth? :: The Sun
+How many planets are in our solar system? :: Eight planets
+Which is the largest planet? :: Jupiter
+Which planet has the most moons? :: Saturn
+What is the hottest planet? :: Venus
+How many moons does Earth have? :: One moon
+What causes day and night on Earth? :: Earth's rotation
+How long does it take Earth to orbit the Sun? :: One year
+What is at the center of our solar system? :: The Sun
+What are asteroids made of? :: Rock and metal
+What is a comet? :: A ball of ice and dust
+The sun is a planet :: false
+Saturn has rings :: true
+Humans have walked on Mars :: false
+
+# Multiple choice example
+Which planet is known as the Red Planet?
+- Venus
+- Mars
+- Jupiter
+- Mercury
+> Mars`
+  },
+  {
+    id: 'vietnamese-animals',
+    name: 'Động Vật Việt Nam',
+    markdown: `Con gì có vằn đen trắng? :: Con ngựa vằn (Zebra)
+Vua của rừng là con gì? :: Con hổ (Tiger)
+Con voi có cái gì rất dài? :: Cái vòi (Trunk)
+Con khỉ thích ăn gì? :: Quả chuối (Banana)
+Con rắn di chuyển như thế nào? :: Bò lúc lỏn (Slithering)
+Con gì bay cao trên trời? :: Con đại bàng (Eagle)
+Con chim nào không bay được? :: Con cánh cụt (Penguin)
+Con gà trống kêu vào lúc nào? :: Sáng sớm (Early morning)
+Con chim nào thông minh nhất? :: Con vẹt (Parrot)
+Con gì canh giữ nhà? :: Con chó (Dog)
+Con mèo thích ăn gì? :: Cá (Fish)
+Con gì cho sữa? :: Con bò (Cow)
+Con lợn ở đâu? :: Chuồng lợn (Pig pen)
+Hổ là loài ăn cỏ :: false
+Voi sợ chuột :: false
+Khỉ có đuôi dài :: true`
+  },
+  {
+    id: 'vietnamese-colors',
+    name: 'Màu Sắc Việt Nam',
+    markdown: `Màu của máu là gì? :: Màu đỏ (Red)
+Màu của lá cây? :: Màu xanh lá cây (Green)
+Màu của bầu trời? :: Màu xanh da trời (Blue)
+Màu của mặt trời? :: Màu vàng (Yellow)
+Màu của tuyết? :: Màu trắng (White)
+Màu của đêm tối? :: Màu đen (Black)
+Quả chuối chín có màu gì? :: Màu vàng
+Cỏ có màu gì? :: Màu xanh lá cây
+Hoa hồng thường có màu gì? :: Màu đỏ hoặc màu hồng
+Cơm trắng có màu gì? :: Màu trắng
+Cà chua có màu gì? :: Màu đỏ
+Cà rốt có màu gì? :: Màu cam
+Tuyết có màu đỏ :: false
+Lá cây có màu xanh :: true
+Mặt trời có màu tím :: false
+
+# Multiple choice example
+Quả cam có màu gì?
+- Màu đỏ
+- Màu cam
+- Màu vàng
+- Màu xanh
+> Màu cam`
+  },
+  {
+    id: 'vietnamese-math',
+    name: 'Toán Học Tiếng Việt',
+    markdown: `Hai cộng hai bằng mấy? :: Bốn (4)
+Ba cộng năm bằng mấy? :: Tám (8)
+Sáu cộng bảy bằng mấy? :: Mười ba (13)
+Một cộng chín bằng mấy? :: Mười (10)
+Mười trừ ba bằng mấy? :: Bảy (7)
+Chín trừ năm bằng mấy? :: Bốn (4)
+Tám trừ tám bằng mấy? :: Không (0)
+Ba nhân bốn bằng mấy? :: Mười hai (12)
+Năm nhân hai bằng mấy? :: Mười (10)
+Tám chia hai bằng mấy? :: Bốn (4)
+Mười hai chia ba bằng mấy? :: Bốn (4)
+Sau số năm là số mấy? :: Số sáu (6)
+Trước số mười là số mấy? :: Số chín (9)
+Hai cộng ba bằng năm :: đúng (true)
+Bốn nhân hai bằng chín :: sai (false)
+Mười chia năm bằng hai :: đúng (true)
+
+# Multiple choice example
+Hai nhân ba bằng mấy?
+- Năm
+- Sáu
+- Bảy
+- Tám
+> Sáu`
   }
 ];
 
-export const sampleMarkdown = `# Elementary Math
+// Simple markdown template - shows the basic format
+export const sampleMarkdown = `What is 2 + 2? :: 4
+What is 5 + 3? :: 8
+What is 10 + 10? :: 20
+What is 10 - 5? :: 5
+What is 8 - 3? :: 5
+What is 7 - 4? :: 3
+3 + 4 equals 7 :: true
+10 - 2 equals 7 :: false
+5 × 2 equals 10 :: true
 
-## Addition
+# Optional: Add multiple choice when needed
+Tom has 3 apples. Sarah gives him 2 more. How many apples does Tom have now?
+- 4 apples
+- 5 apples
+- 6 apples
+- 7 apples
+> 5 apples
 
-- What is 2 + 2? :: 4
-- What is 5 + 3? :: 8
-- What is 10 + 10? :: 20
-
-## Subtraction
-
-- What is 10 - 5? :: 5
-- What is 8 - 3? :: 5
-- What is 7 - 4? :: 3
-
-## Word Problems
-
-- Tom has 3 apples. Sarah gives him 2 more. How many apples does Tom have now?
-  * 4 apples
-  * 5 apples [correct]
-  * 6 apples
-  * 7 apples
-
-- There are 8 birds on a tree. 3 fly away. How many are left? :: 5 birds
-
-## True or False
-
-- 3 + 4 equals 7 :: true
-- 10 - 2 equals 7 :: false
-- 5 × 2 equals 10 :: true`;
+There are 8 birds on a tree. 3 fly away. How many are left? :: 5 birds`;

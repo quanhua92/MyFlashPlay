@@ -11,6 +11,23 @@ export interface Template {
 
 export const templates: Template[] = [
   {
+    id: 'super-simple',
+    name: '✨ Super Simple',
+    description: 'The easiest way to create flashcards',
+    emoji: '⚡',
+    complexity: 'basic',
+    deckName: 'Quick Study Cards',
+    deckDescription: 'Simple flashcards for quick studying',
+    markdown: `What is 2 + 2? :: 4
+Capital of Japan? :: Tokyo
+Water freezes at what temperature? :: 0°C
+Cats are dogs :: false
+The sun is a star :: true
+What color do you get mixing red and blue? :: Purple
+How many days in a week? :: 7
+What comes after Tuesday? :: Wednesday`
+  },
+  {
     id: 'basic-qa',
     name: 'Basic Q&A',
     description: 'Simple question and answer flashcards',
@@ -18,15 +35,19 @@ export const templates: Template[] = [
     complexity: 'basic',
     deckName: 'My First Flashcards',
     deckDescription: 'Simple question and answer cards',
-    markdown: `# ❓ My First Flashcards
+    markdown: `What is the capital of France? :: Paris
+What is 2 + 2? :: 4
+What color do you get when you mix red and blue? :: Purple
+The Earth is flat :: false
+Water boils at 100°C :: true
 
-Simple question and answer cards
-
-## General
-
-- What is the capital of France? :: Paris
-- What is 2 + 2? :: 4
-- What color do you get when you mix red and blue? :: Purple`
+# Optional: Add multiple choice when needed
+What is the largest planet?
+- Earth
+- Jupiter
+- Mars
+- Venus
+> Jupiter`
   },
   {
     id: 'vocabulary',
@@ -36,15 +57,11 @@ Simple question and answer cards
     complexity: 'basic',
     deckName: 'Vocabulary Practice',
     deckDescription: 'Learn new words and their meanings',
-    markdown: `# 📖 Vocabulary Practice
-
-Learn new words and their meanings
-
-## New Words
-
-- What does "serendipity" mean? :: A pleasant surprise or fortunate accident
-- What does "ubiquitous" mean? :: Present everywhere; widespread
-- What does "ephemeral" mean? :: Lasting for a very short time`
+    markdown: `What does "serendipity" mean? :: A pleasant surprise or fortunate accident
+What does "ubiquitous" mean? :: Present everywhere; widespread
+What does "ephemeral" mean? :: Lasting for a very short time
+What does "eloquent" mean? :: Fluent and persuasive in speaking or writing
+What does "resilient" mean? :: Able to recover quickly from difficulties`
   },
   {
     id: 'image-cards',
