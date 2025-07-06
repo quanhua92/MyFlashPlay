@@ -1,5 +1,5 @@
 import { Link, useRouterState } from '@tanstack/react-router';
-import { Home, Plus, BookOpen, Trophy, Menu, X, Settings } from 'lucide-react';
+import { Home, Plus, BookOpen, Trophy, Menu, X, Settings, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
@@ -14,6 +14,7 @@ export function Navigation() {
     { path: '/create' as const, label: 'Create', icon: Plus },
     { path: '/decks' as const, label: 'My Decks', icon: BookOpen },
     { path: '/scores' as const, label: 'Scores', icon: Trophy },
+    { path: '/progress' as const, label: 'Progress', icon: TrendingUp },
     { path: '/settings' as const, label: 'Settings', icon: Settings }
   ];
 
