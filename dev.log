@@ -1,0 +1,11 @@
+
+> myflashplay@ dev /home/ubuntu/workspace/flashplay
+> vite --port 3000
+
+Generated route tree in 80ms
+
+  VITE v6.3.5  ready in 547 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+ ELIFECYCLE  Command failed.

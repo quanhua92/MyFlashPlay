@@ -8,23 +8,56 @@
 
 ## 🧪 Testing & Quality Assurance
 
+### IMPORTANT: Testing Procedures
+
+**See TEST.md for the complete testing plan and troubleshooting guide.**
+
+The TEST.md file contains:
+- Proper environment setup (avoiding port conflicts)
+- Detailed test scenarios with expected results
+- Common issues and their solutions
+- Root cause analysis steps for Vietnamese deck loading issues
+
 ### Integration Testing Suite
 
 I have built a comprehensive integration testing system that can verify FlashPlay's functionality on any deployed URL.
 
-#### Quick Commands
+#### Proper Testing Workflow
 
 ```bash
-# Test production site
+# 1. Kill any existing processes
+pkill -f "vite" || true
+lsof -ti:3000,3001,3002,4173,4174,4175 | xargs kill -9 2>/dev/null || true
+
+# 2. Build the project
+pnpm build
+
+# 3. Start preview server in background and capture the port
+pnpm serve > serve.log 2>&1 &
+sleep 2  # Give server time to start
+
+# 4. Extract the actual port from the log
+PORT=$(grep -o 'http://localhost:[0-9]*' serve.log | head -1 | grep -o '[0-9]*$')
+echo "Server running on port: $PORT"
+
+# 5. Run tests with the actual port
+pnpm test:integration http://localhost:$PORT
+
+# 6. Clean up
+kill %1  # Kill the background serve process
+rm serve.log
+
+# For production testing
 pnpm test:integration https://myflashplay.vercel.app
+```
 
-# Quick health check
-pnpm test:quick https://myflashplay.vercel.app
+#### Alternative: Use concurrently (recommended)
 
-# Test local development
-pnpm test:integration:local
+```bash
+# Kill existing processes first
+pkill -f "vite" || true
 
-# Self-test (build and test automatically)
+# Use the built-in test:self command
 pnpm test:self
 ```
 

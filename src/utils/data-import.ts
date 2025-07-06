@@ -1,6 +1,6 @@
 import { storageManager } from './storage';
 import { markdownStorage } from './markdown-storage';
-import { MarkdownParser } from './markdown-parser';
+import { MarkdownParser } from './markdown';
 import { v4 as uuidv4 } from 'uuid';
 import type { Deck } from '@/types';
 import JSZip from 'jszip';

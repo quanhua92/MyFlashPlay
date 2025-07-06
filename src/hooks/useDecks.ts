@@ -24,24 +24,35 @@ export function useDecks() {
         } else {
           // No decks at all, use samples
           console.log('No existing decks found, initializing with sample decks');
+          console.log('sampleMarkdownDecks count:', sampleMarkdownDecks.length);
+          
           const migratedSamples = await Promise.all(
             sampleMarkdownDecks.map(async (sampleDeck) => {
+              console.log('Processing sample deck:', sampleDeck.id, sampleDeck.name);
+              
               // Save the markdown directly to localStorage
               const markdownKey = `mdoc_${sampleDeck.id}`;
               localStorage.setItem(markdownKey, sampleDeck.markdown);
+              console.log('Saved to localStorage:', markdownKey);
               
               // Parse the markdown to create deck object
-              const { deck } = markdownStorage.loadDeck(sampleDeck.id);
+              const { deck, result } = markdownStorage.loadDeck(sampleDeck.id);
+              console.log('Load result for', sampleDeck.id, ':', result);
+              
               if (deck) {
                 // Update the deck name to match our sample
                 deck.name = sampleDeck.name;
+                console.log('Successfully created deck:', deck.name, 'with', deck.cards.length, 'cards');
                 return deck;
+              } else {
+                console.log('Failed to create deck for', sampleDeck.id, 'Error:', result.error);
               }
               return null;
             })
           );
           
           const successfulSamples = migratedSamples.filter(Boolean) as Deck[];
+          console.log('Successfully migrated', successfulSamples.length, 'sample decks');
           setDecks(successfulSamples);
         }
       } catch (err) {

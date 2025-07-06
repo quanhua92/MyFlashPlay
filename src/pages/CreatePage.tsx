@@ -3,7 +3,7 @@ import { Upload, FileText, Wand2, CheckCircle, Edit3, Code } from 'lucide-react'
 import { motion } from 'framer-motion';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { v4 as uuidv4 } from 'uuid';
-import { MarkdownParser } from '@/utils/markdown-parser';
+import { MarkdownParser } from '@/utils/markdown';
 import { markdownStorage } from '@/utils/markdown-storage';
 import { templates, type Template } from '@/data/templates';
 import { useDecks } from '@/hooks/useDecks';

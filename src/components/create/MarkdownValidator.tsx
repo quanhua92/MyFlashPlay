@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { AlertTriangle, CheckCircle, AlertCircle, Info } from 'lucide-react';
-import { MarkdownParser } from '@/utils/markdown-parser';
+import { MarkdownParser } from '@/utils/markdown';
 
 interface ValidationResult {
   isValid: boolean;
@@ -89,16 +89,16 @@ export function MarkdownValidator({ markdown, onValidationChange }: MarkdownVali
           continue;
         }
 
-        // Check for cards
-        if (line.startsWith('- ')) {
+        // Check for cards (both "- Question :: Answer" and "Question :: Answer" formats)
+        if (line.startsWith('- ') || line.includes(' :: ')) {
           hasCards = true;
           cardCount++;
 
-          const cardContent = line.substring(2).trim();
+          const cardContent = line.startsWith('- ') ? line.substring(2).trim() : line;
           if (!cardContent) {
             result.errors.push({
               type: 'error',
-              message: 'Card content cannot be empty after "-". Example: "- What is 2+2? :: 4"',
+              message: 'Card content cannot be empty. Example: "What is 2+2? :: 4" or "- What is 2+2? :: 4"',
               line: lineNumber
             });
             result.isValid = false;
@@ -122,7 +122,7 @@ export function MarkdownValidator({ markdown, onValidationChange }: MarkdownVali
             if (!question) {
               result.errors.push({
                 type: 'error',
-                message: 'Question cannot be empty before "::". Example: "- What is your name? :: John"',
+                message: 'Question cannot be empty before "::". Example: "What is your name? :: John"',
                 line: lineNumber
               });
               result.isValid = false;
@@ -131,7 +131,7 @@ export function MarkdownValidator({ markdown, onValidationChange }: MarkdownVali
             if (!answer) {
               result.errors.push({
                 type: 'error',
-                message: 'Answer cannot be empty after "::". Example: "- What is 2+2? :: 4"',
+                message: 'Answer cannot be empty after "::". Example: "What is 2+2? :: 4"',
                 line: lineNumber
               });
               result.isValid = false;
@@ -241,7 +241,7 @@ export function MarkdownValidator({ markdown, onValidationChange }: MarkdownVali
               // Not Q&A format and no multiple choice options
               result.errors.push({
                 type: 'error',
-                message: 'Invalid card format. Use "- Question :: Answer" OR multiple choice format.',
+                message: 'Invalid card format. Use "Question :: Answer" OR multiple choice format.',
                 line: lineNumber
               });
               result.errors.push({
@@ -270,7 +270,7 @@ export function MarkdownValidator({ markdown, onValidationChange }: MarkdownVali
           // Unknown line format
           result.errors.push({
             type: 'warning',
-            message: 'Unknown line format. Expected: "# Title", "## Category", "- Card", "  - Option", or "  > Answer"',
+            message: 'Unknown line format. Expected: "# Title", "## Category", "Question :: Answer", "  - Option", or "  > Answer"',
             line: lineNumber
           });
         }
@@ -287,7 +287,7 @@ export function MarkdownValidator({ markdown, onValidationChange }: MarkdownVali
       if (!hasCards) {
         result.errors.push({
           type: 'error',
-          message: 'No flashcards found. Add cards using "- Question :: Answer" format'
+          message: 'No flashcards found. Add cards using "Question :: Answer" format'
         });
         result.isValid = false;
       }

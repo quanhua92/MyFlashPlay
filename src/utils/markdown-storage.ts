@@ -1,5 +1,5 @@
 import { storageManager } from './storage';
-import { MarkdownParser } from './markdown-parser';
+import { MarkdownParser } from './markdown';
 import type { Deck } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -296,14 +296,14 @@ export class MarkdownStorage {
       
       cards.forEach(card => {
         if (card.type === 'simple') {
-          markdown += `- ${card.front} :: ${card.back}\n`;
+          markdown += `${card.front} :: ${card.back}\n`;
         } else if (card.type === 'multiple-choice' && card.options) {
-          markdown += `- ${card.front}\n`;
+          markdown += `${card.front}\n`;
           card.options.forEach((option: any) => {
-            markdown += `  * ${option.text}${option.isCorrect ? ' [correct]' : ''}\n`;
+            markdown += `* ${option.text}${option.isCorrect ? ' [correct]' : ''}\n`;
           });
         } else if (card.type === 'true-false') {
-          markdown += `- ${card.front} :: ${card.back}\n`;
+          markdown += `${card.front} :: ${card.back}\n`;
         }
         
         // Add metadata as comments
@@ -380,11 +380,10 @@ export class MarkdownStorage {
         return false;
       }
       
-      // Must have at least one title or card
-      const hasTitle = markdown.includes('# ');
-      const hasCard = markdown.includes(' :: ') || markdown.includes('- ');
+      // Must have at least one card (simplified check)
+      const hasCard = markdown.includes(' :: ');
       
-      return hasTitle || hasCard;
+      return hasCard;
     } catch {
       return false;
     }

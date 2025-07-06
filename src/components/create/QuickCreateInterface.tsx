@@ -114,9 +114,9 @@ export function QuickCreateInterface({ onMarkdownChange, initialMarkdown = '' }:
         continue;
       }
       
-      // Parse simple Q&A format: "- What is 2 + 2? :: 4"
-      if (trimmed.startsWith('- ') && trimmed.includes(' :: ')) {
-        const content = trimmed.substring(2); // Remove "- "
+      // Parse simple Q&A format: "What is 2 + 2? :: 4" or "- What is 2 + 2? :: 4"
+      if (trimmed.includes(' :: ')) {
+        const content = trimmed.startsWith('- ') ? trimmed.substring(2) : trimmed; // Remove "- " if present
         const parts = content.split(' :: ');
         if (parts.length === 2) {
           parsedCards.push({
