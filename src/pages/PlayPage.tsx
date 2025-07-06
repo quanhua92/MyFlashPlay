@@ -1,11 +1,12 @@
 import { useParams, useSearch } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
-import { Play, BookOpen, Zap, Target } from 'lucide-react';
+import { Play, BookOpen, Zap, Target, Brain } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDecks } from '@/hooks/useDecks';
 import { StudyMode } from '@/components/game/StudyMode';
 import { QuizMode } from '@/components/game/QuizMode';
 import { SpeedChallenge } from '@/components/game/SpeedChallenge';
+import { MemoryMatch } from '@/components/game/MemoryMatch';
 import type { GameMode, GameSession } from '@/types';
 
 export function PlayPage() {
@@ -19,7 +20,7 @@ export function PlayPage() {
 
   // Auto-select mode from search params
   useEffect(() => {
-    if (search?.mode && ['study', 'quiz', 'speed'].includes(search.mode)) {
+    if (search?.mode && ['study', 'quiz', 'speed', 'memory'].includes(search.mode)) {
       setSelectedMode(search.mode as GameMode);
       if (deck) {
         setIsPlaying(true);
@@ -64,6 +65,9 @@ export function PlayPage() {
     if (selectedMode === 'speed') {
       return <SpeedChallenge deck={deck} timeLimit={60} onComplete={handleGameComplete} />;
     }
+    if (selectedMode === 'memory') {
+      return <MemoryMatch deck={deck} difficulty="easy" onComplete={handleGameComplete} />;
+    }
   }
 
   const gameModes = [
@@ -87,6 +91,13 @@ export function PlayPage() {
       description: 'Race against time for bonus points',
       icon: Zap,
       color: 'from-yellow-500 to-orange-500'
+    },
+    {
+      id: 'memory',
+      name: 'Memory Match',
+      description: 'Match questions with their answers',
+      icon: Brain,
+      color: 'from-purple-500 to-pink-500'
     }
   ];
 
