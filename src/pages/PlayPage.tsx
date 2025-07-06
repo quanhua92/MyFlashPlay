@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useDecks } from '@/hooks/useDecks';
 import { StudyMode } from '@/components/game/StudyMode';
 import { QuizMode } from '@/components/game/QuizMode';
+import { SpeedChallenge } from '@/components/game/SpeedChallenge';
 import type { GameMode, GameSession } from '@/types';
 
 export function PlayPage() {
@@ -61,8 +62,7 @@ export function PlayPage() {
       return <QuizMode deck={deck} onComplete={handleGameComplete} />;
     }
     if (selectedMode === 'speed') {
-      // For now, use study mode for speed challenge
-      return <StudyMode deck={deck} onComplete={handleGameComplete} />;
+      return <SpeedChallenge deck={deck} timeLimit={60} onComplete={handleGameComplete} />;
     }
   }
 
