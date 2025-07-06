@@ -15,13 +15,17 @@ interface FallingQuiz {
   correctIndex: number;
 }
 
+type Difficulty = 'easy' | 'medium' | 'hard';
+
 interface FallingQuizModeProps {
   deck: Deck;
+  difficulty?: Difficulty;
   onComplete?: (session: GameSession) => void;
 }
 
-export function FallingQuizMode({ deck, onComplete }: FallingQuizModeProps) {
-  const [gameState, setGameState] = useState<'playing' | 'paused' | 'gameOver'>('playing');
+export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', onComplete }: FallingQuizModeProps) {
+  const [gameState, setGameState] = useState<'setup' | 'playing' | 'paused' | 'gameOver'>('setup');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>(initialDifficulty);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [lives, setLives] = useState(3);
@@ -35,6 +39,39 @@ export function FallingQuizMode({ deck, onComplete }: FallingQuizModeProps) {
   const startTimeRef = useRef<Date>(new Date());
   const spawnTimerRef = useRef<number>(0);
   const difficultyRef = useRef<number>(1);
+  
+  // Difficulty settings for kid-friendly gameplay
+  const getDifficultySettings = (diff: Difficulty, gameLevel: number) => {
+    const settings = {
+      easy: {
+        baseSpeed: 0.05,
+        speedIncrement: 0.02,
+        baseSpawnTime: 8000,
+        spawnTimeReduction: 200,
+        maxLevel: 1
+      },
+      medium: {
+        baseSpeed: 0.1,
+        speedIncrement: 0.05,
+        baseSpawnTime: 6000,
+        spawnTimeReduction: 300,
+        maxLevel: 2
+      },
+      hard: {
+        baseSpeed: 0.2,
+        speedIncrement: 0.1,
+        baseSpawnTime: 4000,
+        spawnTimeReduction: 400,
+        maxLevel: 3
+      }
+    };
+    
+    const config = settings[diff];
+    return {
+      speed: config.baseSpeed + (Math.min(gameLevel, config.maxLevel) * config.speedIncrement),
+      spawnTime: Math.max(2000, config.baseSpawnTime - (Math.min(gameLevel, config.maxLevel) * config.spawnTimeReduction))
+    };
+  };
 
   // Generate quiz from card
   const generateQuiz = useCallback((card: Card, lane: number): FallingQuiz => {
@@ -61,7 +98,7 @@ export function FallingQuizMode({ deck, onComplete }: FallingQuizModeProps) {
       card,
       lane,
       position: 0,
-      speed: 0.5 + (difficultyRef.current * 0.2),
+      speed: getDifficultySettings(selectedDifficulty, difficultyRef.current).speed,
       answers: answers.slice(0, 4), // Max 4 answers
       correctIndex
     };
@@ -114,14 +151,18 @@ export function FallingQuizMode({ deck, onComplete }: FallingQuizModeProps) {
 
     // Spawn new quizzes
     spawnTimerRef.current += deltaTime;
-    if (spawnTimerRef.current > 2000 - (difficultyRef.current * 200)) { // Spawn every 2-1.2 seconds based on difficulty
+    const { spawnTime } = getDifficultySettings(selectedDifficulty, difficultyRef.current);
+    if (spawnTimerRef.current > spawnTime) {
       spawnQuiz();
       spawnTimerRef.current = 0;
     }
 
     // Update difficulty
     const timeInSeconds = (now - startTimeRef.current) / 1000;
-    difficultyRef.current = Math.min(3, 1 + Math.floor(timeInSeconds / 30)); // Increase every 30 seconds, max 3
+    // Slower progression for easier difficulties
+    const progressionTime = selectedDifficulty === 'easy' ? 120 : selectedDifficulty === 'medium' ? 90 : 60;
+    const maxLevel = selectedDifficulty === 'easy' ? 1 : selectedDifficulty === 'medium' ? 2 : 3;
+    difficultyRef.current = Math.min(maxLevel, 1 + Math.floor(timeInSeconds / progressionTime));
 
     setTimeElapsed(Math.floor(timeInSeconds));
 
@@ -191,7 +232,7 @@ export function FallingQuizMode({ deck, onComplete }: FallingQuizModeProps) {
         details: {
           cardResults: [],
           bonuses: [],
-          difficulty: 'medium',
+          difficulty: selectedDifficulty,
           hintsUsed: 0
         }
       };
@@ -201,6 +242,73 @@ export function FallingQuizMode({ deck, onComplete }: FallingQuizModeProps) {
       }
     }
   }, [fallingQuizzes, streak, answeredQuizzes, deck, score, timeElapsed, onComplete]);
+
+  // Setup screen
+  if (gameState === 'setup') {
+    return (
+      <div className="h-screen bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center">
+        <div className="bg-white/90 rounded-xl p-8 shadow-2xl max-w-md w-full mx-4">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Choose Difficulty</h2>
+          
+          <div className="space-y-4 mb-6">
+            {[
+              { 
+                value: 'easy' as Difficulty, 
+                label: 'Easy', 
+                description: 'Perfect for kids - Very slow falling speed',
+                icon: '🐌',
+                color: 'from-green-400 to-green-600'
+              },
+              { 
+                value: 'medium' as Difficulty, 
+                label: 'Medium', 
+                description: 'Moderate speed for learning',
+                icon: '🚶',
+                color: 'from-yellow-400 to-orange-500'
+              },
+              { 
+                value: 'hard' as Difficulty, 
+                label: 'Hard', 
+                description: 'Fast-paced challenge',
+                icon: '🏃',
+                color: 'from-red-400 to-red-600'
+              }
+            ].map((option) => (
+              <button
+                key={option.value}
+                onClick={() => setSelectedDifficulty(option.value)}
+                className={`w-full p-4 rounded-lg border-2 transition-all ${
+                  selectedDifficulty === option.value
+                    ? 'border-purple-500 bg-purple-50'
+                    : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <span className="text-2xl">{option.icon}</span>
+                  <div className="text-left flex-1">
+                    <div className="font-semibold text-gray-800">{option.label}</div>
+                    <div className="text-sm text-gray-600">{option.description}</div>
+                  </div>
+                  {selectedDifficulty === option.value && (
+                    <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+          
+          <button
+            onClick={() => setGameState('playing')}
+            className="w-full py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all"
+          >
+            Start Game
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 overflow-hidden">
