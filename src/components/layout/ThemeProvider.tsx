@@ -46,28 +46,39 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const updateTheme = () => {
+      console.log('Theme update triggered. Current preferences.theme:', preferences.theme);
+      let newTheme: 'light' | 'dark';
+      
       if (preferences.theme === 'auto') {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setActualTheme(prefersDark ? 'dark' : 'light');
+        console.log('Auto mode detected. System prefers dark:', prefersDark);
+        newTheme = prefersDark ? 'dark' : 'light';
       } else {
-        setActualTheme(preferences.theme);
+        console.log('Manual theme selected:', preferences.theme);
+        newTheme = preferences.theme;
       }
+      
+      console.log('Setting actualTheme to:', newTheme);
+      setActualTheme(newTheme);
     };
 
     updateTheme();
 
-    // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', updateTheme);
-
-    return () => mediaQuery.removeEventListener('change', updateTheme);
+    // Listen for system theme changes only in auto mode
+    if (preferences.theme === 'auto') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      mediaQuery.addEventListener('change', updateTheme);
+      return () => mediaQuery.removeEventListener('change', updateTheme);
+    }
   }, [preferences.theme]);
 
   useEffect(() => {
     // Apply theme to document
+    console.log('Applying theme to document. actualTheme:', actualTheme);
     document.documentElement.classList.toggle('dark', actualTheme === 'dark');
     document.documentElement.setAttribute('data-theme', actualTheme);
     document.documentElement.setAttribute('data-color-scheme', preferences.colorScheme);
+    console.log('Document classes after theme application:', document.documentElement.className);
   }, [actualTheme, preferences.colorScheme]);
 
   const setTheme = (theme: Theme) => {
