@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Zap, Target, Heart } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { SafeContentRenderer } from '@/components/common/SafeContentRenderer';
 import type { Deck, Card, GameSession } from '@/types';
 
 interface FallingQuiz {
@@ -253,7 +254,7 @@ export function FallingQuizMode({ deck, onComplete }: FallingQuizModeProps) {
                   >
                     {/* Question */}
                     <div className="text-sm font-medium text-gray-900 dark:text-white mb-2 text-center">
-                      <div dangerouslySetInnerHTML={{ __html: quiz.card.front }} />
+                      <SafeContentRenderer content={quiz.card.front} />
                     </div>
                     
                     {/* Answer Buttons */}

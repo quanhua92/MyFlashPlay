@@ -51,16 +51,39 @@ export function MarkdownValidator({ markdown, onValidationChange }: MarkdownVali
         const line = lines[i].trim();
         const lineNumber = i + 1;
 
+        // Skip empty lines
+        if (line === '') {
+          continue;
+        }
+
         // Check for title
         if (line.startsWith('# ')) {
-          hasTitle = true;
+          const title = line.substring(2).trim();
+          if (!title) {
+            result.errors.push({
+              type: 'error',
+              message: 'Title cannot be empty after "#". Example: "# My Flashcards"',
+              line: lineNumber
+            });
+            result.isValid = false;
+          } else {
+            hasTitle = true;
+          }
           continue;
         }
 
         // Check for categories
         if (line.startsWith('## ')) {
-          currentCategory = line.substring(3).trim();
-          if (currentCategory) {
+          const category = line.substring(3).trim();
+          if (!category) {
+            result.errors.push({
+              type: 'error',
+              message: 'Category name cannot be empty after "##". Example: "## Math"',
+              line: lineNumber
+            });
+            result.isValid = false;
+          } else {
+            currentCategory = category;
             categories.add(currentCategory);
           }
           continue;
@@ -71,73 +94,185 @@ export function MarkdownValidator({ markdown, onValidationChange }: MarkdownVali
           hasCards = true;
           cardCount++;
 
+          const cardContent = line.substring(2).trim();
+          if (!cardContent) {
+            result.errors.push({
+              type: 'error',
+              message: 'Card content cannot be empty after "-". Example: "- What is 2+2? :: 4"',
+              line: lineNumber
+            });
+            result.isValid = false;
+            continue;
+          }
+
           // Validate Q&A format
-          if (line.includes(' :: ')) {
-            const parts = line.substring(2).split(' :: ');
-            if (parts.length !== 2) {
+          if (cardContent.includes(' :: ')) {
+            const parts = cardContent.split(' :: ');
+            if (parts.length > 2) {
+              result.errors.push({
+                type: 'warning',
+                message: 'Multiple "::" found. Only the first one will be used to separate question and answer.',
+                line: lineNumber
+              });
+            }
+            
+            const question = parts[0].trim();
+            const answer = parts[1] ? parts[1].trim() : '';
+            
+            if (!question) {
               result.errors.push({
                 type: 'error',
-                message: 'Invalid Q&A format. Use: "- Question :: Answer"',
+                message: 'Question cannot be empty before "::". Example: "- What is your name? :: John"',
                 line: lineNumber
               });
               result.isValid = false;
-            } else {
-              const question = parts[0].trim();
-              const answer = parts[1].trim();
-              
-              if (!question) {
-                result.errors.push({
-                  type: 'error',
-                  message: 'Question cannot be empty',
-                  line: lineNumber
-                });
-                result.isValid = false;
-              }
-              
-              if (!answer) {
-                result.errors.push({
-                  type: 'error',
-                  message: 'Answer cannot be empty',
-                  line: lineNumber
-                });
-                result.isValid = false;
-              }
+            }
+            
+            if (!answer) {
+              result.errors.push({
+                type: 'error',
+                message: 'Answer cannot be empty after "::". Example: "- What is 2+2? :: 4"',
+                line: lineNumber
+              });
+              result.isValid = false;
+            }
+
+            if (question.length > 200) {
+              result.errors.push({
+                type: 'warning',
+                message: 'Question is very long. Consider shortening for better readability.',
+                line: lineNumber
+              });
+            }
+
+            if (answer.length > 200) {
+              result.errors.push({
+                type: 'warning',
+                message: 'Answer is very long. Consider shortening for better readability.',
+                line: lineNumber
+              });
             }
           } else {
-            // Check if it's a multiple choice question
-            const nextLines = lines.slice(i + 1, i + 6); // Check next 5 lines for options
-            const optionLines = nextLines.filter(l => l.trim().startsWith('  * '));
+            // Check for multiple choice format
+            let nextLineIndex = i + 1;
+            const optionLines = [];
+            let correctAnswerLine = null;
+            
+            // Look for options (lines starting with spaces + -)
+            while (nextLineIndex < lines.length) {
+              const nextLine = lines[nextLineIndex];
+              if (nextLine.match(/^\s+- /)) {
+                const option = nextLine.trim().substring(2).trim();
+                if (!option) {
+                  result.errors.push({
+                    type: 'error',
+                    message: 'Option cannot be empty. Example: "  - Option text"',
+                    line: nextLineIndex + 1
+                  });
+                  result.isValid = false;
+                } else {
+                  optionLines.push({ line: nextLineIndex + 1, content: option });
+                }
+              } else if (nextLine.match(/^\s+> /)) {
+                const correctAnswer = nextLine.trim().substring(2).trim();
+                if (!correctAnswer) {
+                  result.errors.push({
+                    type: 'error',
+                    message: 'Correct answer cannot be empty after ">". Example: "  > Correct answer"',
+                    line: nextLineIndex + 1
+                  });
+                  result.isValid = false;
+                } else {
+                  correctAnswerLine = { line: nextLineIndex + 1, content: correctAnswer };
+                }
+                break;
+              } else if (nextLine.trim() === '') {
+                // Skip empty lines
+              } else {
+                // Non-matching line, stop looking for options
+                break;
+              }
+              nextLineIndex++;
+            }
             
             if (optionLines.length > 0) {
-              // Multiple choice question
-              const correctOptions = optionLines.filter(l => l.includes('[correct]'));
-              
-              if (correctOptions.length === 0) {
+              // Multiple choice format detected
+              if (!correctAnswerLine) {
                 result.errors.push({
                   type: 'error',
-                  message: 'Multiple choice question must have at least one [correct] answer',
+                  message: 'Multiple choice question missing correct answer. Add "  > Correct Answer" after the options.',
                   line: lineNumber
                 });
                 result.isValid = false;
+              } else {
+                // Check if correct answer matches one of the options
+                const matchingOption = optionLines.find(opt => 
+                  opt.content.toLowerCase().trim() === correctAnswerLine.content.toLowerCase().trim()
+                );
+                if (!matchingOption) {
+                  result.errors.push({
+                    type: 'warning',
+                    message: `Correct answer "${correctAnswerLine.content}" doesn't exactly match any option. Make sure it matches one of your options exactly.`,
+                    line: correctAnswerLine.line
+                  });
+                }
               }
               
               if (optionLines.length < 2) {
                 result.errors.push({
+                  type: 'error',
+                  message: 'Multiple choice questions must have at least 2 options. Add more "  - Option" lines.',
+                  line: lineNumber
+                });
+                result.isValid = false;
+              }
+              
+              if (optionLines.length > 6) {
+                result.errors.push({
                   type: 'warning',
-                  message: 'Multiple choice questions should have at least 2 options',
+                  message: 'Too many options (more than 6). Consider reducing for better user experience.',
                   line: lineNumber
                 });
               }
+              
+              // Skip processed lines
+              i = nextLineIndex;
             } else {
               // Not Q&A format and no multiple choice options
               result.errors.push({
                 type: 'error',
-                message: 'Card must be either Q&A format (Question :: Answer) or multiple choice with options',
+                message: 'Invalid card format. Use "- Question :: Answer" OR multiple choice format.',
                 line: lineNumber
+              });
+              result.errors.push({
+                type: 'info',
+                message: 'Multiple choice example:\\n- What is 2+2?\\n  - 3\\n  - 4\\n  - 5\\n  > 4'
               });
               result.isValid = false;
             }
           }
+        } else if (line.startsWith('  - ') || line.startsWith('  > ')) {
+          // These should be part of multiple choice, but we're not in a card context
+          result.errors.push({
+            type: 'error',
+            message: 'Option or answer line found outside of a multiple choice card. These must follow a card starting with "-"',
+            line: lineNumber
+          });
+          result.isValid = false;
+        } else if (line.match(/^\s+/)) {
+          // Line starts with spaces but doesn't match expected patterns
+          result.errors.push({
+            type: 'warning',
+            message: 'Unexpected indented line. For options use "  - Option" and for correct answers use "  > Answer"',
+            line: lineNumber
+          });
+        } else {
+          // Unknown line format
+          result.errors.push({
+            type: 'warning',
+            message: 'Unknown line format. Expected: "# Title", "## Category", "- Card", "  - Option", or "  > Answer"',
+            line: lineNumber
+          });
         }
       }
 

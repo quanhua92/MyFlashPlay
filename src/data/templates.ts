@@ -47,6 +47,30 @@ Learn new words and their meanings
 - What does "ephemeral" mean? :: Lasting for a very short time`
   },
   {
+    id: 'image-cards',
+    name: 'Image Flashcards',
+    description: 'Cards with images for visual learning',
+    emoji: '🖼️',
+    complexity: 'intermediate',
+    deckName: 'Visual Learning Cards',
+    deckDescription: 'Flashcards with images for better memory',
+    markdown: `# 🖼️ Visual Learning Cards
+
+Flashcards with images for better memory and visual learning
+
+## Animals
+
+- What animal is this? ![Dog](https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=300&h=200&fit=crop) :: Dog
+- Name this big cat: ![Lion](https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=300&h=200&fit=crop) :: Lion  
+- What bird is shown? ![Eagle](https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=300&h=200&fit=crop) :: Eagle
+
+## Nature
+
+- What type of flower is this? ![Sunflower](https://images.unsplash.com/photo-1597848212624-e6e2f80d2da1?w=300&h=200&fit=crop) :: Sunflower
+- Name this natural landmark: ![Mountain](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop) :: Mountain
+- What weather is shown? ![Rainbow](https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=300&h=200&fit=crop) :: Rainbow`
+  },
+  {
     id: 'categorized',
     name: 'Categorized Learning',
     description: 'Cards organized by topics with categories',

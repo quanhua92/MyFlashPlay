@@ -11,6 +11,7 @@ import { MarkdownGuide } from '@/components/create/MarkdownGuide';
 import { QuickCreateInterface } from '@/components/create/QuickCreateInterface';
 import { TemplateSelector } from '@/components/create/TemplateSelector';
 import { MarkdownValidator } from '@/components/create/MarkdownValidator';
+import { SafeContentRenderer } from '@/components/common/SafeContentRenderer';
 import type { Deck } from '@/types';
 
 type CreateMode = 'interface' | 'markdown';
@@ -348,10 +349,10 @@ export function CreatePage() {
                         Card {index + 1} • {card.type} • {card.category || 'No category'}
                       </div>
                       <div className="font-medium text-gray-900 dark:text-white mb-2">
-                        <div dangerouslySetInnerHTML={{ __html: card.front }} />
+                        <SafeContentRenderer content={card.front} />
                       </div>
                       <div className="text-gray-600 dark:text-gray-300">
-                        <div dangerouslySetInnerHTML={{ __html: card.back }} />
+                        <SafeContentRenderer content={card.back} />
                       </div>
                     </div>
                   ))}

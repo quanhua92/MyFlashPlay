@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { SafeContentRenderer } from '@/components/common/SafeContentRenderer';
 import type { Flashcard } from '@/types';
 
 interface FlashCardProps {
@@ -49,9 +50,9 @@ export function FlashCard({ card, onFlip, className, showBack = false }: FlashCa
             <div className="text-sm font-medium mb-2 opacity-80">
               {card.category && `${card.category} • `}Question
             </div>
-            <div 
+            <SafeContentRenderer 
+              content={card.front}
               className="text-xl font-bold leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: card.front }} 
             />
             {card.metadata.hint && (
               <div className="mt-4 text-sm opacity-70 italic">
@@ -75,9 +76,9 @@ export function FlashCard({ card, onFlip, className, showBack = false }: FlashCa
             <div className="text-sm font-medium mb-2 opacity-80">
               Answer
             </div>
-            <div 
+            <SafeContentRenderer 
+              content={card.back}
               className="text-xl font-bold leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: card.back }} 
             />
             {card.metadata.explanation && (
               <div className="mt-4 text-sm opacity-80 leading-relaxed">

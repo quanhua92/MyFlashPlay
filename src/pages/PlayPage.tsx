@@ -10,6 +10,7 @@ import { MemoryMatch } from '@/components/game/MemoryMatch';
 import { FallingQuizMode } from '@/components/game/FallingQuizMode';
 import { AchievementNotification } from '@/components/ui/AchievementNotification';
 import { achievementManager } from '@/utils/achievements';
+import { SafeContentRenderer } from '@/components/common/SafeContentRenderer';
 import type { GameMode, GameSession, Achievement } from '@/types';
 
 export function PlayPage() {
@@ -233,7 +234,7 @@ export function PlayPage() {
                   {card.type} • {card.category || 'No category'}
                 </div>
                 <div className="font-medium text-gray-900 dark:text-white">
-                  <div dangerouslySetInnerHTML={{ __html: card.front }} />
+                  <SafeContentRenderer content={card.front} />
                 </div>
               </div>
             ))}
