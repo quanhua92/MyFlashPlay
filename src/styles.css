@@ -102,21 +102,6 @@ code {
   }
 }
 
-/* Prevent bounce scrolling on iOS */
-html {
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
-
-body {
-  height: 100%;
-  width: 100%;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
 /* Disable pull-to-refresh on mobile */
 body {
   overscroll-behavior-y: none;

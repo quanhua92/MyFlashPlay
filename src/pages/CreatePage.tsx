@@ -23,7 +23,7 @@ export function CreatePage() {
   const [isCreating, setIsCreating] = useState(false);
   const [isCreated, setIsCreated] = useState(false);
   const [createMode, setCreateMode] = useState<CreateMode>('interface');
-  const [validationResult, setValidationResult] = useState<any>(null);
+  const [validationResult, setValidationResult] = useState<any>({ isValid: true, errors: [], cardCount: 0 });
   const [editingDeck, setEditingDeck] = useState<Deck | null>(null);
   
   const search = useSearch({ from: '/create' });
@@ -68,80 +68,77 @@ export function CreatePage() {
     
     setIsCreating(true);
     
-    if (editingDeck) {
-      // Update existing deck
-      const updatedDeck: Deck = {
-        ...editingDeck,
-        name: deckName,
-        description,
-        emoji,
-        cards: parsedCards,
-        metadata: {
-          ...editingDeck.metadata,
-          lastModified: new Date().toISOString(),
-        }
-      };
-      
-      updateDeck(editingDeck.id, updatedDeck);
-      console.log(`Updated deck ${editingDeck.id} successfully`);
-    } else {
-      // Create new deck
-      const newDeck: Deck = {
-        id: uuidv4(),
-        name: deckName,
-        description,
-        emoji,
-        cards: parsedCards,
-        metadata: {
-          createdAt: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-        playCount: 0,
-        source: 'created',
-        originalMarkdown: markdown,
-        tags: [],
-        difficulty: 'beginner',
-        estimatedTime: Math.ceil(parsedCards.length / 10) * 5 // Rough estimate
-      },
-      settings: {
-        shuffleCards: true,
-        repeatIncorrect: true,
-        studyMode: 'random'
-      }
-    };
-
-      // Add to storage
-      const addResult = addDeck(newDeck);
-      
-      if (addResult.success) {
+    try {
+      if (editingDeck) {
+        // Update existing deck
+        const updatedDeck: Deck = {
+          ...editingDeck,
+          name: deckName,
+          description,
+          emoji,
+          cards: parsedCards,
+          metadata: {
+            ...editingDeck.metadata,
+            lastModified: new Date().toISOString(),
+          }
+        };
+        
+        updateDeck(editingDeck.id, updatedDeck);
+        console.log(`Updated deck ${editingDeck.id} successfully`);
+        
         setIsCreating(false);
         setIsCreated(true);
         
-        // Redirect after a short delay - fixed route
+        // Redirect after a short delay
         setTimeout(() => {
-          // Double-check that the deck was saved before navigating
-          const { deck: savedDeck } = markdownStorage.loadDeck(newDeck.id);
-          if (savedDeck) {
-            navigate({ to: '/play/$deckId', params: { deckId: newDeck.id } });
-          } else {
-            console.error('Deck was not saved properly, cannot navigate');
-            setIsCreated(false);
-          }
+          navigate({ to: '/decks' });
         }, 1500);
       } else {
-        setIsCreating(false);
-        console.error('Failed to create deck:', addResult.error);
-        // You could set an error state here to show to the user
+        // Create new deck
+        const newDeck: Deck = {
+          id: uuidv4(),
+          name: deckName,
+          description,
+          emoji,
+          cards: parsedCards,
+          metadata: {
+            createdAt: new Date().toISOString(),
+            lastModified: new Date().toISOString(),
+            playCount: 0,
+            source: 'created',
+            originalMarkdown: markdown,
+            tags: [],
+            difficulty: 'beginner',
+            estimatedTime: Math.ceil(parsedCards.length / 10) * 5 // Rough estimate
+          },
+          settings: {
+            shuffleCards: true,
+            repeatIncorrect: true,
+            studyMode: 'random'
+          }
+        };
+
+        // Add to storage
+        const addResult = addDeck(newDeck);
+        
+        if (addResult.success) {
+          console.log(`Successfully created deck ${newDeck.id}`);
+          setIsCreating(false);
+          setIsCreated(true);
+          
+          // Redirect after a short delay
+          setTimeout(() => {
+            navigate({ to: '/decks' });
+          }, 1500);
+        } else {
+          setIsCreating(false);
+          console.error('Failed to create deck:', addResult.error);
+        }
       }
+    } catch (error) {
+      setIsCreating(false);
+      console.error('Error in deck creation:', error);
     }
-    
-    // Common completion logic
-    setIsCreating(false);
-    setIsCreated(true);
-    
-    // Redirect after a short delay
-    setTimeout(() => {
-      navigate({ to: '/decks' });
-    }, 1500);
   };
 
   const handleTemplateSelect = (template: Template) => {
@@ -342,7 +339,7 @@ export function CreatePage() {
               
               {parsedCards.length > 0 ? (
                 <div className="space-y-4 max-h-96 overflow-y-auto">
-                  {parsedCards.slice(0, 3).map((card, index) => (
+                  {parsedCards.map((card, index) => (
                     <div
                       key={card.id}
                       className="border border-gray-200 dark:border-gray-600 rounded-lg p-4"
@@ -358,11 +355,6 @@ export function CreatePage() {
                       </div>
                     </div>
                   ))}
-                  {parsedCards.length > 3 && (
-                    <div className="text-center text-gray-500 dark:text-gray-400">
-                      ... and {parsedCards.length - 3} more cards
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div className="text-center text-gray-500 dark:text-gray-400 py-8">
