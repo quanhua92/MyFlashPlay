@@ -4,22 +4,25 @@ import { motion } from 'framer-motion';
 import { useNavigate } from '@tanstack/react-router';
 import { v4 as uuidv4 } from 'uuid';
 import { MarkdownParser } from '@/utils/markdown-parser';
-import { sampleMarkdown } from '@/data/sample-decks';
+import { templates, type Template } from '@/data/templates';
 import { useDecks } from '@/hooks/useDecks';
 import { MarkdownGuide } from '@/components/create/MarkdownGuide';
 import { QuickCreateInterface } from '@/components/create/QuickCreateInterface';
+import { TemplateSelector } from '@/components/create/TemplateSelector';
+import { MarkdownValidator } from '@/components/create/MarkdownValidator';
 import type { Deck } from '@/types';
 
 type CreateMode = 'interface' | 'markdown';
 
 export function CreatePage() {
-  const [markdown, setMarkdown] = useState(sampleMarkdown);
-  const [deckName, setDeckName] = useState('My Custom Deck');
-  const [description, setDescription] = useState('Created from Markdown');
-  const [emoji, setEmoji] = useState('📚');
+  const [markdown, setMarkdown] = useState(templates[0].markdown);
+  const [deckName, setDeckName] = useState(templates[0].deckName);
+  const [description, setDescription] = useState(templates[0].deckDescription);
+  const [emoji, setEmoji] = useState(templates[0].emoji);
   const [isCreating, setIsCreating] = useState(false);
   const [isCreated, setIsCreated] = useState(false);
   const [createMode, setCreateMode] = useState<CreateMode>('interface');
+  const [validationResult, setValidationResult] = useState<any>(null);
   
   const navigate = useNavigate();
   const { addDeck } = useDecks();
@@ -27,7 +30,11 @@ export function CreatePage() {
   const parsedCards = markdown ? parser.parse(markdown) : [];
 
   const handleCreateDeck = async () => {
-    if (parsedCards.length === 0) return;
+    // Validate before creating
+    if (!validationResult?.isValid || parsedCards.length === 0) {
+      console.error('Cannot create deck: validation failed or no cards');
+      return;
+    }
     
     setIsCreating(true);
     
@@ -61,17 +68,17 @@ export function CreatePage() {
     setIsCreating(false);
     setIsCreated(true);
     
-    // Redirect after a short delay
+    // Redirect after a short delay - fixed route
     setTimeout(() => {
-      navigate({ to: '/play/$deckId', params: { deckId: newDeck.id }, search: { mode: undefined } });
+      navigate({ to: '/play/$deckId', params: { deckId: newDeck.id } });
     }, 1500);
   };
 
-  const loadTemplate = () => {
-    setMarkdown(sampleMarkdown);
-    setDeckName('Elementary Math');
-    setDescription('Basic math problems for kids');
-    setEmoji('🔢');
+  const handleTemplateSelect = (template: Template) => {
+    setMarkdown(template.markdown);
+    setDeckName(template.deckName);
+    setDescription(template.deckDescription);
+    setEmoji(template.emoji);
   };
 
   const switchToMarkdown = () => {
@@ -148,6 +155,9 @@ export function CreatePage() {
               </div>
             </div>
 
+            {/* Template Selector */}
+            <TemplateSelector onSelectTemplate={handleTemplateSelect} />
+
             {/* Markdown Guide */}
             <MarkdownGuide />
 
@@ -219,7 +229,7 @@ export function CreatePage() {
                       </button>
                       <button 
                         className="flex items-center space-x-2 px-3 py-1.5 text-sm bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors"
-                        onClick={loadTemplate}
+                        onClick={() => handleTemplateSelect(templates[0])}
                       >
                         <Wand2 className="w-4 h-4" />
                         <span>Template</span>
@@ -232,6 +242,12 @@ export function CreatePage() {
                     onChange={(e) => setMarkdown(e.target.value)}
                     className="w-full h-96 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm resize-none"
                     placeholder="Paste your Markdown content here..."
+                  />
+
+                  {/* Validation */}
+                  <MarkdownValidator 
+                    markdown={markdown} 
+                    onValidationChange={setValidationResult}
                   />
 
                   <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
@@ -283,11 +299,15 @@ export function CreatePage() {
 
               {parsedCards.length > 0 && (
                 <motion.button 
-                  className="w-full mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-6 rounded-lg font-semibold hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                  className={`w-full mt-6 py-3 px-6 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
+                    validationResult?.isValid && deckName.trim()
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg cursor-pointer'
+                      : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                  }`}
                   onClick={handleCreateDeck}
-                  disabled={isCreating || !deckName.trim()}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  disabled={isCreating || !deckName.trim() || !validationResult?.isValid}
+                  whileHover={validationResult?.isValid ? { scale: 1.02 } : {}}
+                  whileTap={validationResult?.isValid ? { scale: 0.98 } : {}}
                 >
                   {isCreating ? (
                     <>
@@ -300,7 +320,12 @@ export function CreatePage() {
                       <span>Created! Redirecting...</span>
                     </>
                   ) : (
-                    <span>Create Deck ({parsedCards.length} cards)</span>
+                    <span>
+                      {validationResult?.isValid 
+                        ? `Create Deck (${parsedCards.length} cards)` 
+                        : 'Fix validation errors to create deck'
+                      }
+                    </span>
                   )}
                 </motion.button>
               )}
