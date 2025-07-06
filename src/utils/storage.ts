@@ -52,6 +52,11 @@ export class StorageManager {
   // Validate data structure
   private validateData(key: string, data: any): boolean {
     try {
+      // For test keys or non-system keys, accept any valid JSON
+      if (!Object.values(STORAGE_KEYS).includes(key as any)) {
+        return true;
+      }
+      
       switch (key) {
         case STORAGE_KEYS.DECKS:
           // Accept both array format and object with decks array

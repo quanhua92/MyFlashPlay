@@ -23,8 +23,8 @@ describe('Storage Manager', () => {
   });
 
   it('should handle JSON parsing errors', () => {
-    // Mock invalid JSON
-    vi.mocked(localStorage.getItem).mockReturnValue('invalid json');
+    // Set invalid JSON directly in localStorage
+    localStorage.setItem('test-key', 'invalid json');
     
     const result = storageManager.load('test-key');
     expect(result).toBeNull();
@@ -55,7 +55,8 @@ describe('Storage Manager', () => {
 
   it('should handle localStorage quota exceeded', () => {
     // Mock quota exceeded error
-    vi.mocked(localStorage.setItem).mockImplementation(() => {
+    const originalSetItem = localStorage.setItem;
+    localStorage.setItem = vi.fn(() => {
       throw new Error('QuotaExceededError');
     });
 
@@ -65,6 +66,7 @@ describe('Storage Manager', () => {
     
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
+    localStorage.setItem = originalSetItem;
   });
 
   // getKeys method not available in current storage manager

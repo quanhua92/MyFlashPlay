@@ -4,7 +4,14 @@ import { AchievementNotification } from '../ui/AchievementNotification';
 import { ACHIEVEMENTS } from '../../utils/achievements';
 
 describe('AchievementNotification Component', () => {
-  const mockAchievement = ACHIEVEMENTS[0]; // First achievement
+  const mockAchievement = {
+    id: 'test-achievement',
+    name: 'Test Achievement',
+    description: 'Test description',
+    icon: '🎯',
+    points: 100,
+    condition: 'test'
+  };
   const mockOnClose = vi.fn();
 
   beforeEach(() => {
@@ -90,7 +97,7 @@ describe('AchievementNotification Component', () => {
     );
     
     // ConfettiEffect should be rendered
-    expect(screen.getByTestId?.('confetti-effect')).toBeInTheDocument();
+    expect(screen.getByTestId('confetti-effect')).toBeInTheDocument();
   });
 
   it('should have proper accessibility attributes', () => {
@@ -125,7 +132,7 @@ describe('AchievementNotification Component', () => {
       />
     );
     
-    const trophyIcon = screen.getByTestId?.('trophy-icon');
+    const trophyIcon = screen.getByTestId('trophy-icon');
     expect(trophyIcon).toBeInTheDocument();
   });
 
@@ -137,7 +144,7 @@ describe('AchievementNotification Component', () => {
       />
     );
     
-    const notification = screen.getByText(mockAchievement.name).closest('div');
+    const notification = screen.getByText('Test Achievement').closest('div');
     expect(notification).toHaveClass('bg-white', 'dark:bg-gray-900');
   });
 

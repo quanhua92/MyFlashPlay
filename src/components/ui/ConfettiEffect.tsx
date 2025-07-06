@@ -15,11 +15,12 @@ interface ConfettiEffectProps {
   trigger: boolean;
   duration?: number;
   particleCount?: number;
+  'data-testid'?: string;
 }
 
 const colors = ['#9333ea', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#ef4444'];
 
-export function ConfettiEffect({ trigger, duration = 3000, particleCount = 50 }: ConfettiEffectProps) {
+export function ConfettiEffect({ trigger, duration = 3000, particleCount = 50, 'data-testid': testId }: ConfettiEffectProps) {
   const [pieces, setPieces] = useState<ConfettiPiece[]>([]);
 
   useEffect(() => {
@@ -49,8 +50,9 @@ export function ConfettiEffect({ trigger, duration = 3000, particleCount = 50 }:
   }, [trigger, duration, particleCount]);
 
   return (
-    <AnimatePresence>
-      {pieces.map((piece) => (
+    <div data-testid={testId} className="pointer-events-none">
+      <AnimatePresence>
+        {pieces.map((piece) => (
         <motion.div
           key={piece.id}
           className="fixed pointer-events-none z-50"
@@ -78,7 +80,8 @@ export function ConfettiEffect({ trigger, duration = 3000, particleCount = 50 }:
             style={{ backgroundColor: piece.color }}
           />
         </motion.div>
-      ))}
-    </AnimatePresence>
+        ))}
+      </AnimatePresence>
+    </div>
   );
 }
