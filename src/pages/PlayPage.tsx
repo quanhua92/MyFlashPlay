@@ -162,14 +162,22 @@ export function PlayPage() {
             Choose Your Game Mode
           </h2>
           
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             {gameModes.map((mode, index) => (
               <motion.button
                 key={mode.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 * index }}
-                onClick={() => setSelectedMode(mode.id as GameMode)}
+                onClick={() => {
+                  setSelectedMode(mode.id as GameMode);
+                  // Auto-start the game immediately
+                  setTimeout(() => {
+                    if (deck) {
+                      setIsPlaying(true);
+                    }
+                  }, 100);
+                }}
                 className={`p-6 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
                   selectedMode === mode.id
                     ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
@@ -185,28 +193,14 @@ export function PlayPage() {
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
                   {mode.description}
                 </p>
+                <div className="mt-4 flex items-center justify-center space-x-2 text-purple-600 dark:text-purple-400">
+                  <Play className="w-4 h-4" />
+                  <span className="text-sm font-medium">Click to Start</span>
+                </div>
               </motion.button>
             ))}
           </div>
         </div>
-
-        {/* Start Button */}
-        {selectedMode && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="text-center"
-          >
-            <button 
-              onClick={startGame}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2 mx-auto"
-            >
-              <Play className="w-5 h-5" />
-              <span>Start {gameModes.find(m => m.id === selectedMode)?.name}</span>
-            </button>
-          </motion.div>
-        )}
 
         {/* Deck Preview */}
         <motion.div

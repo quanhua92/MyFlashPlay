@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BookOpen, Play, Settings, Trash2, Target, Zap, Brain, ChevronDown, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import type { Deck, GameMode } from '@/types';
 
 interface DeckCardProps {
@@ -13,6 +13,7 @@ interface DeckCardProps {
 export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
   const [showModes, setShowModes] = useState(false);
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
+  const navigate = useNavigate();
 
   const gameModes = [
     {
@@ -48,6 +49,12 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
   const handleModeSelect = (mode: GameMode) => {
     setSelectedMode(mode);
     setShowModes(false);
+    // Immediately navigate to the game - no need to click "Start"
+    navigate({ 
+      to: '/play/$deckId', 
+      params: { deckId: deck.id }, 
+      search: { mode } 
+    });
   };
 
   const handlePlayClick = () => {
@@ -108,40 +115,27 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
 
       {/* Mode Selection */}
       <div className="space-y-3">
-        {/* Quick Play Button or Mode Toggle */}
+        {/* Quick Actions */}
         <div className="flex gap-2">
-          {selectedMode ? (
-            /* Selected mode - show direct play button */
-            <Link
-              to="/play/$deckId"
-              params={{ deckId: deck.id }}
-              search={{ mode: selectedMode }}
-              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-2 px-4 rounded-lg font-medium hover:shadow-md transition-shadow flex items-center justify-center space-x-2"
-            >
-              <Play className="w-4 h-4" />
-              <span>Start {gameModes.find(m => m.id === selectedMode)?.name}</span>
-            </Link>
-          ) : (
-            /* No mode selected - show mode selector */
-            <button
-              onClick={handlePlayClick}
-              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-2 px-4 rounded-lg font-medium hover:shadow-md transition-shadow flex items-center justify-center space-x-2"
-            >
-              <Play className="w-4 h-4" />
-              <span>Choose Mode</span>
-              {showModes ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            </button>
-          )}
+          {/* Quick Study Mode */}
+          <Link
+            to="/play/$deckId"
+            params={{ deckId: deck.id }}
+            search={{ mode: 'study' }}
+            className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-2 px-4 rounded-lg font-medium hover:shadow-md transition-shadow flex items-center justify-center space-x-2"
+          >
+            <Play className="w-4 h-4" />
+            <span>Start Study</span>
+          </Link>
           
-          {/* Change Mode Button (if mode is selected) */}
-          {selectedMode && (
-            <button
-              onClick={() => setShowModes(!showModes)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center"
-            >
-              {showModes ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            </button>
-          )}
+          {/* More Modes Button */}
+          <button
+            onClick={() => setShowModes(!showModes)}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center"
+            title="More game modes"
+          >
+            {showModes ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          </button>
         </div>
 
         {/* Mode Selection Dropdown */}
