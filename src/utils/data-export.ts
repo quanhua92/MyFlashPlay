@@ -121,7 +121,7 @@ export class DataExporter {
   // Export as human-readable markdown (from new storage)
   exportAsMarkdown(): void {
     try {
-      const { decks } = markdownStorage.loadAllDecks();
+      const { decks, errors } = markdownStorage.loadAllDecks();
       
       if (decks.length === 0 && errors.length === 0) {
         throw new Error('No decks found to export');

@@ -47,32 +47,13 @@ export function SettingsPage() {
   const handleExportAll = async () => {
     try {
       await dataExporter.exportAllDataAsMarkdownZip();
-      setExportStatus('Full backup exported successfully!');
+      setExportStatus('Data exported successfully!');
       setTimeout(() => setExportStatus(''), 3000);
     } catch (error) {
       setExportStatus(`Export failed: ${error}`);
     }
   };
 
-  const handleExportDecks = async () => {
-    try {
-      await dataExporter.exportDecksAsMarkdownZip();
-      setExportStatus('Decks exported successfully!');
-      setTimeout(() => setExportStatus(''), 3000);
-    } catch (error) {
-      setExportStatus(`Export failed: ${error}`);
-    }
-  };
-
-  const handleExportMarkdown = () => {
-    try {
-      dataExporter.exportAsMarkdown();
-      setExportStatus('Markdown exported successfully!');
-      setTimeout(() => setExportStatus(''), 3000);
-    } catch (error) {
-      setExportStatus(`Export failed: ${error}`);
-    }
-  };
 
   // Import handlers
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -222,26 +203,8 @@ export function SettingsPage() {
                 className="w-full flex items-center justify-center space-x-2 p-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
               >
                 <Save className="w-5 h-5" />
-                <span>Export Complete Backup (ZIP)</span>
+                <span>Export Data</span>
               </button>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={handleExportDecks}
-                  className="flex items-center justify-center space-x-2 p-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  <span className="text-sm">Decks (JSON)</span>
-                </button>
-                
-                <button
-                  onClick={handleExportMarkdown}
-                  className="flex items-center justify-center space-x-2 p-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  <span className="text-sm">Decks (Markdown)</span>
-                </button>
-              </div>
               
               {exportStatus && (
                 <div className="p-3 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded-lg text-sm">
