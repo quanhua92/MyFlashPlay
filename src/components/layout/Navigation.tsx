@@ -10,11 +10,11 @@ export function Navigation() {
   const currentPath = router.location.pathname;
 
   const navItems = [
-    { path: '/', label: 'Home', icon: Home },
-    { path: '/create', label: 'Create', icon: Plus },
-    { path: '/decks', label: 'My Decks', icon: BookOpen },
-    { path: '/scores', label: 'Scores', icon: Trophy },
-    { path: '/settings', label: 'Settings', icon: Settings }
+    { path: '/' as const, label: 'Home', icon: Home },
+    { path: '/create' as const, label: 'Create', icon: Plus },
+    { path: '/decks' as const, label: 'My Decks', icon: BookOpen },
+    { path: '/scores' as const, label: 'Scores', icon: Trophy },
+    { path: '/settings' as const, label: 'Settings', icon: Settings }
   ];
 
   return (
