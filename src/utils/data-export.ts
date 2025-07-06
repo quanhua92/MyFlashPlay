@@ -1,6 +1,7 @@
 import { STORAGE_KEYS, APP_VERSION } from './constants';
 import { storageManager } from './storage';
-import type { StoredDecks, StoredScores, StoredProgress, UserPreferences } from '@/types';
+import { markdownStorage } from './markdown-storage';
+import type { StoredDecks, StoredScores, StoredProgress, UserPreferences, Deck } from '@/types';
 
 interface ExportData {
   version: string;
@@ -81,8 +82,148 @@ export class DataExporter {
     }
   }
 
-  // Export as human-readable markdown
+  // Export as human-readable markdown (from new storage)
   exportAsMarkdown(): void {
+    try {
+      const { decks, errors } = markdownStorage.loadAllDecks();
+      
+      if (decks.length === 0 && errors.length === 0) {
+        throw new Error('No decks found to export');
+      }
+
+      let markdown = '# FlashPlay Decks Export\n\n';
+      markdown += `Exported on: ${new Date().toLocaleString()}\n`;
+      markdown += `Total decks: ${decks.length}\n`;
+      if (errors.length > 0) {
+        markdown += `Errors: ${errors.length} decks could not be loaded\n`;
+      }
+      markdown += '\n';
+
+      // Export valid decks
+      decks.forEach(deck => {
+        markdown += `## ${deck.emoji} ${deck.name}\n\n`;
+        if (deck.description) {
+          markdown += `${deck.description}\n\n`;
+        }
+        
+        // Group cards by category
+        const categories = new Map<string, typeof deck.cards>();
+        
+        deck.cards.forEach(card => {
+          const category = card.category || 'General';
+          if (!categories.has(category)) {
+            categories.set(category, []);
+          }
+          categories.get(category)!.push(card);
+        });
+
+        // Write cards by category
+        categories.forEach((cards, category) => {
+          if (category !== 'General') {
+            markdown += `### ${category}\n\n`;
+          }
+          
+          cards.forEach(card => {
+            if (card.type === 'simple') {
+              markdown += `- ${card.front} :: ${card.back}\n`;
+            } else if (card.type === 'multiple-choice' && card.options) {
+              markdown += `- ${card.front}\n`;
+              card.options.forEach(opt => {
+                markdown += `  * ${opt.text}${opt.isCorrect ? ' [correct]' : ''}\n`;
+              });
+            } else if (card.type === 'true-false') {
+              markdown += `- ${card.front} :: ${card.back}\n`;
+            }
+            
+            if (card.metadata?.hint) {
+              markdown += `  <!-- Hint: ${card.metadata.hint} -->\n`;
+            }
+            if (card.metadata?.explanation) {
+              markdown += `  <!-- Explanation: ${card.metadata.explanation} -->\n`;
+            }
+            markdown += '\n';
+          });
+        });
+        
+        markdown += '\n---\n\n';
+      });
+
+      // Include error information
+      if (errors.length > 0) {
+        markdown += '## ❌ Corrupted Decks\n\n';
+        markdown += 'The following decks could not be loaded due to corruption:\n\n';
+        errors.forEach(error => {
+          markdown += `- **${error.id}**: ${error.error}\n`;
+        });
+        markdown += '\n';
+      }
+
+      this.downloadText(markdown, `flashplay-decks-${this.getTimestamp()}.md`);
+    } catch (error) {
+      console.error('Markdown export failed:', error);
+      throw error;
+    }
+  }
+
+  // Export individual deck as markdown file
+  exportDeckAsMarkdown(deckId: string): void {
+    try {
+      const { deck, result } = markdownStorage.loadDeck(deckId);
+      
+      if (!deck || !result.success) {
+        throw new Error(result.error || 'Deck not found');
+      }
+
+      // Get the raw markdown from storage
+      const rawMarkdown = localStorage.getItem(`mdoc_${deckId}`);
+      
+      if (rawMarkdown) {
+        const filename = `${deck.name.replace(/[^a-zA-Z0-9]/g, '-')}-${this.getTimestamp()}.md`;
+        this.downloadText(rawMarkdown, filename);
+      } else {
+        throw new Error('Raw markdown not found');
+      }
+    } catch (error) {
+      console.error('Individual deck export failed:', error);
+      throw error;
+    }
+  }
+
+  // Export all decks as separate markdown files (ZIP)
+  async exportAllDecksAsMarkdownFiles(): Promise<void> {
+    try {
+      const { decks } = markdownStorage.loadAllDecks();
+      
+      if (decks.length === 0) {
+        throw new Error('No decks found to export');
+      }
+
+      // Create a simple archive-like structure
+      let archiveContent = '';
+      
+      decks.forEach(deck => {
+        const rawMarkdown = localStorage.getItem(`mdoc_${deck.id}`);
+        if (rawMarkdown) {
+          const filename = `${deck.name.replace(/[^a-zA-Z0-9]/g, '-')}.md`;
+          archiveContent += `\n\n==================== ${filename} ====================\n\n`;
+          archiveContent += rawMarkdown;
+        }
+      });
+
+      if (archiveContent) {
+        const header = `# FlashPlay Individual Deck Files\n\nExported on: ${new Date().toLocaleString()}\nTotal decks: ${decks.length}\n\nEach deck is separated by headers below. Copy the content between headers to create individual .md files.\n\n`;
+        this.downloadText(header + archiveContent, `flashplay-all-decks-${this.getTimestamp()}.md`);
+      } else {
+        throw new Error('No deck content found');
+      }
+    } catch (error) {
+      console.error('Multiple deck export failed:', error);
+      throw error;
+    }
+  }
+
+  // Legacy markdown export (for backward compatibility)
+  exportAsMarkdownLegacy(): void {
     try {
       const stored = storageManager.load<any>(STORAGE_KEYS.DECKS);
       let decks: any[] = [];
@@ -98,12 +239,14 @@ export class DataExporter {
         throw new Error('No decks found to export');
       }
 
-      let markdown = '# FlashPlay Decks Export\n\n';
+      let markdown = '# FlashPlay Decks Export (Legacy)\n\n';
       markdown += `Exported on: ${new Date().toLocaleString()}\n\n`;
 
       decks.forEach(deck => {
         markdown += `## ${deck.emoji} ${deck.name}\n\n`;
-        markdown += `${deck.description}\n\n`;
+        if (deck.description) {
+          markdown += `${deck.description}\n\n`;
+        }
         
         // Group cards by category
         const categories = new Map<string, typeof deck.cards>();
@@ -132,10 +275,10 @@ export class DataExporter {
               markdown += `- ${card.front} :: ${card.back}\n`;
             }
             
-            if (card.metadata.hint) {
+            if (card.metadata?.hint) {
               markdown += `  Hint: ${card.metadata.hint}\n`;
             }
-            if (card.metadata.explanation) {
+            if (card.metadata?.explanation) {
               markdown += `  Explanation: ${card.metadata.explanation}\n`;
             }
             markdown += '\n';
@@ -145,9 +288,9 @@ export class DataExporter {
         markdown += '\n---\n\n';
       });
 
-      this.downloadText(markdown, `flashplay-decks-${this.getTimestamp()}.md`);
+      this.downloadText(markdown, `flashplay-decks-legacy-${this.getTimestamp()}.md`);
     } catch (error) {
-      console.error('Markdown export failed:', error);
+      console.error('Legacy markdown export failed:', error);
       throw error;
     }
   }

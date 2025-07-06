@@ -1,67 +1,126 @@
 import { useState, useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import { deckStorage } from '@/utils/storage';
+import { markdownStorage } from '@/utils/markdown-storage';
 import { sampleDecks } from '@/data/sample-decks';
 import type { Deck } from '@/types';
 
 export function useDecks() {
-  const [decks, setDecks] = useLocalStorage<Deck[]>('flashplay_decks', []);
+  const [decks, setDecks] = useState<Deck[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [migrationStatus, setMigrationStatus] = useState<string | null>(null);
 
-  // Initialize with sample decks if empty
+  // Initialize decks from markdown storage with migration support
   useEffect(() => {
-    setIsLoading(true);
-    try {
-      // Validate decks structure
-      if (!Array.isArray(decks)) {
-        console.error('Decks data is not an array, resetting to sample decks');
-        setDecks(sampleDecks);
-        setError('Data was corrupted, restored sample decks');
-      } else if (decks.length === 0) {
-        setDecks(sampleDecks);
-      } else {
-        // Validate each deck has required fields
-        const validDecks = decks.filter(deck => 
-          deck && 
-          deck.id && 
-          deck.name && 
-          Array.isArray(deck.cards)
-        );
+    const initializeDecks = async () => {
+      setIsLoading(true);
+      try {
+        // Try to load from markdown storage first
+        const { decks: markdownDecks, errors } = markdownStorage.loadAllDecks();
         
-        if (validDecks.length !== decks.length) {
-          console.warn('Some decks were invalid and filtered out');
-          setDecks(validDecks);
+        if (markdownDecks.length > 0) {
+          // We have markdown decks, use them
+          setDecks(markdownDecks);
+          if (errors.length > 0) {
+            setError(`Loaded ${markdownDecks.length} decks, but ${errors.length} had errors`);
+          }
+        } else {
+          // No markdown decks, check for JSON decks to migrate
+          const jsonDecks = deckStorage.load();
+          
+          if (jsonDecks.length > 0) {
+            // Migrate from JSON to markdown
+            setMigrationStatus('Migrating decks to new storage format...');
+            const migrationResult = await markdownStorage.migrateFromJSON();
+            
+            if (migrationResult.success) {
+              setMigrationStatus(`Successfully migrated ${migrationResult.migrated} decks`);
+              
+              // Load the migrated decks
+              const { decks: migratedDecks } = markdownStorage.loadAllDecks();
+              setDecks(migratedDecks);
+            } else {
+              setError(`Migration failed: ${migrationResult.errors.join(', ')}`);
+              setDecks(jsonDecks); // Fallback to JSON decks
+            }
+            
+            setTimeout(() => setMigrationStatus(null), 3000);
+          } else {
+            // No decks at all, use samples
+            console.log('No existing decks found, initializing with sample decks');
+            const migratedSamples = await Promise.all(
+              sampleDecks.map(async (deck) => {
+                const result = markdownStorage.saveDeck(deck);
+                return result.success ? deck : null;
+              })
+            );
+            
+            const successfulSamples = migratedSamples.filter(Boolean) as Deck[];
+            setDecks(successfulSamples);
+            setMigrationStatus(`Initialized with ${successfulSamples.length} sample decks`);
+            setTimeout(() => setMigrationStatus(null), 3000);
+          }
         }
+      } catch (err) {
+        console.error('Error initializing decks:', err);
+        setError('Error loading decks, using fallback');
+        setDecks(sampleDecks);
       }
-    } catch (err) {
-      console.error('Error initializing decks:', err);
-      setDecks(sampleDecks);
-      setError('Error loading decks, using defaults');
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    initializeDecks();
   }, []);
 
   const addDeck = (deck: Deck) => {
-    const newDecks = [...decks, deck];
-    setDecks(newDecks);
-    deckStorage.save(newDecks);
+    // Save to markdown storage
+    const result = markdownStorage.saveDeck(deck);
+    
+    if (result.success) {
+      const newDecks = [...decks, deck];
+      setDecks(newDecks);
+    } else {
+      setError(`Failed to save deck: ${result.error}`);
+    }
   };
 
   const updateDeck = (deckId: string, updates: Partial<Deck>) => {
-    const newDecks = decks.map(deck => 
-      deck.id === deckId 
-        ? { ...deck, ...updates, metadata: { ...deck.metadata, lastModified: new Date().toISOString() } }
-        : deck
-    );
-    setDecks(newDecks);
-    deckStorage.save(newDecks);
+    const existingDeck = decks.find(deck => deck.id === deckId);
+    if (!existingDeck) {
+      setError('Deck not found');
+      return;
+    }
+    
+    const updatedDeck = { 
+      ...existingDeck, 
+      ...updates, 
+      metadata: { ...existingDeck.metadata, lastModified: new Date().toISOString() } 
+    };
+    
+    // Save to markdown storage
+    const result = markdownStorage.saveDeck(updatedDeck);
+    
+    if (result.success) {
+      const newDecks = decks.map(deck => 
+        deck.id === deckId ? updatedDeck : deck
+      );
+      setDecks(newDecks);
+    } else {
+      setError(`Failed to update deck: ${result.error}`);
+    }
   };
 
   const deleteDeck = (deckId: string) => {
-    const newDecks = decks.filter(deck => deck.id !== deckId);
-    setDecks(newDecks);
-    deckStorage.save(newDecks);
+    // Delete from markdown storage
+    const result = markdownStorage.deleteDeck(deckId);
+    
+    if (result.success) {
+      const newDecks = decks.filter(deck => deck.id !== deckId);
+      setDecks(newDecks);
+    } else {
+      setError(`Failed to delete deck: ${result.error}`);
+    }
   };
 
   const getDeck = (deckId: string) => {
@@ -72,6 +131,7 @@ export function useDecks() {
     decks,
     isLoading,
     error,
+    migrationStatus,
     addDeck,
     updateDeck,
     deleteDeck,

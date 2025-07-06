@@ -1,5 +1,7 @@
 import { STORAGE_KEYS } from './constants';
 import { storageManager, deckStorage } from './storage';
+import { markdownStorage } from './markdown-storage';
+import { MarkdownParser } from './markdown-parser';
 import { v4 as uuidv4 } from 'uuid';
 import type { Deck } from '@/types';
 
@@ -19,6 +21,7 @@ interface ImportOptions {
 }
 
 export class DataImporter {
+  private readonly markdownParser = new MarkdownParser();
   // Import full backup
   async importFullBackup(file: File): Promise<ImportResult> {
     try {
@@ -222,7 +225,243 @@ export class DataImporter {
     return Math.abs(hash).toString(16);
   }
 
-  // Preview import changes
+  // Import markdown file
+  async importMarkdownFile(file: File, options: ImportOptions): Promise<ImportResult> {
+    try {
+      const text = await this.readFile(file);
+      
+      // Detect if it's a single deck or multiple decks
+      const decks = this.parseMarkdownContent(text, file.name);
+      
+      if (decks.length === 0) {
+        throw new Error('No valid decks found in markdown file');
+      }
+
+      // Get existing decks from markdown storage
+      const { decks: existingDecks } = markdownStorage.loadAllDecks();
+      
+      // Preview or execute merge
+      const result = this.mergeDecksToMarkdownStorage(existingDecks, decks, options);
+
+      if (!options.dryRun) {
+        // Save merged decks to markdown storage
+        for (const deck of result.decks) {
+          const saveResult = markdownStorage.saveDeck(deck);
+          if (!saveResult.success) {
+            console.error(`Failed to save deck ${deck.name}:`, saveResult.error);
+          }
+        }
+      }
+
+      return {
+        success: true,
+        message: options.dryRun ? 'Preview generated' : 'Markdown imported successfully',
+        imported: result.imported,
+        skipped: result.skipped
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `Markdown import failed: ${error}`,
+        errors: [String(error)]
+      };
+    }
+  }
+
+  // Import multiple markdown files
+  async importMultipleMarkdownFiles(files: FileList, options: ImportOptions): Promise<ImportResult> {
+    try {
+      const allDecks: Deck[] = [];
+      const errors: string[] = [];
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.name.endsWith('.md') || file.name.endsWith('.txt')) {
+          try {
+            const text = await this.readFile(file);
+            const decks = this.parseMarkdownContent(text, file.name);
+            allDecks.push(...decks);
+          } catch (error) {
+            errors.push(`Failed to import ${file.name}: ${error}`);
+          }
+        }
+      }
+
+      if (allDecks.length === 0) {
+        throw new Error('No valid decks found in any markdown files');
+      }
+
+      // Get existing decks from markdown storage
+      const { decks: existingDecks } = markdownStorage.loadAllDecks();
+      
+      // Preview or execute merge
+      const result = this.mergeDecksToMarkdownStorage(existingDecks, allDecks, options);
+
+      if (!options.dryRun) {
+        // Save merged decks to markdown storage
+        for (const deck of result.decks) {
+          const saveResult = markdownStorage.saveDeck(deck);
+          if (!saveResult.success) {
+            console.error(`Failed to save deck ${deck.name}:`, saveResult.error);
+          }
+        }
+      }
+
+      return {
+        success: true,
+        message: options.dryRun ? 'Preview generated' : `Imported ${result.imported} decks from ${files.length} files`,
+        imported: result.imported,
+        skipped: result.skipped,
+        errors: errors.length > 0 ? errors : undefined
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `Multiple file import failed: ${error}`,
+        errors: [String(error)]
+      };
+    }
+  }
+
+  // Parse markdown content into deck(s)
+  private parseMarkdownContent(text: string, filename: string): Deck[] {
+    const decks: Deck[] = [];
+    
+    // Check if it's a multi-deck export (has separator lines)
+    if (text.includes('==================== ') || text.includes('---')) {
+      // Try to split by separators
+      const sections = text.split(/(?:^|\n)(?:={20,}.*?={20,}|---+)\s*\n/);
+      
+      for (const section of sections) {
+        if (section.trim()) {
+          try {
+            const deck = this.createDeckFromMarkdown(section.trim(), filename);
+            if (deck) {
+              decks.push(deck);
+            }
+          } catch (error) {
+            console.error('Failed to parse section:', error);
+          }
+        }
+      }
+    } else {
+      // Single deck file
+      const deck = this.createDeckFromMarkdown(text, filename);
+      if (deck) {
+        decks.push(deck);
+      }
+    }
+    
+    return decks;
+  }
+
+  // Create deck from markdown text
+  private createDeckFromMarkdown(markdown: string, filename: string): Deck | null {
+    try {
+      const cards = this.markdownParser.parse(markdown);
+      
+      if (cards.length === 0) {
+        return null;
+      }
+      
+      // Extract deck info from markdown
+      const lines = markdown.split('\n');
+      const titleLine = lines.find(line => line.startsWith('# '));
+      const descriptionLine = lines.find((line, index) => {
+        return index > 0 && line.trim() && !line.startsWith('#') && !line.startsWith('-');
+      });
+      
+      const fullTitle = titleLine ? titleLine.substring(2).trim() : filename.replace(/\.(md|txt)$/, '');
+      const emoji = this.extractEmoji(fullTitle) || '📚';
+      const name = fullTitle.replace(/^[^\w]+\s*/, ''); // Remove emoji
+      const description = descriptionLine?.trim() || '';
+      
+      return {
+        id: uuidv4(),
+        name,
+        description,
+        emoji,
+        cards,
+        metadata: {
+          createdAt: new Date().toISOString(),
+          lastModified: new Date().toISOString(),
+          playCount: 0,
+          source: 'imported',
+          originalMarkdown: markdown,
+          tags: [],
+          difficulty: 'beginner',
+          estimatedTime: Math.ceil(cards.length / 10) * 5
+        },
+        settings: {
+          shuffleCards: true,
+          repeatIncorrect: true,
+          studyMode: 'random'
+        }
+      };
+    } catch (error) {
+      console.error('Failed to create deck from markdown:', error);
+      return null;
+    }
+  }
+
+  // Extract emoji from title
+  private extractEmoji(title: string): string | null {
+    const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u;
+    const match = title.match(emojiRegex);
+    return match ? match[0] : null;
+  }
+
+  // Merge deck arrays for markdown storage
+  private mergeDecksToMarkdownStorage(
+    existing: Deck[], 
+    imported: Deck[], 
+    options: ImportOptions
+  ): { decks: Deck[]; imported: number; skipped: number } {
+    const result: Deck[] = [...existing];
+    let importedCount = 0;
+    let skippedCount = 0;
+
+    imported.forEach(importDeck => {
+      const existingIndex = existing.findIndex(
+        deck => deck.name === importDeck.name
+      );
+
+      if (existingIndex === -1) {
+        // New deck - always import
+        result.push(importDeck);
+        importedCount++;
+      } else {
+        // Duplicate found - apply strategy
+        switch (options.mergeStrategy) {
+          case 'replace':
+            importDeck.id = existing[existingIndex].id; // Keep same ID
+            result[existingIndex] = importDeck;
+            importedCount++;
+            break;
+
+          case 'keep-both':
+            importDeck.name = `${importDeck.name} (Imported)`;
+            result.push(importDeck);
+            importedCount++;
+            break;
+
+          case 'merge-cards':
+            const merged = this.mergeCards(existing[existingIndex], importDeck);
+            result[existingIndex] = merged;
+            importedCount++;
+            break;
+
+          case 'skip':
+            skippedCount++;
+            break;
+        }
+      }
+    });
+
+    return { decks: result, imported: importedCount, skipped: skippedCount };
+  }
+
+  // Preview import changes (updated for markdown support)
   async previewImport(file: File): Promise<{
     existing: number;
     new: number;
@@ -230,19 +469,29 @@ export class DataImporter {
   }> {
     try {
       const text = await this.readFile(file);
-      const data = JSON.parse(text);
-      
       let importedDecks: Deck[] = [];
       
-      if (data.type === 'decks' && data.data) {
-        importedDecks = data.data.decks || [];
-      } else if (Array.isArray(data)) {
-        importedDecks = data;
-      } else if (data.decks) {
-        importedDecks = data.decks;
+      // Check if it's markdown or JSON
+      if (file.name.endsWith('.md') || file.name.endsWith('.txt')) {
+        importedDecks = this.parseMarkdownContent(text, file.name);
+      } else {
+        // JSON format
+        const data = JSON.parse(text);
+        
+        if (data.type === 'decks' && data.data) {
+          importedDecks = data.data.decks || [];
+        } else if (Array.isArray(data)) {
+          importedDecks = data;
+        } else if (data.decks) {
+          importedDecks = data.decks;
+        }
       }
 
-      const existingDecks = deckStorage.load();
+      // Get existing decks from both storages
+      const jsonDecks = deckStorage.load();
+      const { decks: markdownDecks } = markdownStorage.loadAllDecks();
+      const existingDecks = [...jsonDecks, ...markdownDecks];
+      
       const existingNames = new Set(existingDecks.map(d => d.name));
       
       const duplicates = importedDecks
