@@ -1,6 +1,6 @@
 # FlashPlay 🎯
 
-A kid-friendly, interactive flashcard game web application that transforms Markdown content into engaging learning experiences.
+A kid-friendly, interactive flashcard game web application that transforms Markdown content into engaging learning experiences. Features simplified markdown format and UTF-8 language support.
 
 ## Features ✨
 
