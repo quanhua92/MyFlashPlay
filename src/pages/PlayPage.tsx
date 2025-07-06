@@ -18,7 +18,7 @@ export function PlayPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
   
-  const { getDeck } = useDecks();
+  const { getDeck, isLoading } = useDecks();
   const deck = getDeck(deckId);
 
   // Auto-select mode from search params
@@ -56,6 +56,16 @@ export function PlayPage() {
       setIsPlaying(true);
     }
   };
+
+  // Show loading state while decks are being loaded
+  if (isLoading) {
+    return (
+      <div className="text-center py-16">
+        <div className="animate-spin w-8 h-8 border-2 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <p className="text-gray-600 dark:text-gray-300">Loading deck...</p>
+      </div>
+    );
+  }
 
   if (!deck) {
     return (

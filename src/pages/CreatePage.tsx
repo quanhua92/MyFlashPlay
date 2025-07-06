@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from '@tanstack/react-router';
 import { v4 as uuidv4 } from 'uuid';
 import { MarkdownParser } from '@/utils/markdown-parser';
+import { markdownStorage } from '@/utils/markdown-storage';
 import { templates, type Template } from '@/data/templates';
 import { useDecks } from '@/hooks/useDecks';
 import { MarkdownGuide } from '@/components/create/MarkdownGuide';
@@ -63,15 +64,28 @@ export function CreatePage() {
     };
 
     // Add to storage
-    addDeck(newDeck);
+    const addResult = addDeck(newDeck);
     
-    setIsCreating(false);
-    setIsCreated(true);
-    
-    // Redirect after a short delay - fixed route
-    setTimeout(() => {
-      navigate({ to: '/play/$deckId', params: { deckId: newDeck.id } });
-    }, 1500);
+    if (addResult.success) {
+      setIsCreating(false);
+      setIsCreated(true);
+      
+      // Redirect after a short delay - fixed route
+      setTimeout(() => {
+        // Double-check that the deck was saved before navigating
+        const { deck: savedDeck } = markdownStorage.loadDeck(newDeck.id);
+        if (savedDeck) {
+          navigate({ to: '/play/$deckId', params: { deckId: newDeck.id } });
+        } else {
+          console.error('Deck was not saved properly, cannot navigate');
+          setIsCreated(false);
+        }
+      }, 1500);
+    } else {
+      setIsCreating(false);
+      console.error('Failed to create deck:', addResult.error);
+      // You could set an error state here to show to the user
+    }
   };
 
   const handleTemplateSelect = (template: Template) => {

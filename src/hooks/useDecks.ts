@@ -74,14 +74,20 @@ export function useDecks() {
   }, []);
 
   const addDeck = (deck: Deck) => {
+    console.log(`Adding deck ${deck.id} (${deck.name}) to storage...`);
     // Save to markdown storage
     const result = markdownStorage.saveDeck(deck);
     
     if (result.success) {
+      console.log(`Successfully saved deck ${deck.id} to markdown storage`);
       const newDecks = [...decks, deck];
       setDecks(newDecks);
+      console.log(`Updated state with ${newDecks.length} decks`);
+      return { success: true };
     } else {
+      console.error(`Failed to save deck ${deck.id}:`, result.error);
       setError(`Failed to save deck: ${result.error}`);
+      return { success: false, error: result.error };
     }
   };
 
@@ -124,7 +130,29 @@ export function useDecks() {
   };
 
   const getDeck = (deckId: string) => {
-    return decks.find(deck => deck.id === deckId);
+    // First try to find in current state
+    const deckFromState = decks.find(deck => deck.id === deckId);
+    if (deckFromState) {
+      console.log(`Found deck ${deckId} in state`);
+      return deckFromState;
+    }
+    
+    // If not found in state, try loading from markdown storage directly
+    console.log(`Deck ${deckId} not in state, checking markdown storage...`);
+    const { deck, result } = markdownStorage.loadDeck(deckId);
+    if (deck) {
+      console.log(`Found deck ${deckId} in markdown storage, adding to state`);
+      // Add to state for future use
+      setDecks(prevDecks => {
+        const exists = prevDecks.find(d => d.id === deckId);
+        return exists ? prevDecks : [...prevDecks, deck];
+      });
+      return deck;
+    } else {
+      console.log(`Deck ${deckId} not found anywhere. Result:`, result);
+    }
+    
+    return null;
   };
 
   return {
