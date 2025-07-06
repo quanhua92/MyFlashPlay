@@ -86,9 +86,14 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
           </div>
         </div>
         <div className="flex space-x-2">
-          <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+          <Link
+            to="/create"
+            search={{ editDeck: deck.id }}
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            title="Edit deck"
+          >
             <Settings className="w-4 h-4" />
-          </button>
+          </Link>
           <button 
             className="p-2 text-gray-400 hover:text-red-500 transition-colors"
             onClick={() => {

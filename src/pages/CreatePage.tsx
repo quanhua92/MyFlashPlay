@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, FileText, Wand2, CheckCircle, Edit3, Code } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import { v4 as uuidv4 } from 'uuid';
 import { MarkdownParser } from '@/utils/markdown-parser';
 import { markdownStorage } from '@/utils/markdown-storage';
@@ -24,30 +24,76 @@ export function CreatePage() {
   const [isCreated, setIsCreated] = useState(false);
   const [createMode, setCreateMode] = useState<CreateMode>('interface');
   const [validationResult, setValidationResult] = useState<any>(null);
+  const [editingDeck, setEditingDeck] = useState<Deck | null>(null);
   
+  const search = useSearch({ from: '/create' });
   const navigate = useNavigate();
-  const { addDeck } = useDecks();
+  const { addDeck, updateDeck, getDeck } = useDecks();
   const parser = new MarkdownParser();
   const parsedCards = markdown ? parser.parse(markdown) : [];
 
+  // Load deck for editing if editDeck parameter is provided
+  useEffect(() => {
+    if (search.editDeck) {
+      const deckToEdit = getDeck(search.editDeck);
+      if (deckToEdit) {
+        setEditingDeck(deckToEdit);
+        setDeckName(deckToEdit.name);
+        setDescription(deckToEdit.description);
+        setEmoji(deckToEdit.emoji);
+        
+        // Convert cards back to markdown format
+        const markdownContent = deckToEdit.cards.map(card => {
+          if (card.type === 'basic') {
+            return `- ${card.front} :: ${card.back}`;
+          } else if (card.type === 'multiple_choice') {
+            const choices = card.choices.map(choice => `  - ${choice}`).join('\n');
+            return `- ${card.front} ::\n${choices}\n  > ${card.back}`;
+          }
+          return `- ${card.front} :: ${card.back}`;
+        }).join('\n\n');
+        
+        const fullMarkdown = `# ${deckToEdit.name}\n\n${markdownContent}`;
+        setMarkdown(fullMarkdown);
+      }
+    }
+  }, [search.editDeck, getDeck]);
+
   const handleCreateDeck = async () => {
-    // Validate before creating
+    // Validate before creating/updating
     if (!validationResult?.isValid || parsedCards.length === 0) {
-      console.error('Cannot create deck: validation failed or no cards');
+      console.error('Cannot save deck: validation failed or no cards');
       return;
     }
     
     setIsCreating(true);
     
-    // Create new deck
-    const newDeck: Deck = {
-      id: uuidv4(),
-      name: deckName,
-      description,
-      emoji,
-      cards: parsedCards,
-      metadata: {
-        createdAt: new Date().toISOString(),
+    if (editingDeck) {
+      // Update existing deck
+      const updatedDeck: Deck = {
+        ...editingDeck,
+        name: deckName,
+        description,
+        emoji,
+        cards: parsedCards,
+        metadata: {
+          ...editingDeck.metadata,
+          lastModified: new Date().toISOString(),
+        }
+      };
+      
+      updateDeck(editingDeck.id, updatedDeck);
+      console.log(`Updated deck ${editingDeck.id} successfully`);
+    } else {
+      // Create new deck
+      const newDeck: Deck = {
+        id: uuidv4(),
+        name: deckName,
+        description,
+        emoji,
+        cards: parsedCards,
+        metadata: {
+          createdAt: new Date().toISOString(),
         lastModified: new Date().toISOString(),
         playCount: 0,
         source: 'created',
@@ -63,29 +109,39 @@ export function CreatePage() {
       }
     };
 
-    // Add to storage
-    const addResult = addDeck(newDeck);
-    
-    if (addResult.success) {
-      setIsCreating(false);
-      setIsCreated(true);
+      // Add to storage
+      const addResult = addDeck(newDeck);
       
-      // Redirect after a short delay - fixed route
-      setTimeout(() => {
-        // Double-check that the deck was saved before navigating
-        const { deck: savedDeck } = markdownStorage.loadDeck(newDeck.id);
-        if (savedDeck) {
-          navigate({ to: '/play/$deckId', params: { deckId: newDeck.id } });
-        } else {
-          console.error('Deck was not saved properly, cannot navigate');
-          setIsCreated(false);
-        }
-      }, 1500);
-    } else {
-      setIsCreating(false);
-      console.error('Failed to create deck:', addResult.error);
-      // You could set an error state here to show to the user
+      if (addResult.success) {
+        setIsCreating(false);
+        setIsCreated(true);
+        
+        // Redirect after a short delay - fixed route
+        setTimeout(() => {
+          // Double-check that the deck was saved before navigating
+          const { deck: savedDeck } = markdownStorage.loadDeck(newDeck.id);
+          if (savedDeck) {
+            navigate({ to: '/play/$deckId', params: { deckId: newDeck.id } });
+          } else {
+            console.error('Deck was not saved properly, cannot navigate');
+            setIsCreated(false);
+          }
+        }, 1500);
+      } else {
+        setIsCreating(false);
+        console.error('Failed to create deck:', addResult.error);
+        // You could set an error state here to show to the user
+      }
     }
+    
+    // Common completion logic
+    setIsCreating(false);
+    setIsCreated(true);
+    
+    // Redirect after a short delay
+    setTimeout(() => {
+      navigate({ to: '/decks' });
+    }, 1500);
   };
 
   const handleTemplateSelect = (template: Template) => {
@@ -112,10 +168,13 @@ export function CreatePage() {
       >
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Create Flashcards
+            {editingDeck ? 'Edit Flashcards' : 'Create Flashcards'}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            Choose your preferred way to create flashcards - use our easy interface or write Markdown directly!
+            {editingDeck 
+              ? 'Edit your flashcard deck using our easy interface or Markdown directly!'
+              : 'Choose your preferred way to create flashcards - use our easy interface or write Markdown directly!'
+            }
           </p>
         </div>
 
@@ -331,13 +390,13 @@ export function CreatePage() {
                   ) : isCreated ? (
                     <>
                       <CheckCircle className="w-5 h-5" />
-                      <span>Created! Redirecting...</span>
+                      <span>{editingDeck ? 'Updated!' : 'Created!'} Redirecting...</span>
                     </>
                   ) : (
                     <span>
                       {validationResult?.isValid 
-                        ? `Create Deck (${parsedCards.length} cards)` 
-                        : 'Fix validation errors to create deck'
+                        ? `${editingDeck ? 'Update' : 'Create'} Deck (${parsedCards.length} cards)` 
+                        : `Fix validation errors to ${editingDeck ? 'update' : 'create'} deck`
                       }
                     </span>
                   )}
