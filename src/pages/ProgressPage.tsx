@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { TrendingUp, Trophy, Target, Clock, Calendar, BarChart3, Brain, Zap } from 'lucide-react';
+import { useState } from 'react';
+import { TrendingUp, Trophy, Target, Clock, BarChart3, Brain, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
 import { 

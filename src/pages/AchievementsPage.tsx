@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Trophy, Lock, Star, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { achievementManager } from '@/utils/achievements';
-import type { AchievementProgress } from '@/utils/achievements';
-import type { Achievement } from '@/types';
+// Types imported for component functionality
 
 export function AchievementsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');

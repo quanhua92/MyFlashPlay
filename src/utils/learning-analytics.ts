@@ -132,7 +132,7 @@ export class LearningAnalytics {
         }
         
         if (existing.lastSeen) {
-          cardStatsMap.set(result.cardId, existing);
+          cardStatsMap.set(result.cardId, existing as CardStats);
         }
       });
     });

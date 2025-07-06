@@ -36,7 +36,7 @@ export function SpeedChallenge({
   
   const startTime = useRef(new Date());
   const questionStartTime = useRef(Date.now());
-  const timerRef = useRef<NodeJS.Timeout>();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const cardResults = useRef<Array<any>>([]);
 
   const currentCard = cards[currentIndex];

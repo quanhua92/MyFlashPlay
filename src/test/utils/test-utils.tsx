@@ -1,5 +1,5 @@
-import { render, RenderOptions } from '@testing-library/react';
-import { ReactElement, ReactNode } from 'react';
+import { render, type RenderOptions } from '@testing-library/react';
+import { type ReactElement, type ReactNode } from 'react';
 import { createMemoryHistory } from '@tanstack/react-router';
 import { Router, RouterProvider, createRouter } from '@tanstack/react-router';
 import { routeTree } from '../../routeTree.gen';
@@ -32,9 +32,7 @@ function customRender(
   
   function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <RouterProvider router={testRouter}>
-        {children}
-      </RouterProvider>
+      <RouterProvider router={testRouter} />
     );
   }
 
@@ -60,10 +58,11 @@ export const mockDeck = {
       difficulty: 'easy' as const,
       category: 'math',
       metadata: {
+        difficulty: 'easy' as const,
+        tags: [],
         created: '2024-01-01T00:00:00Z',
         lastReviewed: null,
-        reviewCount: 0,
-        tags: []
+        reviewCount: 0
       }
     },
     {
@@ -74,10 +73,11 @@ export const mockDeck = {
       difficulty: 'easy' as const,
       category: 'geography',
       metadata: {
+        difficulty: 'easy' as const,
+        tags: [],
         created: '2024-01-01T00:00:00Z',
         lastReviewed: null,
-        reviewCount: 0,
-        tags: []
+        reviewCount: 0
       }
     }
   ],
