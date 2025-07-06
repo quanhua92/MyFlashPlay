@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, RotateCcw, Home, CheckCircle } from 'lucide-
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
 import { FlashCard } from '@/components/flashcard/FlashCard';
+import { ProgressBar, playSound } from '@/components/ui';
 import type { Deck, GameSession } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -27,6 +28,7 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
   const goNext = () => {
     if (currentIndex < cards.length - 1) {
       setCurrentIndex(currentIndex + 1);
+      playSound('flip');
     } else {
       completeSession();
     }
@@ -35,6 +37,7 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
   const goPrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
+      playSound('flip');
     }
   };
 
@@ -73,6 +76,7 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
     };
 
     setIsComplete(true);
+    playSound('complete');
     onComplete?.(session);
   };
 
@@ -134,22 +138,15 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
     <div className="max-w-4xl mx-auto">
       {/* Progress Bar */}
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-            Card {currentIndex + 1} of {cards.length}
-          </span>
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-            {Math.round(progress)}% Complete
-          </span>
-        </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-          <motion.div
-            className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.3 }}
-          />
-        </div>
+        <ProgressBar
+          current={currentIndex + 1}
+          total={cards.length}
+          showPercentage={true}
+          showSteps={true}
+          color="purple"
+          size="md"
+          animated={true}
+        />
       </div>
 
       {/* Flashcard */}
