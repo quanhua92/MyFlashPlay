@@ -83,7 +83,7 @@ export function playSound(soundType: 'correct' | 'incorrect' | 'complete' | 'fli
   }
 
   // Create audio element and play sound
-  const audio = new Audio();
+  // const audio = new Audio(); // Removed unused
   
   // Use simple oscillator sounds for now
   const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();

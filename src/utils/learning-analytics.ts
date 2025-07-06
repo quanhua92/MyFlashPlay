@@ -1,6 +1,4 @@
-import type { GameSession, Card } from '@/types';
-import { storageManager } from './storage';
-import { STORAGE_KEYS } from './constants';
+import type { GameSession } from '@/types';
 
 export interface LearningStats {
   totalSessions: number;
@@ -53,7 +51,7 @@ export class LearningAnalytics {
     let totalQuestions = 0;
     
     sessions.forEach(session => {
-      totalTime += session.duration;
+      totalTime += session.duration || 0;
       totalCorrect += session.score.correctAnswers;
       totalQuestions += session.score.totalQuestions;
       
@@ -74,7 +72,7 @@ export class LearningAnalytics {
       currentStreak,
       bestStreak,
       lastStudyDate: sessions.length > 0 
-        ? sessions[sessions.length - 1].endTime 
+        ? sessions[sessions.length - 1].endTime || null
         : null
     };
   }
@@ -112,7 +110,9 @@ export class LearningAnalytics {
         );
         
         // Update last seen
-        if (new Date(session.endTime) > new Date(existing.lastSeen)) {
+        if (session.endTime && existing.lastSeen && new Date(session.endTime) > new Date(existing.lastSeen)) {
+          existing.lastSeen = session.endTime;
+        } else if (session.endTime && !existing.lastSeen) {
           existing.lastSeen = session.endTime;
         }
         
@@ -131,7 +131,9 @@ export class LearningAnalytics {
           existing.difficulty = 'medium';
         }
         
-        cardStatsMap.set(result.cardId, existing);
+        if (existing.lastSeen) {
+          cardStatsMap.set(result.cardId, existing);
+        }
       });
     });
     
@@ -156,7 +158,7 @@ export class LearningAnalytics {
       };
       
       existing.totalSessions++;
-      existing.totalTime += session.duration;
+      existing.totalTime += session.duration || 0;
       existing.cardsStudied += session.details.cardResults.length;
       
       // Update average accuracy
@@ -198,9 +200,9 @@ export class LearningAnalytics {
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       const hour = date.getHours();
       
-      daily.set(dayKey, (daily.get(dayKey) || 0) + session.duration);
-      weekly.set(weekKey, (weekly.get(weekKey) || 0) + session.duration);
-      monthly.set(monthKey, (monthly.get(monthKey) || 0) + session.duration);
+      daily.set(dayKey, (daily.get(dayKey) || 0) + (session.duration || 0));
+      weekly.set(weekKey, (weekly.get(weekKey) || 0) + (session.duration || 0));
+      monthly.set(monthKey, (monthly.get(monthKey) || 0) + (session.duration || 0));
       hourly.set(hour, (hourly.get(hour) || 0) + 1);
     });
     
@@ -286,8 +288,7 @@ export class LearningAnalytics {
    */
   static getLearningInsights(
     stats: LearningStats,
-    cardStats: Map<string, CardStats>,
-    deckStats: Map<string, DeckStats>
+    cardStats: Map<string, CardStats>
   ): string[] {
     const insights: string[] = [];
     

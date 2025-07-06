@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Brain, Trophy, Timer, RotateCcw, Home } from 'lucide-react';
+import { Brain, Trophy, RotateCcw, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
 import { ScoreDisplay, ConfettiEffect, playSound } from '@/components/ui';
 import { announce } from '@/hooks/useAccessibility';
-import type { Deck, Card, GameSession } from '@/types';
+import type { Deck, GameSession } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 interface MemoryMatchProps {
@@ -34,8 +34,7 @@ export function MemoryMatch({
     hard: { rows: 8, cols: 8, pairs: 32 }
   };
 
-  const { rows, cols, pairs } = gridSizes[difficulty];
-  const totalCards = rows * cols;
+  const { cols, pairs } = gridSizes[difficulty];
 
   // Filter cards that can be used (simple type only for now)
   const usableCards = deck.cards

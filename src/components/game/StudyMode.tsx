@@ -24,7 +24,7 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
   const [isComplete, setIsComplete] = useState(false);
 
   const currentCard = cards[currentIndex];
-  const progress = ((currentIndex + 1) / cards.length) * 100;
+  // const progress = ((currentIndex + 1) / cards.length) * 100; // Removed unused
 
   const goNext = () => {
     if (currentIndex < cards.length - 1) {

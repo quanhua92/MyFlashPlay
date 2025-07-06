@@ -120,7 +120,7 @@ describe('Achievement Manager', () => {
       score: { ...mockGameSession.score, accuracy: 95 } // Above 90%
     };
     
-    const unlocked = achievementManager.checkAchievements(session);
+    achievementManager.checkAchievements(session);
     
     // Should increment progress towards quick learner
     const quickLearner = achievementManager.getAllAchievements()

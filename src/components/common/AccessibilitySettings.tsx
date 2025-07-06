@@ -1,5 +1,4 @@
-import { Eye, Type, Zap, Volume2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Eye, Zap, Volume2 } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS } from '@/utils/constants';
 import type { UserPreferences } from '@/types';

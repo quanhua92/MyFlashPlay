@@ -56,19 +56,37 @@ export const mockDeck = {
       id: 'card-1',
       front: 'What is 2+2?',
       back: '4',
-      type: 'basic' as const,
+      type: 'simple' as const,
       difficulty: 'easy' as const,
-      category: 'math'
+      category: 'math',
+      metadata: {
+        created: '2024-01-01T00:00:00Z',
+        lastReviewed: null,
+        reviewCount: 0,
+        tags: []
+      }
     },
     {
       id: 'card-2',
       front: 'What is the capital of France?',
       back: 'Paris',
-      type: 'basic' as const,
+      type: 'simple' as const,
       difficulty: 'easy' as const,
-      category: 'geography'
+      category: 'geography',
+      metadata: {
+        created: '2024-01-01T00:00:00Z',
+        lastReviewed: null,
+        reviewCount: 0,
+        tags: []
+      }
     }
   ],
+  settings: {
+    shuffleCards: false,
+    showHints: true,
+    autoAdvance: false,
+    timeLimit: 0
+  },
   metadata: {
     estimatedTime: 5,
     difficulty: 'easy' as const,
@@ -82,32 +100,38 @@ export const mockDeck = {
 export const mockGameSession = {
   id: 'test-session',
   deckId: 'test-deck',
+  deckName: 'Test Deck',
   mode: 'quiz' as const,
   startTime: '2024-01-01T00:00:00Z',
   endTime: '2024-01-01T00:05:00Z',
   duration: 300,
   score: {
     points: 200,
-    correct: 2,
-    incorrect: 0,
     accuracy: 100,
-    bestStreak: 2,
-    totalQuestions: 2
+    correctAnswers: 2,
+    totalQuestions: 2,
+    streak: 2,
+    bestStreak: 2
   },
-  cards: [
-    {
-      cardId: 'card-1',
-      attempts: 1,
-      correct: true,
-      timeSpent: 10,
-      hintsUsed: 0
-    },
-    {
-      cardId: 'card-2',
-      attempts: 1,
-      correct: true,
-      timeSpent: 8,
-      hintsUsed: 0
-    }
-  ]
+  details: {
+    cardResults: [
+      {
+        cardId: 'card-1',
+        attempts: 1,
+        wasCorrect: true,
+        timeSpent: 10,
+        hintUsed: false
+      },
+      {
+        cardId: 'card-2',
+        attempts: 1,
+        wasCorrect: true,
+        timeSpent: 8,
+        hintUsed: false
+      }
+    ],
+    bonuses: [],
+    difficulty: 'easy' as const,
+    hintsUsed: 0
+  }
 };

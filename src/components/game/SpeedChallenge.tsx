@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Timer, Zap, AlertCircle, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
-import { FlashCard } from '@/components/flashcard/FlashCard';
 import { ScoreDisplay, ConfettiEffect, playSound } from '@/components/ui';
-import type { Deck, Card, GameSession, CardType } from '@/types';
+import type { Deck, GameSession } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 interface SpeedChallengeProps {
@@ -32,7 +31,7 @@ export function SpeedChallenge({
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [answerTime, setAnswerTime] = useState<number>(0);
+  // const [answerTime, setAnswerTime] = useState<number>(0); // Removed unused
   const [speedBonus, setSpeedBonus] = useState(0);
   
   const startTime = useRef(new Date());
@@ -49,9 +48,9 @@ export function SpeedChallenge({
   useEffect(() => {
     if (!isComplete && timeRemaining > 0) {
       timerRef.current = setTimeout(() => {
-        setTimeRemaining(timeRemaining - 1);
+        setTimeRemaining(prev => Math.max(0, prev - 1) as 30 | 60 | 90);
       }, 1000);
-    } else if (timeRemaining === 0 && !isComplete) {
+    } else if (timeRemaining <= 0 && !isComplete) {
       completeSession();
     }
 
@@ -72,7 +71,6 @@ export function SpeedChallenge({
   const handleAnswer = (isCorrect: boolean) => {
     const answerEndTime = Date.now();
     const timeSpent = answerEndTime - questionStartTime.current;
-    setAnswerTime(timeSpent);
 
     let pointsEarned = 0;
     let newStreak = streak;
@@ -148,7 +146,7 @@ export function SpeedChallenge({
       details: {
         cardResults: cardResults.current,
         bonuses: [
-          { type: 'speed', amount: cardResults.current.reduce((sum, r) => sum + (r.speedBonus || 0), 0) }
+          { type: 'speed', description: 'Speed bonus', points: cardResults.current.reduce((sum, r) => sum + (r.speedBonus || 0), 0) }
         ],
         difficulty: 'speed',
         hintsUsed: 0
