@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ScoresRouteImport } from './routes/scores'
 import { Route as DecksRouteImport } from './routes/decks'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayDeckIdRouteImport } from './routes/play.$deckId'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScoresRoute = ScoresRouteImport.update({
   id: '/scores',
   path: '/scores',
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/create': typeof CreateRoute
   '/decks': typeof DecksRoute
   '/scores': typeof ScoresRoute
+  '/settings': typeof SettingsRoute
   '/play/$deckId': typeof PlayDeckIdRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/create': typeof CreateRoute
   '/decks': typeof DecksRoute
   '/scores': typeof ScoresRoute
+  '/settings': typeof SettingsRoute
   '/play/$deckId': typeof PlayDeckIdRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,28 @@ export interface FileRoutesById {
   '/create': typeof CreateRoute
   '/decks': typeof DecksRoute
   '/scores': typeof ScoresRoute
+  '/settings': typeof SettingsRoute
   '/play/$deckId': typeof PlayDeckIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/create' | '/decks' | '/scores' | '/play/$deckId'
+  fullPaths:
+    | '/'
+    | '/create'
+    | '/decks'
+    | '/scores'
+    | '/settings'
+    | '/play/$deckId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create' | '/decks' | '/scores' | '/play/$deckId'
-  id: '__root__' | '/' | '/create' | '/decks' | '/scores' | '/play/$deckId'
+  to: '/' | '/create' | '/decks' | '/scores' | '/settings' | '/play/$deckId'
+  id:
+    | '__root__'
+    | '/'
+    | '/create'
+    | '/decks'
+    | '/scores'
+    | '/settings'
+    | '/play/$deckId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,11 +98,19 @@ export interface RootRouteChildren {
   CreateRoute: typeof CreateRoute
   DecksRoute: typeof DecksRoute
   ScoresRoute: typeof ScoresRoute
+  SettingsRoute: typeof SettingsRoute
   PlayDeckIdRoute: typeof PlayDeckIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/scores': {
       id: '/scores'
       path: '/scores'
@@ -124,6 +154,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreateRoute: CreateRoute,
   DecksRoute: DecksRoute,
   ScoresRoute: ScoresRoute,
+  SettingsRoute: SettingsRoute,
   PlayDeckIdRoute: PlayDeckIdRoute,
 }
 export const routeTree = rootRouteImport

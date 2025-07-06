@@ -34,10 +34,38 @@ export class StorageManager {
       const data = localStorage.getItem(key);
       if (!data) return null;
       
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      
+      // Validate the data structure
+      if (!this.validateData(key, parsed)) {
+        console.error(`Invalid data structure for ${key}`);
+        return null;
+      }
+      
+      return parsed;
     } catch (error) {
       this.handleStorageError(error, key);
       return null;
+    }
+  }
+
+  // Validate data structure
+  private validateData(key: string, data: any): boolean {
+    try {
+      switch (key) {
+        case STORAGE_KEYS.DECKS:
+          return data && Array.isArray(data.decks);
+        case STORAGE_KEYS.SCORES:
+          return data && Array.isArray(data.sessions) && data.statistics;
+        case STORAGE_KEYS.PREFERENCES:
+          return data && data.theme && data.version;
+        case STORAGE_KEYS.PROGRESS:
+          return data && typeof data.cardProgress === 'object';
+        default:
+          return true;
+      }
+    } catch {
+      return false;
     }
   }
 

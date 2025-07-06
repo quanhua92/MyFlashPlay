@@ -7,12 +7,37 @@ import type { Deck } from '@/types';
 export function useDecks() {
   const [decks, setDecks] = useLocalStorage<Deck[]>('flashplay_decks', []);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Initialize with sample decks if empty
   useEffect(() => {
     setIsLoading(true);
-    if (decks.length === 0) {
+    try {
+      // Validate decks structure
+      if (!Array.isArray(decks)) {
+        console.error('Decks data is not an array, resetting to sample decks');
+        setDecks(sampleDecks);
+        setError('Data was corrupted, restored sample decks');
+      } else if (decks.length === 0) {
+        setDecks(sampleDecks);
+      } else {
+        // Validate each deck has required fields
+        const validDecks = decks.filter(deck => 
+          deck && 
+          deck.id && 
+          deck.name && 
+          Array.isArray(deck.cards)
+        );
+        
+        if (validDecks.length !== decks.length) {
+          console.warn('Some decks were invalid and filtered out');
+          setDecks(validDecks);
+        }
+      }
+    } catch (err) {
+      console.error('Error initializing decks:', err);
       setDecks(sampleDecks);
+      setError('Error loading decks, using defaults');
     }
     setIsLoading(false);
   }, []);
@@ -46,6 +71,7 @@ export function useDecks() {
   return {
     decks,
     isLoading,
+    error,
     addDeck,
     updateDeck,
     deleteDeck,
