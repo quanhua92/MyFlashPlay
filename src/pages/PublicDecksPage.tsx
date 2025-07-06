@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Search, Globe, Download, Play, Copy, ExternalLink, Filter, Star } from 'lucide-react';
 import { publicMarkdownDecks, getPublicDecksByTag, getPublicDecksByDifficulty, generatePublicDeckUrl } from '@/data/public-decks';
 import { markdownStorage } from '@/utils/markdown-storage';
-import { parseMarkdown } from '@/utils/markdown';
+import { markdownProcessor } from '@/utils/markdown';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from '@tanstack/react-router';
 
@@ -41,8 +41,8 @@ export function PublicDecksPage() {
       setSaveStatus(prev => ({ ...prev, [publicDeck.id]: 'saving' }));
 
       // Parse the markdown to validate it
-      const parseResult = parseMarkdown(publicDeck.markdown);
-      if (!parseResult.success || parseResult.cards.length === 0) {
+      const parseResult = markdownProcessor.parse(publicDeck.markdown);
+      if (parseResult.errors.length > 0 || parseResult.cards.length === 0) {
         throw new Error('Invalid deck format');
       }
 
@@ -92,9 +92,9 @@ export function PublicDecksPage() {
   const handlePlay = (deck: typeof publicMarkdownDecks[0]) => {
     // Save temporarily and navigate to play
     const tempId = `temp-${deck.id}`;
-    const parseResult = parseMarkdown(deck.markdown);
+    const parseResult = markdownProcessor.parse(deck.markdown);
     
-    if (parseResult.success && parseResult.cards.length > 0) {
+    if (parseResult.errors.length === 0 && parseResult.cards.length > 0) {
       // Create temporary deck for playing
       const tempDeck = {
         id: tempId,
