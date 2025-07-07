@@ -4,11 +4,14 @@ import { motion } from "framer-motion"
 import { useDecks } from "@/hooks/useDecks"
 import { achievementManager } from "@/utils/achievements"
 import { useTranslation } from "@/i18n"
+import { DeckCard } from "@/components/decks/DeckCard"
+import { markdownStorage } from "@/utils/markdown-storage"
+import { sampleMarkdownDecks } from "@/data/sample-decks"
+import type { Deck } from "@/types"
 
 export function HomePage() {
-  const { decks } = useDecks()
+  const { deleteDeck } = useDecks()
   const t = useTranslation()
-  const achievementStats = achievementManager.getStats()
   achievementManager.checkDailyStreak() // Check daily streak on home page visit
 
   // Development helper: Force reload sample decks if URL has ?reload-samples
@@ -27,23 +30,40 @@ export function HomePage() {
     }
   }
 
+  const parsedSampleDecks = sampleMarkdownDecks
+    .map((deckData) => {
+      const deck = markdownStorage["markdownToDeck"](
+        deckData.id,
+        deckData.markdown,
+        deckData.name,
+        deckData.name.match(/\p{Emoji}/u)?.[0],
+      )
+      if (deck) {
+        deck.description = deckData.description
+        deck.metadata.tags = deckData.tags
+        deck.metadata.difficulty = deckData.difficulty
+      }
+      return deck
+    })
+    .filter(Boolean) as Deck[]
+
   const features = [
     {
       icon: Target,
-      title: t('home.feature1Title'),
-      description: t('home.feature1Description'),
+      title: t("home.feature1Title"),
+      description: t("home.feature1Description"),
       color: "from-purple-500 to-pink-500",
     },
     {
       icon: Zap,
-      title: t('home.feature2Title'),
-      description: t('home.feature2Description'),
+      title: t("home.feature2Title"),
+      description: t("home.feature2Description"),
       color: "from-blue-500 to-cyan-500",
     },
     {
       icon: Trophy,
-      title: t('home.feature3Title'),
-      description: t('home.feature3Description'),
+      title: t("home.feature3Title"),
+      description: t("home.feature3Description"),
       color: "from-green-500 to-emerald-500",
     },
     {
@@ -65,11 +85,11 @@ export function HomePage() {
       >
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
           <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-            {t('nav.appTitle')}
+            {t("nav.appTitle")}
           </span>
         </h1>
         <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-          {t('home.subtitle')}
+          {t("home.subtitle")}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -78,7 +98,7 @@ export function HomePage() {
             className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
           >
             <Plus className="w-5 h-5" />
-            <span>{t('home.getStartedButton')}</span>
+            <span>{t("home.getStartedButton")}</span>
           </Link>
 
           <Link
@@ -86,7 +106,7 @@ export function HomePage() {
             className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-8 py-4 rounded-xl text-lg font-semibold border-2 border-gray-200 dark:border-gray-700 hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
           >
             <BookOpen className="w-5 h-5" />
-            <span>{t('nav.myDecks')}</span>
+            <span>{t("nav.myDecks")}</span>
           </Link>
         </div>
       </motion.div>
@@ -99,7 +119,7 @@ export function HomePage() {
         className="py-16"
       >
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-          {t('home.featuresTitle')}
+          {t("home.featuresTitle")}
         </h2>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -135,50 +155,17 @@ export function HomePage() {
         className="py-16"
       >
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-          {t('home.sampleDecksTitle')}
+          {t("home.sampleDecksTitle")}
         </h2>
 
-        {/* Debug info in development */}
-        {process.env.NODE_ENV === "development" && (
-          <div className="mb-4 p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg text-sm">
-            <div>Decks found: {decks.length}</div>
-            <div>Deck names: {decks.map((d) => d.name).join(", ")}</div>
-          </div>
-        )}
-
         <div className="grid md:grid-cols-3 gap-8">
-          {decks.slice(0, 6).map((deck, index) => (
-            <motion.div
+          {parsedSampleDecks.map((deck, index) => (
+            <DeckCard
               key={deck.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 * index }}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-            >
-              <div className="text-center mb-4">
-                <span className="text-4xl mb-2 block">{deck.emoji}</span>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  {deck.name}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mt-2">
-                  {deck.description}
-                </p>
-              </div>
-
-              <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
-                <span>{deck.cards.length} cards</span>
-                <span>{deck.metadata.estimatedTime} min</span>
-              </div>
-
-              <Link
-                to="/play/$deckId"
-                params={{ deckId: deck.id }}
-                search={{ mode: undefined }}
-                className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-3 rounded-xl font-semibold hover:shadow-lg transition-shadow"
-              >
-                {t('common.play')}
-              </Link>
-            </motion.div>
+              deck={deck}
+              index={index}
+              onDelete={deleteDeck}
+            />
           ))}
         </div>
       </motion.div>
