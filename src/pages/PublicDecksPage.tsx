@@ -110,7 +110,7 @@ export function PublicDecksPage() {
       sessionStorage.setItem(`temp_deck_${tempId}`, JSON.stringify(tempDeck));
       
       // Navigate to play page
-      navigate({ to: '/play', search: { deck: tempId, source: 'temp' } });
+      navigate({ to: '/play-public', search: { deck: tempId, source: 'temp' } });
     }
   };
 

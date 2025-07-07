@@ -11,7 +11,7 @@ import { SafeContentRenderer } from '@/components/common/SafeContentRenderer';
 import type { GameMode, GameSession, Deck } from '@/types';
 
 export function PlayTempPage() {
-  const search = useSearch({ from: '/play' });
+  const search = useSearch({ from: '/play-public' });
   const navigate = useNavigate();
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
