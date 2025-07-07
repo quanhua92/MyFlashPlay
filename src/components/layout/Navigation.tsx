@@ -2,7 +2,6 @@ import { Link, useRouterState } from '@tanstack/react-router';
 import { Home, Plus, BookOpen, Trophy, Menu, X, Settings, TrendingUp, Globe } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ThemeToggle } from '@/components/common/ThemeToggle';
 
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -33,13 +32,13 @@ export function Navigation() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden sm:flex sm:items-center sm:space-x-4">
+          <div className="hidden sm:flex sm:items-center sm:space-x-2">
             {navItems.map(({ path, label, icon: Icon }) => (
               <Link
                 key={path}
                 to={path}
                 className={cn(
-                  'flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors',
+                  'flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors whitespace-nowrap',
                   'hover:bg-gray-100 dark:hover:bg-gray-800',
                   currentPath === path
                     ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300'
@@ -47,18 +46,16 @@ export function Navigation() {
                 )}
               >
                 <Icon className="w-5 h-5" />
-                <span className="font-medium">{label}</span>
+                <span className="font-medium text-sm">{label}</span>
               </Link>
             ))}
-            <ThemeToggle />
           </div>
 
           {/* Mobile menu button */}
           <div className="sm:hidden flex items-center">
-            <ThemeToggle />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="ml-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               {mobileMenuOpen ? (
                 <X className="w-6 h-6" />

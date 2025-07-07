@@ -127,10 +127,10 @@ export function PublicDecksPage() {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy': return 'text-green-600 bg-green-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
-      case 'hard': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'easy': return 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30';
+      case 'medium': return 'text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30';
+      case 'hard': return 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30';
+      default: return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700';
     }
   };
 
@@ -145,12 +145,12 @@ export function PublicDecksPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <motion.h1 
-            className="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3"
+            className="text-4xl font-bold text-gray-900 dark:text-white mb-4 flex items-center justify-center gap-3"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
           >
@@ -158,7 +158,7 @@ export function PublicDecksPage() {
             Public Decks
           </motion.h1>
           <motion.p 
-            className="text-xl text-gray-600 max-w-2xl mx-auto"
+            className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -169,7 +169,7 @@ export function PublicDecksPage() {
 
         {/* Search and Filter Bar */}
         <motion.div 
-          className="bg-white rounded-xl shadow-lg p-6 mb-8"
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -183,7 +183,7 @@ export function PublicDecksPage() {
                 placeholder="Search decks by name, description, or tags..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -193,7 +193,7 @@ export function PublicDecksPage() {
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value as FilterType)}
-                className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                className="pl-10 pr-8 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">All Decks</option>
                 <option value="english-vietnamese">🇺🇸🇻🇳 English-Vietnamese</option>
@@ -205,10 +205,10 @@ export function PublicDecksPage() {
           </div>
 
           {/* Stats */}
-          <div className="mt-4 text-sm text-gray-600">
+          <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
             Showing {filteredDecks.length} of {publicMarkdownDecks.length} decks
             {filter === 'english-vietnamese' && (
-              <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+              <span className="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs">
                 English Learning Focus
               </span>
             )}
@@ -224,16 +224,16 @@ export function PublicDecksPage() {
             return (
               <motion.div
                 key={deck.id}
-                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ y: -5 }}
               >
                 {/* Header */}
-                <div className="p-6 border-b border-gray-100">
+                <div className="p-6 border-b border-gray-100 dark:border-gray-700">
                   <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-xl font-bold text-gray-900 line-clamp-2">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-2">
                       {deck.name}
                     </h3>
                     {deck.tags?.includes('english') && deck.tags?.includes('vietnamese') && (
@@ -241,7 +241,7 @@ export function PublicDecksPage() {
                     )}
                   </div>
                   
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
                     {deck.description}
                   </p>
 
@@ -251,11 +251,11 @@ export function PublicDecksPage() {
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(deck.difficulty)}`}>
                         {deck.difficulty}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {cardCount} cards
                       </span>
                     </div>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
                       by {deck.author}
                     </span>
                   </div>
@@ -266,13 +266,13 @@ export function PublicDecksPage() {
                       {deck.tags.slice(0, 3).map(tag => (
                         <span 
                           key={tag}
-                          className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
+                          className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs"
                         >
                           #{tag}
                         </span>
                       ))}
                       {deck.tags.length > 3 && (
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
                           +{deck.tags.length - 3} more
                         </span>
                       )}
@@ -296,7 +296,7 @@ export function PublicDecksPage() {
                   <div className="grid grid-cols-3 gap-2">
                     <button
                       onClick={() => handlePlay(deck)}
-                      className="flex items-center justify-center space-x-1 py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                      className="flex items-center justify-center space-x-1 py-2 px-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
                       title="Play Now"
                     >
                       <Play className="w-4 h-4" />
@@ -305,7 +305,7 @@ export function PublicDecksPage() {
 
                     <button
                       onClick={() => handleDownload(deck)}
-                      className="flex items-center justify-center space-x-1 py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                      className="flex items-center justify-center space-x-1 py-2 px-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
                       title="Download Markdown"
                     >
                       <Download className="w-4 h-4" />
@@ -314,7 +314,7 @@ export function PublicDecksPage() {
 
                     <button
                       onClick={() => handleCopyLink(deck.id)}
-                      className="flex items-center justify-center space-x-1 py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                      className="flex items-center justify-center space-x-1 py-2 px-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
                       title="Copy Share Link"
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -334,9 +334,9 @@ export function PublicDecksPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <Globe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">No decks found</h3>
-            <p className="text-gray-500">
+            <Globe className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No decks found</h3>
+            <p className="text-gray-500 dark:text-gray-500">
               Try adjusting your search terms or filters to find more decks.
             </p>
           </motion.div>
@@ -344,7 +344,7 @@ export function PublicDecksPage() {
 
         {/* Info Footer */}
         <motion.div
-          className="mt-12 text-center text-gray-500 text-sm"
+          className="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
