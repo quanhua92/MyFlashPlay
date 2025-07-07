@@ -9,6 +9,19 @@ export function HomePage() {
   const achievementStats = achievementManager.getStats();
   achievementManager.checkDailyStreak(); // Check daily streak on home page visit
   
+  // Development helper: Force reload sample decks if URL has ?reload-samples
+  if (typeof window !== 'undefined' && window.location.search.includes('reload-samples')) {
+    // Clear localStorage and reload
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('mdoc_')) {
+        localStorage.removeItem(key);
+      }
+    });
+    if (!window.location.search.includes('reloaded')) {
+      window.location.href = window.location.pathname + '?reloaded=true';
+    }
+  }
+  
   const features = [
     {
       icon: Target,
@@ -117,6 +130,14 @@ export function HomePage() {
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
           Try These Sample Decks
         </h2>
+        
+        {/* Debug info in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mb-4 p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg text-sm">
+            <div>Decks found: {decks.length}</div>
+            <div>Deck names: {decks.map(d => d.name).join(', ')}</div>
+          </div>
+        )}
         
         <div className="grid md:grid-cols-3 gap-8">
           {decks.slice(0, 3).map((deck, index) => (

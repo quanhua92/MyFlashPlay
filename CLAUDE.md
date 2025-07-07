@@ -152,27 +152,49 @@ The system has been simplified to **pure markdown storage**:
 
 ## 🚀 Development Workflow
 
-### 1. Make Changes
+### IMPORTANT: User-Controlled Dev Server Only
+
+**User ALWAYS runs `pnpm dev` in a separate terminal. Claude NEVER builds or serves:**
+
 ```bash
-# Start development
+# User runs in terminal:
 pnpm dev
+
+# Claude ONLY runs tests against running dev server:
+pnpm test:integration http://localhost:3000  # or whatever port shown
 ```
 
-### 2. Test Locally
+**Claude Rules:**
+- ❌ NEVER run `pnpm serve`, or `pnpm test:self`
+- ❌ NEVER kill processes or manage dev server
+- ✅ ONLY test against user's running dev server
+- ✅ Ask user to run `pnpm dev` if needed
+- ✅ Run `pnpm build` after making changes
+
+**Benefits:**
+- ✅ No port conflicts or process management
+- ✅ Hot reload works during development
+- ✅ User has full control over dev server
+- ✅ Faster iteration cycle
+- ✅ Real-time development testing
+
+### Testing Commands for Claude
+
 ```bash
-# Quick local test
-pnpm test:quick:local
+# Development testing (user must run pnpm dev first)
+pnpm test:integration http://localhost:3000
+
+# Quick health check  
+pnpm test:quick http://localhost:3000
+
+# Production verification only
+pnpm test:integration https://myflashplay.vercel.app
 ```
 
-### 3. Build & Test
-```bash
-# Full integration test
-pnpm test:self
-```
+### Production Deployment Testing
 
-### 4. Deploy & Verify
 ```bash
-# Test production deployment
+# Only for production testing after deployment
 pnpm test:integration https://myflashplay.vercel.app
 ```
 

@@ -15,8 +15,13 @@ export function useDecks() {
         // Load from markdown storage
         const { decks: markdownDecks, errors } = markdownStorage.loadAllDecks();
         
-        if (markdownDecks.length > 0) {
-          // We have markdown decks, use them
+        // Check if we have sample decks specifically (look for known sample deck IDs)
+        const hasSampleDecks = markdownDecks.some(deck => 
+          ['math-basics', 'science-animals', 'space-exploration', 'vietnamese-animals', 'vietnamese-colors', 'vietnamese-math'].includes(deck.id)
+        );
+        
+        if (markdownDecks.length > 0 && hasSampleDecks) {
+          // We have markdown decks including samples, use them
           setDecks(markdownDecks);
           if (errors.length > 0) {
             setError(`Loaded ${markdownDecks.length} decks, but ${errors.length} had errors`);
