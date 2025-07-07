@@ -1,5 +1,5 @@
 import { Link, useRouterState } from '@tanstack/react-router';
-import { Home, Plus, BookOpen, Trophy, TrendingUp, Globe } from 'lucide-react';
+import { Home, Plus, BookOpen, Trophy, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -12,7 +12,7 @@ export function MobileNavigation() {
     { path: '/create' as const, label: 'Create', icon: Plus },
     { path: '/decks' as const, label: 'My Decks', icon: BookOpen },
     { path: '/public-decks' as const, label: 'Public', icon: Globe },
-    { path: '/progress' as const, label: 'Progress', icon: TrendingUp }
+    { path: '/achievements' as const, label: 'Achievements', icon: Trophy }
   ];
 
   return (
