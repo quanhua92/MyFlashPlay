@@ -367,29 +367,38 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
 
   return (
     <div className="h-screen bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 overflow-hidden">
-      {/* Header */}
-      <div className="flex justify-between items-center p-4 bg-black/20 text-white">
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-1">
-            <Target className="w-5 h-5" />
-            <span className="font-bold">{score}</span>
+      {/* Header - Moved all info to right side to avoid Back button overlap */}
+      <div className="flex justify-end items-center p-4 bg-black/20 text-white">
+        <div className="flex items-center space-x-6 bg-black/30 px-6 py-3 rounded-xl backdrop-blur-sm">
+          {/* Lives - Bigger Hearts */}
+          <div className="flex items-center space-x-2">
+            {Array.from({ length: 3 }, (_, i) => (
+              <Heart
+                key={i}
+                className={`w-8 h-8 ${i < lives ? 'text-red-500 fill-current' : 'text-gray-400'}`}
+              />
+            ))}
           </div>
-          <div className="flex items-center space-x-1">
-            <Zap className="w-5 h-5" />
-            <span>{streak}</span>
+          
+          {/* Score */}
+          <div className="flex items-center space-x-2">
+            <Target className="w-6 h-6" />
+            <span className="font-bold text-xl">{score}</span>
           </div>
-          <div className="flex items-center space-x-1">
-            <Clock className="w-5 h-5" />
-            <span>{Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')}</span>
+          
+          {/* Streak */}
+          <div className="flex items-center space-x-2">
+            <Zap className="w-6 h-6" />
+            <span className="font-bold text-lg">{streak}</span>
           </div>
-        </div>
-        <div className="flex items-center space-x-1">
-          {Array.from({ length: 3 }, (_, i) => (
-            <Heart
-              key={i}
-              className={`w-6 h-6 ${i < lives ? 'text-red-500 fill-current' : 'text-gray-400'}`}
-            />
-          ))}
+          
+          {/* Timer - Bigger */}
+          <div className="flex items-center space-x-2">
+            <Clock className="w-6 h-6" />
+            <span className="font-bold text-lg font-mono">
+              {Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')}
+            </span>
+          </div>
         </div>
       </div>
 

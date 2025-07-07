@@ -4,7 +4,7 @@
 export const publicMarkdownDecks = [
   {
     id: 'public-english-vietnamese-basic',
-    name: '🇺🇸🇻🇳 English-Vietnamese Basic Words',
+    name: '📚 English-Vietnamese Basic Words',
     description: 'Essential English vocabulary with Vietnamese translations',
     author: 'MyFlashPlay Team',
     difficulty: 'easy',
@@ -821,13 +821,13 @@ export function getPublicDeck(id: string) {
 }
 
 export function getPublicDecksByTag(tag: string) {
-  return publicMarkdownDecks.filter(deck => 
+  return publicMarkdownDecks.filter(deck =>
     deck.tags?.includes(tag)
   );
 }
 
 export function getPublicDecksByDifficulty(difficulty: string) {
-  return publicMarkdownDecks.filter(deck => 
+  return publicMarkdownDecks.filter(deck =>
     deck.difficulty === difficulty
   );
 }
@@ -840,7 +840,7 @@ export function generatePublicDeckUrl(deckId: string): string {
 // Featured decks for home page showcase
 export const featuredVietnameseDecks = [
   'public-english-vietnamese-basic',
-  'public-english-vietnamese-family', 
+  'public-english-vietnamese-family',
   'public-english-vietnamese-colors',
   'public-english-vietnamese-animals',
   'public-english-vietnamese-food',

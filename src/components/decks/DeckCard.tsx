@@ -248,14 +248,53 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
       </div>
 
       {/* Description */}
-      <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
+      <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm line-clamp-2">
         {deck.description}
       </p>
 
-      {/* Deck Stats */}
+      {/* Tags and Info - Consistent with Public Decks */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+            deck.metadata?.difficulty === 'easy' ? 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30' :
+            deck.metadata?.difficulty === 'medium' ? 'text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30' :
+            deck.metadata?.difficulty === 'hard' ? 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30' :
+            'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700'
+          }`}>
+            {deck.metadata?.difficulty || 'medium'}
+          </span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {deck.cards.length} cards
+          </span>
+        </div>
+        <span className="text-xs text-gray-500 dark:text-gray-400">
+          ~{deck.metadata?.estimatedTime || 5} min
+        </span>
+      </div>
+
+      {/* Tags */}
+      {deck.metadata?.tags && deck.metadata.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1 mb-3">
+          {deck.metadata.tags.slice(0, 3).map(tag => (
+            <span 
+              key={tag}
+              className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs"
+            >
+              #{tag}
+            </span>
+          ))}
+          {deck.metadata.tags.length > 3 && (
+            <span className="text-xs text-gray-400 dark:text-gray-500">
+              +{deck.metadata.tags.length - 3} more
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Stats */}
       <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 mb-4">
-        <span>Played {deck.metadata.playCount} times</span>
-        <span>{deck.metadata.estimatedTime} min</span>
+        <span>Played {deck.metadata?.playCount || 0} times</span>
+        <span>Last played: {deck.metadata?.lastModified ? new Date(deck.metadata.lastModified).toLocaleDateString() : 'Never'}</span>
       </div>
 
       {/* Mode Selection */}

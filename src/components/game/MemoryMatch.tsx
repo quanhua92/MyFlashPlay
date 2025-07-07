@@ -235,6 +235,7 @@ export function MemoryMatch({
     setMatchedPairs(0);
     setScore(0);
     setIsComplete(false);
+    setShowConfetti(false);
   };
 
   if (isComplete) {

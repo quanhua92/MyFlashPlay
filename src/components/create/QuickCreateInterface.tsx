@@ -14,9 +14,10 @@ interface Card {
 interface QuickCreateInterfaceProps {
   onMarkdownChange: (markdown: string) => void;
   initialMarkdown?: string;
+  isActive?: boolean;
 }
 
-export function QuickCreateInterface({ onMarkdownChange, initialMarkdown = '' }: QuickCreateInterfaceProps) {
+export function QuickCreateInterface({ onMarkdownChange, initialMarkdown = '', isActive = true }: QuickCreateInterfaceProps) {
   const [cards, setCards] = useState<Card[]>(() => {
     // Initialize with one empty card if no initial markdown
     if (!initialMarkdown) {
@@ -33,6 +34,7 @@ export function QuickCreateInterface({ onMarkdownChange, initialMarkdown = '' }:
   const [deckDescription, setDeckDescription] = useState('');
   const [focusedCardIndex, setFocusedCardIndex] = useState<number | null>(null);
   const [showKeyboardHints, setShowKeyboardHints] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(Boolean(initialMarkdown));
   
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -83,15 +85,19 @@ export function QuickCreateInterface({ onMarkdownChange, initialMarkdown = '' }:
 
   // Initialize from markdown if provided
   useEffect(() => {
-    if (initialMarkdown) {
+    if (initialMarkdown && isInitializing) {
       parseMarkdownToCards(initialMarkdown);
+      setIsInitializing(false);
     }
-  }, [initialMarkdown]);
+  }, [initialMarkdown, isInitializing]);
 
   // Convert cards to markdown whenever cards change (debounced)
   useEffect(() => {
-    debouncedGenerateMarkdown();
-  }, [debouncedGenerateMarkdown]);
+    // Only generate markdown when component is active and not initializing
+    if (isActive && !isInitializing && cards.length > 0) {
+      debouncedGenerateMarkdown();
+    }
+  }, [cards, deckTitle, deckDescription, isInitializing, isActive]);
 
   const parseMarkdownToCards = (markdown: string) => {
     const lines = markdown.split('\n');

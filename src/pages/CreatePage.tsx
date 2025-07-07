@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Upload, FileText, Wand2, CheckCircle, Edit3, Code } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Upload, FileText, Wand2, CheckCircle, Edit3, Code, Tag, X, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { v4 as uuidv4 } from 'uuid';
@@ -26,6 +26,9 @@ export function CreatePage() {
   const [createMode, setCreateMode] = useState<CreateMode>('interface');
   const [validationResult, setValidationResult] = useState<any>({ isValid: true, errors: [], cardCount: 0 });
   const [editingDeck, setEditingDeck] = useState<Deck | null>(null);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
+  const loadedDeckRef = useRef<string | null>(null);
   
   const search = useSearch({ from: '/create' });
   const navigate = useNavigate();
@@ -35,20 +38,22 @@ export function CreatePage() {
 
   // Load deck for editing if editDeck parameter is provided
   useEffect(() => {
-    if (search.editDeck) {
+    if (search.editDeck && loadedDeckRef.current !== search.editDeck) {
       const deckToEdit = getDeck(search.editDeck);
       if (deckToEdit) {
+        loadedDeckRef.current = search.editDeck;
         setEditingDeck(deckToEdit);
         setDeckName(deckToEdit.name);
         setDescription(deckToEdit.description);
         setEmoji(deckToEdit.emoji);
+        setTags(deckToEdit.metadata?.tags || []);
         
         // Convert cards back to markdown format
         const markdownContent = deckToEdit.cards.map(card => {
           if (card.type === 'basic') {
             return `- ${card.front} :: ${card.back}`;
           } else if (card.type === 'multiple_choice') {
-            const choices = card.choices.map(choice => `  - ${choice}`).join('\n');
+            const choices = card.choices?.map(choice => `  - ${choice}`).join('\n') || '';
             return `- ${card.front} ::\n${choices}\n  > ${card.back}`;
           }
           return `- ${card.front} :: ${card.back}`;
@@ -57,8 +62,11 @@ export function CreatePage() {
         const fullMarkdown = `# ${deckToEdit.name}\n\n${markdownContent}`;
         setMarkdown(fullMarkdown);
       }
+    } else if (!search.editDeck) {
+      // Reset when not editing
+      loadedDeckRef.current = null;
     }
-  }, [search.editDeck, getDeck]);
+  }, [search.editDeck]);
 
   const handleCreateDeck = async () => {
     // Validate before creating/updating
@@ -81,6 +89,7 @@ export function CreatePage() {
           metadata: {
             ...editingDeck.metadata,
             lastModified: new Date().toISOString(),
+            tags: tags
           }
         };
         
@@ -108,7 +117,7 @@ export function CreatePage() {
             playCount: 0,
             source: 'created',
             originalMarkdown: markdown,
-            tags: [],
+            tags: tags,
             difficulty: 'beginner',
             estimatedTime: Math.ceil(parsedCards.length / 10) * 5 // Rough estimate
           },
@@ -147,6 +156,27 @@ export function CreatePage() {
     setDeckName(template.deckName);
     setDescription(template.deckDescription);
     setEmoji(template.emoji);
+  };
+
+  const addTag = () => {
+    const tag = tagInput.trim().toLowerCase();
+    if (tag && !tags.includes(tag)) {
+      setTags([...tags, tag]);
+      setTagInput('');
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag();
+    } else if (e.key === 'Backspace' && tagInput === '' && tags.length > 0) {
+      removeTag(tags[tags.length - 1]);
+    }
   };
 
   const switchToMarkdown = () => {
@@ -224,6 +254,60 @@ export function CreatePage() {
                   placeholder="Enter deck description"
                 />
               </div>
+
+              {/* Tags Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                  <Tag className="w-4 h-4" />
+                  Tags
+                </label>
+                
+                {/* Tag Input */}
+                <div className="flex gap-2 mb-3">
+                  <input
+                    type="text"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={handleTagInputKeyDown}
+                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    placeholder="Add tags (press Enter or comma to add)"
+                  />
+                  <button
+                    type="button"
+                    onClick={addTag}
+                    disabled={!tagInput.trim()}
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add
+                  </button>
+                </div>
+
+                {/* Tag Display */}
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 rounded-full text-sm"
+                      >
+                        #{tag}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(tag)}
+                          className="ml-1 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Tags help organize and categorize your flashcard decks. Press Enter or comma to add multiple tags.
+                </p>
+              </div>
             </div>
 
             {/* Template Selector */}
@@ -266,6 +350,7 @@ export function CreatePage() {
                 <QuickCreateInterface 
                   onMarkdownChange={setMarkdown}
                   initialMarkdown={markdown}
+                  isActive={true}
                 />
               ) : (
                 <div className="space-y-4">

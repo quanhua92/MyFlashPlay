@@ -1,21 +1,40 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Globe, Download, Play, Copy, ExternalLink, Filter, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Globe, Download, Play, Copy, ExternalLink, Filter, Star, Heart, X, Check, Share2 } from 'lucide-react';
 import { publicMarkdownDecks, getPublicDecksByTag, getPublicDecksByDifficulty, generatePublicDeckUrl } from '@/data/public-decks';
 import { markdownStorage } from '@/utils/markdown-storage';
 import { markdownProcessor } from '@/utils/markdown';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from '@tanstack/react-router';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 type FilterType = 'all' | 'easy' | 'medium' | 'hard' | 'english-vietnamese';
+type StarFilter = 'all' | 'starred' | 'unstarred';
 
 export function PublicDecksPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<FilterType>('all');
+  const [starFilter, setStarFilter] = useState<StarFilter>('all');
   const [saveStatus, setSaveStatus] = useState<{ [key: string]: 'idle' | 'saving' | 'saved' | 'error' }>({});
+  const [starredDecks, setStarredDecks] = useLocalStorage<string[]>('starred_public_decks', []);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [shareDeckName, setShareDeckName] = useState('');
+  const [urlCopied, setUrlCopied] = useState(false);
   const navigate = useNavigate();
 
-  // Filter decks based on search term and filter
+  // Helper functions for starring
+  const isStarred = (deckId: string) => starredDecks.includes(deckId);
+  
+  const toggleStar = (deckId: string) => {
+    setStarredDecks(prev => 
+      prev.includes(deckId) 
+        ? prev.filter(id => id !== deckId)
+        : [...prev, deckId]
+    );
+  };
+
+  // Filter decks based on search term, filter, and star filter
   const filteredDecks = publicMarkdownDecks.filter(deck => {
     const matchesSearch = deck.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          deck.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -23,6 +42,17 @@ export function PublicDecksPage() {
     
     if (!matchesSearch) return false;
 
+    // Star filter
+    switch (starFilter) {
+      case 'starred':
+        if (!isStarred(deck.id)) return false;
+        break;
+      case 'unstarred':
+        if (isStarred(deck.id)) return false;
+        break;
+    }
+
+    // Difficulty and tag filter
     switch (filter) {
       case 'easy':
       case 'medium':
@@ -127,15 +157,30 @@ export function PublicDecksPage() {
     }
   };
 
+  // Open share dialog
+  const handleOpenShareDialog = (deck: typeof publicMarkdownDecks[0]) => {
+    const url = generatePublicDeckUrl(deck.id);
+    setShareUrl(url);
+    setShareDeckName(deck.name);
+    setShareDialogOpen(true);
+    setUrlCopied(false);
+  };
+
   // Copy share link
-  const handleCopyLink = async (deckId: string) => {
-    const url = generatePublicDeckUrl(deckId);
+  const handleCopyShareUrl = async () => {
     try {
-      await navigator.clipboard.writeText(url);
-      // Could add a toast notification here
+      await navigator.clipboard.writeText(shareUrl);
+      setUrlCopied(true);
+      setTimeout(() => setUrlCopied(false), 3000);
     } catch (error) {
       console.error('Failed to copy link:', error);
     }
+  };
+
+  // Close share dialog
+  const closeShareDialog = () => {
+    setShareDialogOpen(false);
+    setUrlCopied(false);
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -180,6 +225,44 @@ export function PublicDecksPage() {
           </motion.p>
         </div>
 
+        {/* Star Filter Tabs */}
+        <motion.div 
+          className="mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <div className="flex justify-center">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-2 inline-flex">
+              {[
+                { value: 'all' as StarFilter, label: 'All Decks', icon: Globe, count: publicMarkdownDecks.length },
+                { value: 'starred' as StarFilter, label: 'Starred', icon: Star, count: starredDecks.length },
+                { value: 'unstarred' as StarFilter, label: 'Unstarred', icon: Heart, count: publicMarkdownDecks.length - starredDecks.length }
+              ].map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => setStarFilter(tab.value)}
+                  className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all ${
+                    starFilter === tab.value
+                      ? 'bg-purple-600 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <tab.icon className="w-5 h-5" />
+                  <span className="font-medium">{tab.label}</span>
+                  <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                    starFilter === tab.value
+                      ? 'bg-white/20 text-white'
+                      : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
+                  }`}>
+                    {tab.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
         {/* Search and Filter Bar */}
         <motion.div 
           className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8"
@@ -209,7 +292,7 @@ export function PublicDecksPage() {
                 className="pl-10 pr-8 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">All Decks</option>
-                <option value="english-vietnamese">🇺🇸🇻🇳 English-Vietnamese</option>
+                <option value="english-vietnamese">📚 English-Vietnamese</option>
                 <option value="easy">Easy</option>
                 <option value="medium">Medium</option>
                 <option value="hard">Hard</option>
@@ -218,10 +301,15 @@ export function PublicDecksPage() {
           </div>
 
           {/* Stats */}
-          <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
-            Showing {filteredDecks.length} of {publicMarkdownDecks.length} decks
+          <div className="mt-4 text-sm text-gray-600 dark:text-gray-300 flex items-center gap-4">
+            <span>Showing {filteredDecks.length} of {publicMarkdownDecks.length} decks</span>
+            {starFilter !== 'all' && (
+              <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-xs font-medium">
+                {starFilter === 'starred' ? '⭐ Starred' : '🤍 Unstarred'} Filter Active
+              </span>
+            )}
             {filter === 'english-vietnamese' && (
-              <span className="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs">
+              <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs">
                 English Learning Focus
               </span>
             )}
@@ -246,12 +334,26 @@ export function PublicDecksPage() {
                 {/* Header */}
                 <div className="p-6 border-b border-gray-100 dark:border-gray-700">
                   <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-2">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-2 flex-1 mr-3">
                       {deck.name}
                     </h3>
-                    {deck.tags?.includes('english') && deck.tags?.includes('vietnamese') && (
-                      <Star className="w-5 h-5 text-yellow-500 flex-shrink-0 ml-2" />
-                    )}
+                    <div className="flex items-center space-x-2 flex-shrink-0">
+                      <button
+                        onClick={() => toggleStar(deck.id)}
+                        className={`p-1 rounded-full transition-all hover:scale-110 ${
+                          isStarred(deck.id)
+                            ? 'text-yellow-500 hover:text-yellow-600'
+                            : 'text-gray-300 dark:text-gray-600 hover:text-yellow-400'
+                        }`}
+                        title={isStarred(deck.id) ? 'Remove from starred' : 'Add to starred'}
+                      >
+                        <Star 
+                          className={`w-6 h-6 transition-all ${
+                            isStarred(deck.id) ? 'fill-current' : ''
+                          }`} 
+                        />
+                      </button>
+                    </div>
                   </div>
                   
                   <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
@@ -326,11 +428,11 @@ export function PublicDecksPage() {
                     </button>
 
                     <button
-                      onClick={() => handleCopyLink(deck.id)}
+                      onClick={() => handleOpenShareDialog(deck)}
                       className="flex items-center justify-center space-x-1 py-2 px-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
-                      title="Copy Share Link"
+                      title="Share Deck"
                     >
-                      <ExternalLink className="w-4 h-4" />
+                      <Share2 className="w-4 h-4" />
                       <span className="text-sm">Share</span>
                     </button>
                   </div>
@@ -366,6 +468,150 @@ export function PublicDecksPage() {
           <p className="mt-1">Save any deck to your collection and start learning immediately!</p>
         </motion.div>
       </div>
+
+      {/* Awesome Share Dialog */}
+      <AnimatePresence>
+        {shareDialogOpen && (
+          <motion.div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeShareDialog}
+          >
+            <motion.div
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden"
+              initial={{ scale: 0.7, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.7, opacity: 0, y: 50 }}
+              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white relative overflow-hidden">
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <Share2 className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold">Share Deck</h3>
+                        <p className="text-white/80 text-sm">Spread the knowledge!</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={closeShareDialog}
+                      className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center hover:bg-white/30 transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  
+                  <div className="text-center">
+                    <h4 className="text-lg font-semibold mb-1">{shareDeckName}</h4>
+                    <p className="text-white/80 text-sm">Share this awesome flashcard deck with friends!</p>
+                  </div>
+                </div>
+                
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                {/* URL Display */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Share URL
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={shareUrl}
+                      readOnly
+                      className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 font-mono"
+                    />
+                    <div className="absolute right-1 top-1 bottom-1 flex items-center">
+                      <button
+                        onClick={handleCopyShareUrl}
+                        className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${ 
+                          urlCopied
+                            ? 'bg-green-500 text-white'
+                            : 'bg-purple-600 hover:bg-purple-700 text-white'
+                        }`}
+                      >
+                        {urlCopied ? (
+                          <div className="flex items-center space-x-1">
+                            <Check className="w-4 h-4" />
+                            <span>Copied!</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-1">
+                            <Copy className="w-4 h-4" />
+                            <span>Copy</span>
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Social Share Options */}
+                <div className="mb-6">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Or share via:
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <a
+                      href={`https://twitter.com/intent/tweet?text=Check out this awesome flashcard deck: "${shareDeckName}"&url=${encodeURIComponent(shareUrl)}&hashtags=flashcards,learning,MyFlashPlay`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center space-x-2 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                      </svg>
+                      <span className="text-sm font-medium">Twitter</span>
+                    </a>
+                    
+                    <a
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      </svg>
+                      <span className="text-sm font-medium">Facebook</span>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Tips */}
+                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Star className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-purple-800 dark:text-purple-200 mb-1">
+                        Pro Tip
+                      </p>
+                      <p className="text-sm text-purple-700 dark:text-purple-300">
+                        Anyone with this link can instantly play the deck or save it to their collection. Perfect for sharing with study groups!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
