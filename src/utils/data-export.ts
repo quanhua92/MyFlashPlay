@@ -4,6 +4,18 @@ import { markdownStorage } from './markdown-storage';
 import type { StoredDecks, StoredScores, StoredProgress, UserPreferences } from '@/types';
 import JSZip from 'jszip';
 
+// Simple MD5-like hash function for browser environment
+function simpleHash(str: string): string {
+  let hash = 0;
+  if (str.length === 0) return hash.toString();
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(16);
+}
+
 // Legacy interface - no longer used
 // interface ExportData {
 //   version: string;
@@ -20,60 +32,171 @@ import JSZip from 'jszip';
 // }
 
 export class DataExporter {
-  // Export all data as markdown ZIP file
+  // Export all data as markdown ZIP file with extensive logging
   async exportAllDataAsMarkdownZip(): Promise<void> {
+    console.log('🚀 [EXPORT] Starting export process...');
+    const exportStartTime = Date.now();
+    
     try {
       const zip = new JSZip();
       const timestamp = this.getTimestamp();
+      console.log(`📅 [EXPORT] Export timestamp: ${timestamp}`);
       
       // Get all decks from markdown storage
       const { decks } = markdownStorage.loadAllDecks();
+      console.log(`📚 [EXPORT] Found ${decks.length} decks to export`);
       
       if (decks.length === 0) {
+        console.error('❌ [EXPORT] No decks found to export');
         throw new Error('No decks found to export');
       }
       
       // Create decks folder and add each deck as a markdown file
       const decksFolder = zip.folder('decks');
-      if (!decksFolder) throw new Error('Failed to create decks folder');
+      if (!decksFolder) {
+        console.error('❌ [EXPORT] Failed to create decks folder');
+        throw new Error('Failed to create decks folder');
+      }
       
-      decks.forEach(deck => {
+      // Create export log
+      const exportLog: string[] = [];
+      exportLog.push(`# Export Log - ${new Date().toISOString()}`);
+      exportLog.push(`Total decks found: ${decks.length}\n`);
+      
+      let exportedCount = 0;
+      let skippedCount = 0;
+      
+      decks.forEach((deck, index) => {
+        console.log(`\n📋 [EXPORT] Processing deck ${index + 1}/${decks.length}:`);
+        console.log(`   ID: ${deck.id}`);
+        console.log(`   Name: "${deck.name}"`);
+        console.log(`   Description: "${deck.description}"`);
+        console.log(`   Emoji: ${deck.emoji}`);
+        console.log(`   Cards: ${deck.cards.length}`);
+        
+        // Extract categories and tags
+        const categories = [...new Set(deck.cards.map(card => card.category).filter(Boolean))];
+        const tags = deck.metadata?.tags || [];
+        
+        console.log(`   Categories: [${categories.join(', ')}]`);
+        console.log(`   Tags: [${tags.join(', ')}]`);
+        
         const rawMarkdown = localStorage.getItem(`mdoc_${deck.id}`);
         if (rawMarkdown) {
+          const contentHash = simpleHash(rawMarkdown);
+          const contentLength = rawMarkdown.length;
+          const firstLines = rawMarkdown.split('\n').slice(0, 3).join('\n');
+          
+          console.log(`   Raw markdown length: ${contentLength} characters`);
+          console.log(`   Content hash: ${contentHash}`);
+          console.log(`   First 3 lines of content:`);
+          console.log(`   ${firstLines.split('\n').map(line => `     > ${line}`).join('\n')}`);
+          
           const filename = `${deck.name.replace(/[^a-zA-Z0-9]/g, '-')}.md`;
           decksFolder.file(filename, rawMarkdown);
+          exportedCount++;
+          
+          // Add to export log
+          exportLog.push(`## Deck ${index + 1}: ${deck.name}`);
+          exportLog.push(`- **ID**: ${deck.id}`);
+          exportLog.push(`- **File**: ${filename}`);
+          exportLog.push(`- **Description**: ${deck.description}`);
+          exportLog.push(`- **Emoji**: ${deck.emoji}`);
+          exportLog.push(`- **Cards**: ${deck.cards.length}`);
+          exportLog.push(`- **Categories**: ${categories.length > 0 ? categories.join(', ') : 'None'}`);
+          exportLog.push(`- **Tags**: ${tags.length > 0 ? tags.join(', ') : 'None'}`);
+          exportLog.push(`- **Content Length**: ${contentLength} chars`);
+          exportLog.push(`- **Content Hash**: ${contentHash}`);
+          exportLog.push(`- **Created**: ${deck.metadata?.createdAt || 'Unknown'}`);
+          exportLog.push(`- **Last Modified**: ${deck.metadata?.lastModified || 'Unknown'}`);
+          exportLog.push(`- **Play Count**: ${deck.metadata?.playCount || 0}`);
+          exportLog.push(`- **First Lines**:`);
+          exportLog.push('  ```');
+          exportLog.push(`  ${firstLines}`);
+          exportLog.push('  ```\n');
+          
+          console.log(`   ✅ Exported as: ${filename}`);
+        } else {
+          console.warn(`   ⚠️  No raw markdown found for deck ${deck.id}, skipping`);
+          skippedCount++;
+          
+          // Add to export log
+          exportLog.push(`## Deck ${index + 1}: ${deck.name} (SKIPPED)`);
+          exportLog.push(`- **ID**: ${deck.id}`);
+          exportLog.push(`- **Reason**: No raw markdown found in localStorage`);
+          exportLog.push('');
         }
       });
       
+      console.log(`\n📊 [EXPORT] Export summary:`);
+      console.log(`   Successfully exported: ${exportedCount} decks`);
+      console.log(`   Skipped: ${skippedCount} decks`);
+      
+      // Add summary to export log
+      exportLog.push(`\n## Export Summary`);
+      exportLog.push(`- **Total decks found**: ${decks.length}`);
+      exportLog.push(`- **Successfully exported**: ${exportedCount}`);
+      exportLog.push(`- **Skipped**: ${skippedCount}`);
+      exportLog.push(`- **Export time**: ${Date.now() - exportStartTime}ms`);
+      exportLog.push(`- **Export date**: ${new Date().toISOString()}`);
+      
+      // Add export log to ZIP
+      zip.file('export-log.md', exportLog.join('\n'));
+      console.log('📄 [EXPORT] Added export log file');
+      
       // Export progress data as markdown
+      console.log('📈 [EXPORT] Processing progress data...');
       const progressData = this.exportProgressAsMarkdown();
       if (progressData) {
         zip.file('progress.md', progressData);
+        console.log('✅ [EXPORT] Added progress.md');
+      } else {
+        console.log('ℹ️  [EXPORT] No progress data to export');
       }
       
       // Export achievements as markdown
+      console.log('🏆 [EXPORT] Processing achievements data...');
       const achievementsData = this.exportAchievementsAsMarkdown();
       if (achievementsData) {
         zip.file('achievements.md', achievementsData);
+        console.log('✅ [EXPORT] Added achievements.md');
+      } else {
+        console.log('ℹ️  [EXPORT] No achievements data to export');
       }
       
       // Export preferences as markdown
+      console.log('⚙️ [EXPORT] Processing preferences data...');
       const preferencesData = this.exportPreferencesAsMarkdown();
       if (preferencesData) {
         zip.file('preferences.md', preferencesData);
+        console.log('✅ [EXPORT] Added preferences.md');
+      } else {
+        console.log('ℹ️  [EXPORT] No preferences data to export');
       }
       
       // Add export info
-      const exportInfo = `# MyFlashPlay Export\n\nExported on: ${new Date().toLocaleString()}\nVersion: ${APP_VERSION}\nTotal decks: ${decks.length}\n\n## Contents\n\n- **decks/**: Individual deck files in markdown format\n- **progress.md**: Learning progress and statistics\n- **achievements.md**: Unlocked achievements\n- **preferences.md**: User preferences and settings\n\n## Import Instructions\n\n1. Extract this ZIP file\n2. Use MyFlashPlay's import feature to select the ZIP file\n3. Choose merge strategy for existing decks\n\n---\n\n*This export contains only markdown files for maximum compatibility*`;
+      const exportInfo = `# MyFlashPlay Export\n\nExported on: ${new Date().toLocaleString()}\nVersion: ${APP_VERSION}\nTotal decks: ${decks.length}\nExported decks: ${exportedCount}\nSkipped decks: ${skippedCount}\n\n## Contents\n\n- **decks/**: Individual deck files in markdown format\n- **export-log.md**: Detailed export log with hashes and metadata\n- **progress.md**: Learning progress and statistics\n- **achievements.md**: Unlocked achievements\n- **preferences.md**: User preferences and settings\n\n## Import Instructions\n\n1. Extract this ZIP file\n2. Use MyFlashPlay's import feature to select the ZIP file\n3. Choose merge strategy for existing decks\n\n---\n\n*This export contains only markdown files for maximum compatibility*`;
       
       zip.file('README.md', exportInfo);
+      console.log('📄 [EXPORT] Added README.md');
       
       // Generate and download ZIP
+      console.log('📦 [EXPORT] Generating ZIP file...');
       const zipBlob = await zip.generateAsync({ type: 'blob' });
-      this.downloadBlob(zipBlob, `flashplay-export-${timestamp}.zip`);
+      const filename = `flashplay-export-${timestamp}.zip`;
+      console.log(`💾 [EXPORT] Downloading as: ${filename}`);
+      console.log(`📊 [EXPORT] ZIP file size: ${(zipBlob.size / 1024).toFixed(2)} KB`);
+      
+      this.downloadBlob(zipBlob, filename);
+      
+      const exportEndTime = Date.now();
+      const totalTime = exportEndTime - exportStartTime;
+      console.log(`🎉 [EXPORT] Export completed successfully!`);
+      console.log(`⏱️  [EXPORT] Total export time: ${totalTime}ms`);
+      console.log(`📈 [EXPORT] Final stats: ${exportedCount}/${decks.length} decks exported, ${skippedCount} skipped`);
       
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error('❌ [EXPORT] Export failed:', error);
       throw new Error('Failed to export data. Please try again.');
     }
   }
@@ -475,7 +598,13 @@ export class DataExporter {
   // Generate timestamp for filenames
   private getTimestamp(): string {
     const now = new Date();
-    return now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hour = String(now.getHours()).padStart(2, '0');
+    const minute = String(now.getMinutes()).padStart(2, '0');
+    const second = String(now.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day}-${hour}-${minute}-${second}`;
   }
 
   // Simple checksum for data integrity

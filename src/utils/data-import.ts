@@ -5,6 +5,18 @@ import { v4 as uuidv4 } from 'uuid';
 import type { Deck } from '@/types';
 import JSZip from 'jszip';
 
+// Simple hash function for browser environment (same as export)
+function simpleHash(str: string): string {
+  let hash = 0;
+  if (str.length === 0) return hash.toString();
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(16);
+}
+
 export type MergeStrategy = 'replace' | 'keep-both' | 'merge-cards' | 'skip';
 
 interface ImportResult {
@@ -23,95 +35,274 @@ interface ImportOptions {
 export class DataImporter {
   private readonly markdownParser = new MarkdownParser();
   
-  // Import markdown ZIP file (new primary import method)
+  // Import markdown ZIP file with extensive logging
   async importMarkdownZip(file: File, options: ImportOptions): Promise<ImportResult> {
+    console.log('🚀 [IMPORT] Starting import process...');
+    const importStartTime = Date.now();
+    
+    console.log(`📄 [IMPORT] File details:`);
+    console.log(`   Name: ${file.name}`);
+    console.log(`   Size: ${(file.size / 1024).toFixed(2)} KB`);
+    console.log(`   Type: ${file.type}`);
+    console.log(`   Last Modified: ${new Date(file.lastModified).toISOString()}`);
+    console.log(`   Merge Strategy: ${options.mergeStrategy}`);
+    console.log(`   Dry Run: ${options.dryRun || false}`);
+    
     try {
       const zip = new JSZip();
       const zipData = await file.arrayBuffer();
+      console.log(`📦 [IMPORT] ZIP data loaded, ${zipData.byteLength} bytes`);
+      
       const zipContents = await zip.loadAsync(zipData);
+      console.log(`✅ [IMPORT] ZIP file parsed successfully`);
       
       const results: string[] = [];
       const errors: string[] = [];
       const importedDecks: Deck[] = [];
       
+      // Create import log
+      const importLog: string[] = [];
+      importLog.push(`# Import Log - ${new Date().toISOString()}`);
+      importLog.push(`Source file: ${file.name}`);
+      importLog.push(`File size: ${(file.size / 1024).toFixed(2)} KB`);
+      importLog.push(`Merge strategy: ${options.mergeStrategy}`);
+      importLog.push(`Dry run: ${options.dryRun || false}\n`);
+      
+      // Check if this looks like an export log is present
+      const exportLogFile = zipContents.file('export-log.md');
+      if (exportLogFile) {
+        const exportLogContent = await exportLogFile.async('text');
+        console.log('📋 [IMPORT] Found export log in ZIP file');
+        console.log('📋 [IMPORT] Export log preview:');
+        console.log(exportLogContent.split('\n').slice(0, 10).map(line => `   ${line}`).join('\n'));
+        importLog.push('## Original Export Log Found');
+        importLog.push('```');
+        importLog.push(exportLogContent.split('\n').slice(0, 20).join('\n')); // First 20 lines
+        importLog.push('```\n');
+      }
+      
       // Process deck files
       const decksFolder = zipContents.folder('decks');
       if (decksFolder) {
         const deckFiles = Object.keys(decksFolder.files).filter(name => 
-          name.endsWith('.md') && !decksFolder.files[name].dir
+          name.endsWith('.md') && !decksFolder.files[name].dir && name.startsWith('decks/')
         );
         
+        console.log(`📚 [IMPORT] Found ${deckFiles.length} deck files in ZIP`);
+        console.log(`📚 [IMPORT] Deck files: [${deckFiles.join(', ')}]`);
+        
         for (const filename of deckFiles) {
+          console.log(`\n📋 [IMPORT] Processing: ${filename}`);
+          
           try {
-            const content = await decksFolder.file(filename)?.async('text');
+            // Remove 'decks/' prefix to get the relative filename within the folder
+            const relativeFilename = filename.replace('decks/', '');
+            const content = await decksFolder.file(relativeFilename)?.async('text');
             if (content) {
+              const contentHash = simpleHash(content);
+              const contentLength = content.length;
+              const firstLines = content.split('\n').slice(0, 3).join('\n');
+              
+              console.log(`   Content length: ${contentLength} characters`);
+              console.log(`   Content hash: ${contentHash}`);
+              console.log(`   First 3 lines:`);
+              console.log(`   ${firstLines.split('\n').map(line => `     > ${line}`).join('\n')}`);
+              
               const deck = this.createDeckFromMarkdown(content, filename);
               if (deck) {
+                // Extract categories and tags from deck
+                const categories = [...new Set(deck.cards.map(card => card.category).filter(Boolean))];
+                const tags = deck.metadata?.tags || [];
+                
+                console.log(`   ✅ Deck created successfully:`);
+                console.log(`      ID: ${deck.id}`);
+                console.log(`      Name: "${deck.name}"`);
+                console.log(`      Description: "${deck.description}"`);
+                console.log(`      Emoji: ${deck.emoji}`);
+                console.log(`      Cards: ${deck.cards.length}`);
+                console.log(`      Categories: [${categories.join(', ')}]`);
+                console.log(`      Tags: [${tags.join(', ')}]`);
+                
                 importedDecks.push(deck);
+                
+                // Add to import log
+                importLog.push(`## Deck: ${deck.name}`);
+                importLog.push(`- **Source File**: ${filename}`);
+                importLog.push(`- **Generated ID**: ${deck.id}`);
+                importLog.push(`- **Name**: ${deck.name}`);
+                importLog.push(`- **Description**: ${deck.description}`);
+                importLog.push(`- **Emoji**: ${deck.emoji}`);
+                importLog.push(`- **Cards**: ${deck.cards.length}`);
+                importLog.push(`- **Categories**: ${categories.length > 0 ? categories.join(', ') : 'None'}`);
+                importLog.push(`- **Tags**: ${tags.length > 0 ? tags.join(', ') : 'None'}`);
+                importLog.push(`- **Content Length**: ${contentLength} chars`);
+                importLog.push(`- **Content Hash**: ${contentHash}`);
+                importLog.push(`- **Import Status**: Success`);
+                importLog.push(`- **First Lines**:`);
+                importLog.push('  ```');
+                importLog.push(`  ${firstLines}`);
+                importLog.push('  ```\n');
                 results.push(`Imported deck: ${deck.name}`);
+              } else {
+                console.warn(`   ⚠️  Failed to create deck from ${filename}`);
+                errors.push(`Failed to parse deck from ${filename}`);
+                
+                // Add to import log
+                importLog.push(`## Deck: ${filename} (FAILED)`);
+                importLog.push(`- **Source File**: ${filename}`);
+                importLog.push(`- **Content Length**: ${contentLength} chars`);
+                importLog.push(`- **Content Hash**: ${contentHash}`);
+                importLog.push(`- **Import Status**: Failed - Could not parse deck`);
+                importLog.push(`- **Error**: Failed to create deck from markdown`);
+                importLog.push('');
               }
+            } else {
+              console.warn(`   ⚠️  No content found in ${filename}`);
+              errors.push(`No content found in ${filename}`);
             }
           } catch (err) {
+            console.error(`   ❌ Error processing ${filename}:`, err);
             errors.push(`Failed to import deck ${filename}: ${err}`);
+            
+            // Add to import log
+            importLog.push(`## Deck: ${filename} (ERROR)`);
+            importLog.push(`- **Source File**: ${filename}`);
+            importLog.push(`- **Import Status**: Error`);
+            importLog.push(`- **Error**: ${err}`);
+            importLog.push('');
           }
         }
+      } else {
+        console.log('📂 [IMPORT] No decks folder found in ZIP file');
+        importLog.push('## No Decks Folder Found');
+        importLog.push('The ZIP file does not contain a "decks" folder.');
+        importLog.push('');
       }
       
+      console.log(`\n📊 [IMPORT] Processing summary:`);
+      console.log(`   Decks parsed: ${importedDecks.length}`);
+      console.log(`   Errors: ${errors.length}`);
+      
       // Process progress file
+      console.log('📈 [IMPORT] Checking for progress.md...');
       const progressFile = zipContents.file('progress.md');
       if (progressFile) {
         try {
-          await progressFile.async('text');
-          // Progress is informational only, we don't import it back
+          const progressContent = await progressFile.async('text');
+          console.log('✅ [IMPORT] Found progress.md (informational only)');
           results.push('Progress data found (informational only)');
+          importLog.push('## Progress Data Found');
+          importLog.push('Progress.md file was found but not imported (informational only).');
+          importLog.push('');
         } catch (err) {
+          console.error('❌ [IMPORT] Failed to read progress.md:', err);
           errors.push(`Failed to read progress: ${err}`);
         }
+      } else {
+        console.log('ℹ️  [IMPORT] No progress.md found');
       }
       
       // Process achievements file
+      console.log('🏆 [IMPORT] Checking for achievements.md...');
       const achievementsFile = zipContents.file('achievements.md');
       if (achievementsFile) {
         try {
-          await achievementsFile.async('text');
-          // Achievements are informational only, we don't import them back
+          const achievementsContent = await achievementsFile.async('text');
+          console.log('✅ [IMPORT] Found achievements.md (informational only)');
           results.push('Achievements data found (informational only)');
+          importLog.push('## Achievements Data Found');
+          importLog.push('Achievements.md file was found but not imported (informational only).');
+          importLog.push('');
         } catch (err) {
+          console.error('❌ [IMPORT] Failed to read achievements.md:', err);
           errors.push(`Failed to read achievements: ${err}`);
         }
+      } else {
+        console.log('ℹ️  [IMPORT] No achievements.md found');
       }
       
       // Process preferences file
+      console.log('⚙️ [IMPORT] Checking for preferences.md...');
       const preferencesFile = zipContents.file('preferences.md');
       if (preferencesFile) {
         try {
-          await preferencesFile.async('text');
-          // Preferences are informational only, we don't import them back
+          const preferencesContent = await preferencesFile.async('text');
+          console.log('✅ [IMPORT] Found preferences.md (informational only)');
           results.push('Preferences data found (informational only)');
+          importLog.push('## Preferences Data Found');
+          importLog.push('Preferences.md file was found but not imported (informational only).');
+          importLog.push('');
         } catch (err) {
+          console.error('❌ [IMPORT] Failed to read preferences.md:', err);
           errors.push(`Failed to read preferences: ${err}`);
         }
+      } else {
+        console.log('ℹ️  [IMPORT] No preferences.md found');
       }
       
       if (importedDecks.length === 0) {
+        console.error('❌ [IMPORT] No valid decks found in ZIP file');
         throw new Error('No valid decks found in ZIP file');
       }
       
       // Get existing decks from markdown storage
+      console.log('🔍 [IMPORT] Loading existing decks for merge analysis...');
       const { decks: existingDecks } = markdownStorage.loadAllDecks();
+      console.log(`📚 [IMPORT] Found ${existingDecks.length} existing decks`);
       
       // Preview or execute merge
+      console.log(`🔄 [IMPORT] Processing merge with strategy: ${options.mergeStrategy}`);
       const result = this.mergeDecksToMarkdownStorage(existingDecks, importedDecks, options);
+      console.log(`📊 [IMPORT] Merge result: ${result.imported} imported, ${result.skipped} skipped`);
+      
+      // Add merge summary to import log
+      importLog.push('## Import Summary');
+      importLog.push(`- **Decks processed**: ${importedDecks.length}`);
+      importLog.push(`- **Decks imported**: ${result.imported}`);
+      importLog.push(`- **Decks skipped**: ${result.skipped}`);
+      importLog.push(`- **Errors**: ${errors.length}`);
+      importLog.push(`- **Merge strategy**: ${options.mergeStrategy}`);
+      importLog.push(`- **Dry run**: ${options.dryRun || false}`);
+      importLog.push(`- **Import time**: ${Date.now() - importStartTime}ms`);
+      importLog.push(`- **Existing decks before import**: ${existingDecks.length}`);
       
       if (!options.dryRun) {
+        console.log('💾 [IMPORT] Saving decks to storage...');
         // Save merged decks to markdown storage
+        let savedCount = 0;
         for (const deck of result.decks) {
+          console.log(`   Saving: ${deck.name} (${deck.id})`);
           const saveResult = markdownStorage.saveDeck(deck);
           if (!saveResult.success) {
+            console.error(`   ❌ Failed to save ${deck.name}:`, saveResult.error);
             errors.push(`Failed to save deck ${deck.name}: ${saveResult.error}`);
+          } else {
+            console.log(`   ✅ Saved: ${deck.name}`);
+            // Also save raw markdown to localStorage for future editing
+            const rawMarkdown = deck.metadata?.originalMarkdown;
+            if (rawMarkdown) {
+              localStorage.setItem(`mdoc_${deck.id}`, rawMarkdown);
+              console.log(`   ✅ Saved raw markdown for: ${deck.name}`);
+            }
+            savedCount++;
           }
         }
+        console.log(`💾 [IMPORT] Successfully saved ${savedCount}/${result.decks.length} decks`);
+        
+        // Save import log to localStorage for debugging
+        const importLogContent = importLog.join('\n');
+        const logKey = `import_log_${Date.now()}`;
+        localStorage.setItem(logKey, importLogContent);
+        console.log(`📋 [IMPORT] Import log saved to localStorage: ${logKey}`);
+      } else {
+        console.log('🔍 [IMPORT] Dry run - no decks saved');
       }
+      
+      const importEndTime = Date.now();
+      const totalTime = importEndTime - importStartTime;
+      console.log(`\n🎉 [IMPORT] Import ${options.dryRun ? 'preview' : 'process'} completed!`);
+      console.log(`⏱️  [IMPORT] Total import time: ${totalTime}ms`);
+      console.log(`📈 [IMPORT] Final result: ${result.imported}/${importedDecks.length} decks imported, ${errors.length} errors`);
       
       return {
         success: errors.length === 0,
@@ -121,6 +312,7 @@ export class DataImporter {
         errors: errors.length > 0 ? errors : undefined
       };
     } catch (error) {
+      console.error('❌ [IMPORT] Import failed:', error);
       return {
         success: false,
         message: `ZIP import failed: ${error}`,
@@ -607,11 +799,13 @@ export class DataImporter {
         const decksFolder = zipContents.folder('decks');
         if (decksFolder) {
           const deckFiles = Object.keys(decksFolder.files).filter(name => 
-            name.endsWith('.md') && !decksFolder.files[name].dir
+            name.endsWith('.md') && !decksFolder.files[name].dir && name.startsWith('decks/')
           );
           
           for (const filename of deckFiles) {
-            const content = await decksFolder.file(filename)?.async('text');
+            // Remove 'decks/' prefix to get the relative filename within the folder
+            const relativeFilename = filename.replace('decks/', '');
+            const content = await decksFolder.file(relativeFilename)?.async('text');
             if (content) {
               const deck = this.createDeckFromMarkdown(content, filename);
               if (deck) {

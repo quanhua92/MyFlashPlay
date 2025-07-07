@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Download, Upload, Moon, Sun, Monitor, Volume2, VolumeX, Save, AlertCircle, Accessibility, Database, Trash2, Shield, HardDrive, FileText, Globe } from 'lucide-react';
+import { Download, Upload, Moon, Sun, Monitor, Volume2, VolumeX, Save, AlertCircle, Accessibility, Database, Trash2, Shield, HardDrive, FileText, Globe, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTheme } from '@/components/layout/ThemeProvider';
 import { dataExporter } from '@/utils/data-export';
 import { dataImporter, type MergeStrategy } from '@/utils/data-import';
+import { markdownStorage } from '@/utils/markdown-storage';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS } from '@/utils/constants';
 import { AccessibilitySettings } from '@/components/common/AccessibilitySettings';
@@ -57,6 +58,7 @@ export function SettingsPage() {
   const [hasExportedData, setHasExportedData] = useState<boolean>(false);
   const [nuclearUnlocked, setNuclearUnlocked] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [showImportFormat, setShowImportFormat] = useState<boolean>(false);
 
   // Export handlers
   const handleExportAll = async () => {
@@ -126,6 +128,7 @@ export function SettingsPage() {
     }
     setIsImporting(false);
   };
+
 
   // Advanced localStorage management functions
   const getStorageInfo = () => {
@@ -466,79 +469,233 @@ export function SettingsPage() {
             </h2>
             
             <div className="space-y-4">
+              {/* File Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Select file to import
-                </label>
                 <input
+                  ref={(input) => {
+                    if (input) {
+                      // Store ref for programmatic access
+                      (window as any).fileInputRef = input;
+                    }
+                  }}
                   type="file"
-                  accept=".json"
+                  accept=".zip"
                   onChange={handleFileSelect}
-                  className="block w-full text-sm text-gray-500 dark:text-gray-400
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-lg file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-purple-50 file:text-purple-700
-                    dark:file:bg-purple-900/20 dark:file:text-purple-300
-                    hover:file:bg-purple-100 dark:hover:file:bg-purple-900/30"
+                  className="hidden"
                 />
-              </div>
-
-              {importPreview && (
-                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
-                    Import Preview
-                  </h3>
-                  <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-                    <li>• {importPreview.new} new decks to import</li>
-                    <li>• {importPreview.existing} existing decks</li>
-                    {importPreview.duplicates.length > 0 && (
-                      <li className="text-orange-600 dark:text-orange-400">
-                        • {importPreview.duplicates.length} duplicates: {importPreview.duplicates.join(', ')}
-                      </li>
-                    )}
-                  </ul>
-                </div>
-              )}
-
-              {selectedFile && importPreview?.duplicates.length > 0 && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    How to handle duplicates?
-                  </label>
-                  <select
-                    value={mergeStrategy}
-                    onChange={(e) => setMergeStrategy(e.target.value as MergeStrategy)}
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="keep-both">Keep both (rename imported)</option>
-                    <option value="replace">Replace existing</option>
-                    <option value="merge-cards">Merge cards</option>
-                    <option value="skip">Skip duplicates</option>
-                  </select>
-                </div>
-              )}
-
-              <div className="flex space-x-3">
-                <button
-                  onClick={handleImport}
-                  disabled={!selectedFile || isImporting}
-                  className="flex-1 flex items-center justify-center space-x-2 p-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
-                >
-                  <Upload className="w-5 h-5" />
-                  <span>{isImporting ? 'Importing...' : 'Import Decks'}</span>
-                </button>
                 
-                <button
-                  onClick={handleFullImport}
-                  disabled={!selectedFile || isImporting}
-                  className="flex items-center justify-center space-x-2 px-4 py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
-                  title="Replace all data with backup"
-                >
-                  <AlertCircle className="w-5 h-5" />
-                  <span>Full Restore</span>
-                </button>
+                {!selectedFile ? (
+                  <button
+                    onClick={() => (window as any).fileInputRef?.click()}
+                    className="w-full flex items-center justify-center space-x-2 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-purple-400 dark:hover:border-purple-500 rounded-lg transition-colors bg-gray-50 dark:bg-gray-700 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                  >
+                    <Upload className="w-6 h-6 text-gray-400" />
+                    <div className="text-center">
+                      <div className="text-lg font-medium text-gray-700 dark:text-gray-300">
+                        Select ZIP file to import
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        Click to browse for your MyFlashPlay export file
+                      </div>
+                    </div>
+                  </button>
+                ) : (
+                  <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center">
+                          <FileText className="w-5 h-5 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-green-800 dark:text-green-200">
+                            {selectedFile.name}
+                          </div>
+                          <div className="text-sm text-green-600 dark:text-green-400">
+                            {(selectedFile.size / 1024).toFixed(2)} KB
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setSelectedFile(null);
+                          setImportPreview(null);
+                          setImportStatus('');
+                        }}
+                        className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-800 rounded-lg transition-colors"
+                        title="Remove file"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* Format Details Toggle */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <button
+                  onClick={() => setShowImportFormat(!showImportFormat)}
+                  className="flex items-center justify-between w-full p-3 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                >
+                  <div className="flex items-center space-x-2">
+                    <FileText className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Expected ZIP File Format
+                    </span>
+                  </div>
+                  <div className={`transform transition-transform ${showImportFormat ? 'rotate-180' : ''}`}>
+                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </button>
+
+                {showImportFormat && (
+                  <div className="mt-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3">
+                      📦 Expected ZIP File Structure
+                    </h4>
+                    
+                    <div className="space-y-3 text-xs font-mono">
+                      <div className="text-blue-700 dark:text-blue-300">
+                        <div className="font-semibold mb-2">flashplay-export-YYYY-MM-DD-HH-MM-SS.zip</div>
+                        <div className="ml-2 space-y-1">
+                          <div>├── 📁 <span className="font-semibold text-purple-600 dark:text-purple-400">decks/</span></div>
+                          <div className="ml-4 space-y-1 text-gray-600 dark:text-gray-400">
+                            <div>├── Deck-Name-1.md</div>
+                            <div>├── Deck-Name-2.md</div>
+                            <div>└── Deck-Name-N.md</div>
+                          </div>
+                          <div>├── 📄 <span className="text-gray-600 dark:text-gray-400">export-log.md</span> <span className="text-gray-500">(optional - detailed export info)</span></div>
+                          <div>├── 📄 <span className="text-gray-600 dark:text-gray-400">progress.md</span> <span className="text-gray-500">(optional - learning stats)</span></div>
+                          <div>├── 📄 <span className="text-gray-600 dark:text-gray-400">achievements.md</span> <span className="text-gray-500">(optional - achievements)</span></div>
+                          <div>├── 📄 <span className="text-gray-600 dark:text-gray-400">preferences.md</span> <span className="text-gray-500">(optional - user settings)</span></div>
+                          <div>└── 📄 <span className="text-gray-600 dark:text-gray-400">README.md</span> <span className="text-gray-500">(optional - export info)</span></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded border border-blue-200 dark:border-blue-700">
+                      <h5 className="text-xs font-semibold text-blue-800 dark:text-blue-200 mb-2">
+                        📋 Deck File Format (Markdown)
+                      </h5>
+                      <pre className="text-xs text-gray-700 dark:text-gray-300 overflow-x-auto">
+{`# 📚 Deck Name
+
+Brief deck description
+
+## Category 1
+
+- Front text :: Back text
+- Question? :: Answer
+- True or false statement :: true
+
+## Category 2
+
+- Multiple choice question?
+  - Option 1
+  - Option 2 
+  - Correct option
+  > Correct option`}
+                      </pre>
+                    </div>
+
+                    <div className="mt-3 text-xs space-y-2">
+                      <div className="flex items-start space-x-2">
+                        <div className="w-4 h-4 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mt-0.5">
+                          <div className="w-2 h-2 bg-green-600 dark:bg-green-400 rounded-full"></div>
+                        </div>
+                        <div>
+                          <span className="font-medium text-green-800 dark:text-green-200">Required:</span>
+                          <span className="text-green-700 dark:text-green-300 ml-1">decks/ folder with .md files</span>
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-2">
+                        <div className="w-4 h-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mt-0.5">
+                          <div className="w-2 h-2 bg-gray-600 dark:bg-gray-400 rounded-full"></div>
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-800 dark:text-gray-200">Optional:</span>
+                          <span className="text-gray-700 dark:text-gray-300 ml-1">export-log.md, progress.md, achievements.md, preferences.md, README.md</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded border border-yellow-200 dark:border-yellow-700">
+                      <div className="flex items-start space-x-2">
+                        <div className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5">💡</div>
+                        <div>
+                          <div className="text-xs font-medium text-yellow-800 dark:text-yellow-200 mb-1">Pro Tip</div>
+                          <div className="text-xs text-yellow-700 dark:text-yellow-300">
+                            Use the "Export Data" button above to create a properly formatted ZIP file that you can then re-import or share.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Import Actions - Only show when file is selected */}
+              {selectedFile && (
+                <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                  {importPreview && (
+                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
+                        Import Preview
+                      </h3>
+                      <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                        <li>• {importPreview.new} new decks to import</li>
+                        <li>• {importPreview.existing} existing decks</li>
+                        {importPreview.duplicates.length > 0 && (
+                          <li className="text-orange-600 dark:text-orange-400">
+                            • {importPreview.duplicates.length} duplicates: {importPreview.duplicates.join(', ')}
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+
+                  {importPreview?.duplicates.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        How to handle duplicates?
+                      </label>
+                      <select
+                        value={mergeStrategy}
+                        onChange={(e) => setMergeStrategy(e.target.value as MergeStrategy)}
+                        className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      >
+                        <option value="keep-both">Keep both (rename imported)</option>
+                        <option value="replace">Replace existing</option>
+                        <option value="merge-cards">Merge cards</option>
+                        <option value="skip">Skip duplicates</option>
+                      </select>
+                    </div>
+                  )}
+
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={handleImport}
+                      disabled={isImporting}
+                      className="flex-1 flex items-center justify-center space-x-2 p-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
+                    >
+                      <Upload className="w-5 h-5" />
+                      <span>{isImporting ? 'Importing...' : 'Import Decks'}</span>
+                    </button>
+                    
+                    <button
+                      onClick={handleFullImport}
+                      disabled={isImporting}
+                      className="flex items-center justify-center space-x-2 px-4 py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
+                      title="Replace all data with backup"
+                    >
+                      <AlertCircle className="w-5 h-5" />
+                      <span>Full Restore</span>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {importStatus && (
                 <div className={`p-3 rounded-lg text-sm ${
@@ -551,6 +708,7 @@ export function SettingsPage() {
               )}
             </div>
           </motion.div>
+
 
           {/* Advanced localStorage Management */}
           <motion.div

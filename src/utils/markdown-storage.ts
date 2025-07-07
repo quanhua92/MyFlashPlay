@@ -79,19 +79,11 @@ export class MarkdownStorage {
 
   // Load deck from markdown
   loadDeck(deckId: string): { deck: Deck | null; result: MarkdownStorageResult } {
-    console.log(`[MarkdownStorage] loadDeck called with deckId: ${deckId}`);
     try {
       const key = `${this.PREFIX}${deckId}`;
-      console.log(`[MarkdownStorage] Looking for key: ${key}`);
       const markdown = localStorage.getItem(key);
-      console.log(`[MarkdownStorage] Found markdown:`, {
-        found: !!markdown,
-        length: markdown?.length || 0,
-        preview: markdown?.substring(0, 100) + '...'
-      });
       
       if (!markdown) {
-        console.log(`[MarkdownStorage] No markdown found for key: ${key}`);
         return {
           deck: null,
           result: { success: false, error: 'Deck not found' }
@@ -113,20 +105,11 @@ export class MarkdownStorage {
 
       // Get deck metadata from index
       const index = this.getIndex();
-      console.log(`[MarkdownStorage] Current index:`, index);
       const deckMetadata = index.find(entry => entry.id === deckId);
-      console.log(`[MarkdownStorage] Found metadata:`, deckMetadata);
       
       const deck = this.markdownToDeck(deckId, markdown, deckMetadata?.name, deckMetadata?.emoji);
-      console.log(`[MarkdownStorage] Converted to deck:`, {
-        found: !!deck,
-        id: deck?.id,
-        name: deck?.name,
-        cardCount: deck?.cards?.length
-      });
       
       if (!deck) {
-        console.log(`[MarkdownStorage] Failed to parse markdown`);
         return {
           deck: null,
           result: {
@@ -138,7 +121,6 @@ export class MarkdownStorage {
         };
       }
 
-      console.log(`[MarkdownStorage] Successfully loaded deck ${deckId}`);
       return {
         deck,
         result: { success: true }
@@ -157,14 +139,11 @@ export class MarkdownStorage {
 
   // Load all decks
   loadAllDecks(): { decks: Deck[]; errors: Array<{ id: string; error: string }> } {
-    console.log('[MarkdownStorage] loadAllDecks called');
     const index = this.getIndex();
-    console.log('[MarkdownStorage] Loading decks from index:', index.map(e => ({ id: e.id, name: e.name })));
     const decks: Deck[] = [];
     const errors: Array<{ id: string; error: string }> = [];
 
     index.forEach(entry => {
-      console.log(`[MarkdownStorage] Loading deck from index: ${entry.id} - ${entry.name}`);
       const { deck, result } = this.loadDeck(entry.id);
       
       if (deck) {
@@ -177,10 +156,6 @@ export class MarkdownStorage {
       }
     });
 
-    console.log('[MarkdownStorage] loadAllDecks complete:', {
-      deckCount: decks.length,
-      errorCount: errors.length
-    });
     return { decks, errors };
   }
 
@@ -210,19 +185,11 @@ export class MarkdownStorage {
 
   // Get deck index for listing
   getIndex(): Array<{ id: string; name: string; emoji: string; lastModified: string }> {
-    console.log('[MarkdownStorage] getIndex called');
     try {
       const indexData = localStorage.getItem(this.INDEX_KEY);
-      console.log(`[MarkdownStorage] Index data found:`, {
-        found: !!indexData,
-        length: indexData?.length || 0
-      });
-      const parsed = indexData ? JSON.parse(indexData) : [];
-      console.log(`[MarkdownStorage] Parsed index:`, parsed);
-      return parsed;
+      return indexData ? JSON.parse(indexData) : [];
     } catch (error) {
       console.error('[MarkdownStorage] Failed to load deck index:', error);
-      console.log('[MarkdownStorage] Rebuilding index...');
       return this.rebuildIndex();
     }
   }
@@ -362,28 +329,10 @@ export class MarkdownStorage {
   // Convert markdown to deck
   private markdownToDeck(deckId: string, markdown: string, providedName?: string, providedEmoji?: string): Deck | null {
     try {
-      console.log(`[MarkdownStorage markdownToDeck] Processing deck ${deckId}:`, {
-        markdownLength: markdown.length,
-        providedName,
-        providedEmoji,
-        markdownPreview: markdown.substring(0, 200) + '...'
-      });
-      
       const parseResult = markdownProcessor.parse(markdown);
       const cards = parseResult.cards;
       
-      console.log(`[MarkdownStorage markdownToDeck] Parse result for ${deckId}:`, {
-        cardCount: cards.length,
-        parseErrors: parseResult.errors?.length || 0,
-        firstThreeCards: cards.slice(0, 3).map(card => ({
-          type: card.type,
-          front: card.front.substring(0, 50) + '...',
-          back: card.back.substring(0, 50) + '...'
-        }))
-      });
-      
       if (cards.length === 0) {
-        console.log(`[MarkdownStorage markdownToDeck] No cards found for ${deckId}`);
         return null;
       }
       
@@ -399,7 +348,7 @@ export class MarkdownStorage {
       });
       const description = descriptionLine?.trim() || '';
       
-      const finalDeck = {
+      return {
         id: deckId,
         name,
         description,
@@ -421,15 +370,6 @@ export class MarkdownStorage {
           studyMode: 'random'
         }
       };
-      
-      console.log(`[MarkdownStorage markdownToDeck] Final deck for ${deckId}:`, {
-        id: finalDeck.id,
-        name: finalDeck.name,
-        cardCount: finalDeck.cards.length,
-        originalMarkdownLength: finalDeck.metadata.originalMarkdown.length
-      });
-      
-      return finalDeck;
     } catch (error) {
       console.error('Failed to convert markdown to deck:', error);
       return null;
