@@ -1,4 +1,6 @@
-export const publicVietnameseBasicPhysics = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseBasicPhysics: PublicDeck = {
   id: 'public-vietnamese-basic-physics',
   name: '⚛️ Vật lý Cơ bản',
   description: 'Các khái niệm và câu hỏi vật lý nền tảng bằng Tiếng Việt.',

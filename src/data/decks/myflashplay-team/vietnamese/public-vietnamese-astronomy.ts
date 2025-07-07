@@ -1,4 +1,6 @@
-export const publicVietnameseAstronomy = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseAstronomy: PublicDeck = {
   id: 'public-vietnamese-astronomy',
   name: '🔭 Thiên văn học',
   description: 'Các hành tinh, ngôi sao, thiên hà và khám phá không gian.',

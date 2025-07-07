@@ -1,4 +1,6 @@
-export const publicVietnameseHistoryAdvanced = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseHistoryAdvanced: PublicDeck = {
   id: 'public-vietnamese-history-advanced',
   name: '📜 Lịch sử Việt Nam Nâng cao',
   description: 'Các triều đại, sự kiện lịch sử và các nhân vật quan trọng.',

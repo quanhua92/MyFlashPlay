@@ -1,4 +1,6 @@
-export const publicEnglishVietnameseBody = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnglishVietnameseBody: PublicDeck = {
   id: 'public-english-vietnamese-body',
   name: '👤 English-Vietnamese Body Parts',
   description: 'Learn body parts in English and Vietnamese',

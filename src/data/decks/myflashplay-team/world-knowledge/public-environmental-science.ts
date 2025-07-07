@@ -1,4 +1,6 @@
-export const publicEnvironmentalScience = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnvironmentalScience: PublicDeck = {
   id: 'public-environmental-science',
   name: '♻️ Khoa học Môi trường',
   description: 'Hệ sinh thái, ô nhiễm và các biện pháp bảo vệ môi trường.',

@@ -1,4 +1,6 @@
-export const publicVietnameseLiterature = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseLiterature: PublicDeck = {
   id: 'public-vietnamese-literature',
   name: '📚 Văn học Việt Nam',
   description: 'Tác giả, tác phẩm và nhân vật nổi tiếng trong văn học Việt Nam.',

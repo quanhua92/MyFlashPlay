@@ -32,7 +32,9 @@ function PublicDeckPlayPage() {
         const publicDeck = getPublicDeck(deckId);
         if (publicDeck) {
           setPublicDeckData(publicDeck);
-          const result = markdownProcessor.parse(publicDeck.markdown);
+          // Ensure markdown property exists and is a string
+          const markdownContent = publicDeck.markdown || '';
+          const result = markdownProcessor.parse(markdownContent);
           const cards = result.cards;
           const processedDeck: Deck = {
             id: publicDeck.id,

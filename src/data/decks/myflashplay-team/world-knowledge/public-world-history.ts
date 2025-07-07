@@ -1,4 +1,6 @@
-export const publicWorldHistory = {
+import type { PublicDeck } from '@/types';
+
+export const publicWorldHistory: PublicDeck = {
   id: 'public-world-history',
   name: '🌍 Lịch sử Thế giới',
   description: 'Các sự kiện, đế chế và nhân vật lịch sử quan trọng trên thế giới.',

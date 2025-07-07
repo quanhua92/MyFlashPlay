@@ -1,4 +1,6 @@
-export const publicPsychology = {
+import type { PublicDeck } from '@/types';
+
+export const publicPsychology: PublicDeck = {
   id: 'public-psychology',
   name: '🧠 Tâm lý học Cơ bản',
   description: 'Các khái niệm, thí nghiệm nổi tiếng và các rối loạn tâm lý.',

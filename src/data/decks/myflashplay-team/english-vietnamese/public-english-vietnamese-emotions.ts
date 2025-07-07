@@ -1,4 +1,6 @@
-export const publicEnglishVietnameseEmotions = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnglishVietnameseEmotions: PublicDeck = {
   id: 'public-english-vietnamese-emotions',
   name: '😊 English-Vietnamese Emotions',
   description: 'Express feelings and emotions in both languages',

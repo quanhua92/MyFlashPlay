@@ -1,4 +1,6 @@
-export const publicEnglishVietnameseHobbies = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnglishVietnameseHobbies: PublicDeck = {
   id: 'public-english-vietnamese-hobbies',
   name: '🎨 English-Vietnamese Hobbies',
   description: 'Free time activities and hobbies',

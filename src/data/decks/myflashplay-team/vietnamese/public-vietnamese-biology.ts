@@ -1,4 +1,6 @@
-export const publicVietnameseBiology = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseBiology: PublicDeck = {
   id: 'public-vietnamese-biology',
   name: '🧬 Sinh học',
   description: 'Tế bào, di truyền và các hệ cơ quan trong cơ thể người.',

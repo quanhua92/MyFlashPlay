@@ -42,16 +42,16 @@ export { publicVietnameseAstronomy } from './vietnamese/public-vietnamese-astron
 export { publicVietnameseMythology } from './vietnamese/public-vietnamese-mythology';
 export { publicVietnameseEconomics } from './vietnamese/public-vietnamese-economics';
 export { publicVietnameseProverbs } from './vietnamese/public-vietnamese-proverbs';
-export { vietnameseDoraemonDeck } from './vietnamese/public-vietnamese-doraemon';
-export { vietnameseCartoonHeroesDeck } from './vietnamese/public-vietnamese-cartoon-heroes';
-export { vietnameseToysGamesDeck } from './vietnamese/public-vietnamese-toys-games';
-export { vietnameseFairyTalesDeck } from './vietnamese/public-vietnamese-fairy-tales';
-export { vietnamesePokemonDeck } from './vietnamese/public-vietnamese-pokemon';
-export { vietnameseDisneyMoviesDeck } from './vietnamese/public-vietnamese-disney-movies';
-export { vietnameseFunFactsDeck } from './vietnamese/public-vietnamese-fun-facts';
-export { vietnameseSuperheroesDeck } from './vietnamese/public-vietnamese-superheroes';
-export { vietnameseDinosaursDeck } from './vietnamese/public-vietnamese-dinosaurs';
-export { vietnameseSpaceAdventureDeck } from './vietnamese/public-vietnamese-space-adventure';
+export { publicVietnameseDoraemon } from './vietnamese/public-vietnamese-doraemon';
+export { publicVietnameseCartoonHeroes } from './vietnamese/public-vietnamese-cartoon-heroes';
+export { publicVietnameseToysGames } from './vietnamese/public-vietnamese-toys-games';
+export { publicVietnameseFairyTales } from './vietnamese/public-vietnamese-fairy-tales';
+export { publicVietnamesePokemon } from './vietnamese/public-vietnamese-pokemon';
+export { publicVietnameseDisneyMovies } from './vietnamese/public-vietnamese-disney-movies';
+export { publicVietnameseFunFacts } from './vietnamese/public-vietnamese-fun-facts';
+export { publicVietnameseSuperheroes } from './vietnamese/public-vietnamese-superheroes';
+export { publicVietnameseDinosaurs } from './vietnamese/public-vietnamese-dinosaurs';
+export { publicVietnameseSpaceAdventure } from './vietnamese/public-vietnamese-space-adventure';
 
 // World knowledge decks
 export { publicWorldHistory } from './world-knowledge/public-world-history';

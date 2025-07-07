@@ -1,4 +1,6 @@
-export const publicEnglishVietnameseTime = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnglishVietnameseTime: PublicDeck = {
   id: 'public-english-vietnamese-time',
   name: '📅 English-Vietnamese Time & Days',
   description: 'Time expressions and days of the week',

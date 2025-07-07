@@ -1,4 +1,6 @@
-export const publicGeology = {
+import type { PublicDeck } from '@/types';
+
+export const publicGeology: PublicDeck = {
   id: 'public-geology',
   name: '🌍 Địa chất học',
   description: 'Các loại đá, khoáng vật và kiến tạo mảng.',

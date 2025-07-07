@@ -1,4 +1,6 @@
-export const publicWorldGeography = {
+import type { PublicDeck } from '@/types';
+
+export const publicWorldGeography: PublicDeck = {
   id: 'public-world-geography',
   name: '🌐 Địa lý Thế giới',
   description: 'Các châu lục, đại dương và địa danh nổi tiếng trên thế giới.',

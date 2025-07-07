@@ -1,4 +1,6 @@
-export const publicEnglishVietnameseWeather = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnglishVietnameseWeather: PublicDeck = {
   id: 'public-english-vietnamese-weather',
   name: '🌤️ English-Vietnamese Weather',
   description: 'Weather and climate vocabulary',

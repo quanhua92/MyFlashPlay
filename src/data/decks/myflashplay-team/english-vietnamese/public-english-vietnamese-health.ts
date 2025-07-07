@@ -1,4 +1,6 @@
-export const publicEnglishVietnameseHealth = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnglishVietnameseHealth: PublicDeck = {
   id: 'public-english-vietnamese-health',
   name: '🏥 English-Vietnamese Health',
   description: 'Health, medical, and wellness vocabulary',

@@ -1,4 +1,6 @@
-export const publicEnglishVietnameseNumbers = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnglishVietnameseNumbers: PublicDeck = {
   id: 'public-english-vietnamese-numbers',
   name: '🔢 English-Vietnamese Numbers',
   description: 'Learn numbers in English and Vietnamese',

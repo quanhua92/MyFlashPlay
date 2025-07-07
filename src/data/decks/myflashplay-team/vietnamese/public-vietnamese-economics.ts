@@ -1,4 +1,6 @@
-export const publicVietnameseEconomics = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseEconomics: PublicDeck = {
   id: 'public-vietnamese-economics',
   name: '💹 Kinh tế học Cơ bản',
   description: 'Các khái niệm cơ bản về kinh tế, cung cầu và thị trường.',

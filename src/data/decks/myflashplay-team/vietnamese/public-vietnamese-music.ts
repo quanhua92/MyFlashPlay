@@ -1,4 +1,6 @@
-export const publicVietnameseMusic = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseMusic: PublicDeck = {
   id: 'public-vietnamese-music',
   name: '🎵 Âm nhạc Việt Nam',
   description: 'Nhạc cụ truyền thống, nhạc sĩ và các thể loại âm nhạc Việt Nam.',

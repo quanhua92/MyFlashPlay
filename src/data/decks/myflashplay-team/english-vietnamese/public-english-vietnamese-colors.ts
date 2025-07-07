@@ -1,4 +1,6 @@
-export const publicEnglishVietnameseColors = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnglishVietnameseColors: PublicDeck = {
   id: 'public-english-vietnamese-colors',
   name: '🌈 English-Vietnamese Colors',
   description: 'Learn color names in English and Vietnamese',

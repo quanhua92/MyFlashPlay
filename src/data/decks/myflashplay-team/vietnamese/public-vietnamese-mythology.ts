@@ -1,4 +1,6 @@
-export const publicVietnameseMythology = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseMythology: PublicDeck = {
   id: 'public-vietnamese-mythology',
   name: '🏛️ Thần thoại Việt Nam & Thế giới',
   description: 'Các vị thần, sinh vật và câu chuyện thần thoại nổi tiếng.',

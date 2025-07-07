@@ -1,4 +1,6 @@
-export const publicVietnameseCinema = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseCinema: PublicDeck = {
   id: 'public-vietnamese-cinema',
   name: '🎬 Điện ảnh Việt Nam',
   description: 'Các bộ phim kinh điển, đạo diễn và diễn viên nổi tiếng của Việt Nam.',

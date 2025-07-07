@@ -1,4 +1,6 @@
-export const publicSociology = {
+import type { PublicDeck } from '@/types';
+
+export const publicSociology: PublicDeck = {
   id: 'public-sociology',
   name: '👨‍👩‍👧‍👦 Xã hội học Cơ bản',
   description: 'Cấu trúc xã hội, văn hóa và hành vi xã hội.',

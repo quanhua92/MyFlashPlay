@@ -1,4 +1,6 @@
-export const publicVietnameseGeographyAdvanced = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseGeographyAdvanced: PublicDeck = {
   id: 'public-vietnamese-geography-advanced',
   name: '🗺️ Địa lý Việt Nam Nâng cao',
   description: 'Các tỉnh, sông ngòi, núi non và vườn quốc gia của Việt Nam.',

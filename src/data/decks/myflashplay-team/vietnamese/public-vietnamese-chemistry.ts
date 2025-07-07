@@ -1,4 +1,6 @@
-export const publicVietnameseChemistry = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseChemistry: PublicDeck = {
   id: 'public-vietnamese-chemistry',
   name: '🧪 Hóa học',
   description: 'Nguyên tố, bảng tuần hoàn và các phản ứng hóa học.',

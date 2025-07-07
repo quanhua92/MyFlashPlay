@@ -1,4 +1,6 @@
-export const publicVietnameseFunScience = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseFunScience: PublicDeck = {
   id: 'public-vietnamese-fun-science',
   name: '🔬 Khoa học Vui',
   description: 'Các câu hỏi khoa học thú vị bằng Tiếng Việt cho mọi lứa tuổi.',

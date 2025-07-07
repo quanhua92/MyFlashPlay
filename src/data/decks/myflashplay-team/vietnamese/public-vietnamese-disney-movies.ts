@@ -1,134 +1,55 @@
-import type { Deck } from '../../../../types/flashcard.types';
+import type { PublicDeck } from '@/types';
 
-export const vietnameseDisneyMoviesDeck: Deck = {
-  id: 'vietnamese-disney-movies',
-  title: 'Phim Disney Yêu Thích',
+export const publicVietnameseDisneyMovies: PublicDeck = {
+  id: 'public-vietnamese-disney-movies',
+  name: '🏰 Phim Disney Yêu Thích',
   description: 'Khám phá thế giới kỳ diệu của các bộ phim Disney và những nhân vật đáng yêu',
-  cards: [
-    {
-      id: 'disney-1',
-      front: 'Công chúa có mái tóc dài màu vàng',
-      back: 'Rapunzel',
-      category: 'Công chúa'
-    },
-    {
-      id: 'disney-2',
-      front: 'Công chúa băng giá có phép màu',
-      back: 'Elsa',
-      category: 'Công chúa'
-    },
-    {
-      id: 'disney-3',
-      front: 'Em gái của Elsa, tóc đỏ và vui vẻ',
-      back: 'Anna',
-      category: 'Công chúa'
-    },
-    {
-      id: 'disney-4',
-      front: 'Người tuyết vui nhộn thích mùa hè',
-      back: 'Olaf',
-      category: 'Frozen'
-    },
-    {
-      id: 'disney-5',
-      front: 'Sư tử con sẽ trở thành vua',
-      back: 'Simba',
-      category: 'Vua sư tử'
-    },
-    {
-      id: 'disney-6',
-      front: 'Bố của Simba, vua sư tử',
-      back: 'Mufasa',
-      category: 'Vua sư tử'
-    },
-    {
-      id: 'disney-7',
-      front: 'Chú heo rừng bạn của Simba',
-      back: 'Pumbaa',
-      category: 'Vua sư tử'
-    },
-    {
-      id: 'disney-8',
-      front: 'Chú cầy mangut bạn của Simba',
-      back: 'Timon',
-      category: 'Vua sư tử'
-    },
-    {
-      id: 'disney-9',
-      front: 'Nàng tiên cá muốn lên đất liền',
-      back: 'Ariel',
-      category: 'Nàng tiên cá'
-    },
-    {
-      id: 'disney-10',
-      front: 'Cô gái xinh đẹp yêu thích đọc sách',
-      back: 'Belle',
-      category: 'Người đẹp và quái vật'
-    },
-    {
-      id: 'disney-11',
-      front: 'Cô gái dũng cảm cải trang thành nam',
-      back: 'Mulan',
-      category: 'Mulan'
-    },
-    {
-      id: 'disney-12',
-      front: 'Công chúa da đỏ yêu thiên nhiên',
-      back: 'Pocahontas',
-      category: 'Pocahontas'
-    },
-    {
-      id: 'disney-13',
-      front: 'Cô gái làm việc chăm chỉ cho mẹ kế',
-      back: 'Cinderella',
-      category: 'Cinderella'
-    },
-    {
-      id: 'disney-14',
-      front: 'Cô gái ngủ 100 năm',
-      back: 'Aurora (Công chúa ngủ trong rừng)',
-      category: 'Công chúa'
-    },
-    {
-      id: 'disney-15',
-      front: 'Cô gái có làn da trắng như tuyết',
-      back: 'Bạch Tuyết',
-      category: 'Bạch Tuyết'
-    },
-    {
-      id: 'disney-16',
-      front: 'Cậu bé không bao giờ lớn lên',
-      back: 'Peter Pan',
-      category: 'Peter Pan'
-    },
-    {
-      id: 'disney-17',
-      front: 'Cậu bé nghèo có đèn thần',
-      back: 'Aladdin',
-      category: 'Aladdin'
-    },
-    {
-      id: 'disney-18',
-      front: 'Thần đèn xanh vui nhộn',
-      back: 'Genie',
-      category: 'Aladdin'
-    },
-    {
-      id: 'disney-19',
-      front: 'Chú voi con có tai to',
-      back: 'Dumbo',
-      category: 'Dumbo'
-    },
-    {
-      id: 'disney-20',
-      front: 'Chú cá nhỏ màu cam bị lạc',
-      back: 'Nemo',
-      category: 'Tìm Nemo'
-    }
-  ],
+  author: 'MyFlashPlay Team',
+  difficulty: 'easy',
   tags: ['trẻ em', 'disney', 'phim hoạt hình', 'công chúa', 'phiêu lưu'],
-  language: 'vi',
-  isPublic: true,
-  createdAt: new Date('2024-01-01'),
-  updatedAt: new Date('2024-01-01')
+  markdown: `# Công chúa
+Công chúa có mái tóc dài màu vàng :: Rapunzel
+Công chúa băng giá có phép màu :: Elsa
+Em gái của Elsa, tóc đỏ và vui vẻ :: Anna
+Cô gái ngủ 100 năm :: Aurora (Công chúa ngủ trong rừng)
+
+# Frozen
+Người tuyết vui nhộn thích mùa hè :: Olaf
+
+# Vua sư tử
+Sư tử con sẽ trở thành vua :: Simba
+Bố của Simba, vua sư tử :: Mufasa
+Chú heo rừng bạn của Simba :: Pumbaa
+Chú cầy mangut bạn của Simba :: Timon
+
+# Nàng tiên cá
+Nàng tiên cá muốn lên đất liền :: Ariel
+
+# Người đẹp và quái vật
+Cô gái xinh đẹp yêu thích đọc sách :: Belle
+
+# Mulan
+Cô gái dũng cảm cải trang thành nam :: Mulan
+
+# Pocahontas
+Công chúa da đỏ yêu thiên nhiên :: Pocahontas
+
+# Cinderella
+Cô gái làm việc chăm chỉ cho mẹ kế :: Cinderella
+
+# Bạch Tuyết
+Cô gái có làn da trắng như tuyết :: Bạch Tuyết
+
+# Peter Pan
+Cậu bé không bao giờ lớn lên :: Peter Pan
+
+# Aladdin
+Cậu bé nghèo có đèn thần :: Aladdin
+Thần đèn xanh vui nhộn :: Genie
+
+# Dumbo
+Chú voi con có tai to :: Dumbo
+
+# Tìm Nemo
+Chú cá nhỏ màu cam bị lạc :: Nemo`
 };

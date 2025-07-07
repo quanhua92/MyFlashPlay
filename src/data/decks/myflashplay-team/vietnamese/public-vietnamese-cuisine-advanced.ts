@@ -1,4 +1,6 @@
-export const publicVietnameseCuisineAdvanced = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseCuisineAdvanced: PublicDeck = {
   id: 'public-vietnamese-cuisine-advanced',
   name: '🍲 Ẩm thực Việt Nam Nâng cao',
   description: 'Đặc sản vùng miền, nguyên liệu và kỹ thuật nấu ăn.',

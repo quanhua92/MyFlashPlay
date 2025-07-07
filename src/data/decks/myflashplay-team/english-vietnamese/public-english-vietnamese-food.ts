@@ -1,4 +1,6 @@
-export const publicEnglishVietnameseFood = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnglishVietnameseFood: PublicDeck = {
   id: 'public-english-vietnamese-food',
   name: '🍜 English-Vietnamese Food',
   description: 'Learn food vocabulary in English and Vietnamese',

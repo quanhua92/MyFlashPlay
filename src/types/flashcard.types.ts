@@ -52,3 +52,17 @@ export interface Deck {
     studyMode: StudyMode;
   };
 }
+
+/**
+ * Public deck structure for community-shared decks
+ * Contains raw markdown content that gets parsed into Deck format
+ */
+export interface PublicDeck {
+  id: string;
+  name: string;
+  description: string;
+  author: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  tags: string[];
+  markdown: string;
+}

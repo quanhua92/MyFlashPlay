@@ -1,4 +1,6 @@
-export const publicEnglishVietnameseVerbs = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnglishVietnameseVerbs: PublicDeck = {
   id: 'public-english-vietnamese-verbs',
   name: '⚡ English-Vietnamese Common Verbs',
   description: 'Essential verbs in English and Vietnamese',

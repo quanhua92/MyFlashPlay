@@ -1,4 +1,6 @@
-export const publicEnglishVietnameseFamily = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnglishVietnameseFamily: PublicDeck = {
   id: 'public-english-vietnamese-family',
   name: '👨‍👩‍👧‍👦 English-Vietnamese Family Words',
   description: 'Learn family terms in English and Vietnamese',

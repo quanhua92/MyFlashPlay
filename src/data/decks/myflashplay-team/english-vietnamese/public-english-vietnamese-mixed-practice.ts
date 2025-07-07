@@ -1,4 +1,6 @@
-export const publicEnglishVietnameseMixedPractice = {
+import type { PublicDeck } from '@/types';
+
+export const publicEnglishVietnameseMixedPractice: PublicDeck = {
   id: 'public-english-vietnamese-mixed-practice',
   name: '🎓 English-Vietnamese Mixed Practice',
   description: 'A mix of question types for practicing English and Vietnamese, including multiple choice and true/false.',

@@ -1,4 +1,6 @@
-export const publicVietnameseProverbs = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseProverbs: PublicDeck = {
   id: 'public-vietnamese-proverbs',
   name: '🗣️ Tục ngữ & Thành ngữ Việt Nam',
   description: 'Các câu tục ngữ, thành ngữ phổ biến và ý nghĩa của chúng.',

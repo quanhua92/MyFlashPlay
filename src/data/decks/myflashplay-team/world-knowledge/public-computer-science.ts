@@ -1,4 +1,6 @@
-export const publicComputerScience = {
+import type { PublicDeck } from '@/types';
+
+export const publicComputerScience: PublicDeck = {
   id: 'public-computer-science',
   name: '💻 Khoa học Máy tính',
   description: 'Các khái niệm lập trình, phần cứng và phần mềm.',

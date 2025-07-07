@@ -1,4 +1,6 @@
-export const publicVietnameseArt = {
+import type { PublicDeck } from '@/types';
+
+export const publicVietnameseArt: PublicDeck = {
   id: 'public-vietnamese-art',
   name: '🎨 Mỹ thuật Việt Nam',
   description: 'Họa sĩ, phong cách và các giai đoạn lịch sử của mỹ thuật Việt Nam.',

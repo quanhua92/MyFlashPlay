@@ -32,6 +32,15 @@ export class MarkdownProcessor {
    * Parse markdown content into flashcards
    */
   parse(markdown: string): ParseResult {
+    // Handle null/undefined markdown
+    if (!markdown || typeof markdown !== 'string') {
+      return {
+        cards: [],
+        errors: ['Invalid markdown content: expected string but received ' + typeof markdown],
+        warnings: []
+      };
+    }
+    
     // Apply pre-processing
     let processedMarkdown = this.preprocess(markdown);
     
