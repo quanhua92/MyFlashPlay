@@ -1,5 +1,5 @@
 import type { Flashcard } from '@/types/flashcard.types';
-import { ExportOptions, DeckMetadata } from './types';
+import type { ExportOptions, DeckMetadata } from './types';
 
 export class MarkdownExporter {
   export(cards: Flashcard[], options?: ExportOptions): string {

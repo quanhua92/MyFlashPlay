@@ -1,14 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { Flashcard, Difficulty } from '@/types/flashcard.types';
-import { 
+import type { 
   Token, 
-  TokenType, 
   ParseContext, 
   ParseResult, 
   ParseError,
   DeckMetadata,
   ParserPlugin 
 } from './types';
+import { TokenType } from './types';
 
 export class MarkdownParser {
   private plugins: ParserPlugin[] = [];

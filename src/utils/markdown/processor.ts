@@ -3,7 +3,7 @@ import { MarkdownLexer } from './lexer';
 import { MarkdownParser } from './parser';
 import { MarkdownValidator } from './validator';
 import { MarkdownExporter } from './exporter';
-import { 
+import type { 
   ParseResult, 
   ParserPlugin, 
   ValidationRule, 
