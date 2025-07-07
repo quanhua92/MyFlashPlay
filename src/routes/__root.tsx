@@ -1,12 +1,12 @@
 import { createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { RootLayout } from '@/components/layout/RootLayout'
 
 export const Route = createRootRoute({
   component: () => (
     <>
       <RootLayout />
-      <TanStackRouterDevtools />
+      {/* Router devtools disabled to prevent Vite cache issues */}
+      {/* You can access router state via browser dev tools React components tab */}
     </>
   ),
 })

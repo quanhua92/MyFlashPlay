@@ -22,4 +22,17 @@ export default defineConfig({
   preview: {
     port: 3000,
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        'service-worker': path.resolve(__dirname, 'src/service-worker.ts'),
+      },
+      output: {
+        entryFileNames: (chunkInfo) => {
+          return chunkInfo.name === 'service-worker' ? '[name].js' : 'assets/[name]-[hash].js'
+        },
+      },
+    },
+  },
 })
