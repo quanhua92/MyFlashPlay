@@ -8,7 +8,7 @@ export function ThemeToggle() {
   const themes = [
     { value: 'light' as const, icon: Sun, label: 'Light' },
     { value: 'dark' as const, icon: Moon, label: 'Dark' },
-    { value: 'auto' as const, icon: Monitor, label: 'Auto' }
+    { value: 'system' as const, icon: Monitor, label: 'System' }
   ];
 
   return (
@@ -24,6 +24,7 @@ export function ThemeToggle() {
               : 'hover:bg-gray-200 dark:hover:bg-gray-700'
           )}
           title={label}
+          aria-label={`Switch to ${label.toLowerCase()} theme`}
         >
           <Icon 
             className={cn(

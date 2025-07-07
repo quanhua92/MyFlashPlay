@@ -1,119 +1,76 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { STORAGE_KEYS } from '@/utils/constants';
-import type { UserPreferences } from '@/types';
 
-type Theme = 'light' | 'dark' | 'auto';
-type ColorScheme = 'rainbow' | 'ocean' | 'space' | 'forest';
+type Theme = 'dark' | 'light' | 'system';
 
-interface ThemeContextType {
+interface ThemeProviderContextType {
   theme: Theme;
-  colorScheme: ColorScheme;
   setTheme: (theme: Theme) => void;
-  setColorScheme: (scheme: ColorScheme) => void;
-  actualTheme: 'light' | 'dark';
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeProviderContext = createContext<ThemeProviderContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [preferences, setPreferences] = useLocalStorage<UserPreferences>(
-    STORAGE_KEYS.PREFERENCES,
-    {
-      version: '1.0.0',
-      theme: 'auto',
-      colorScheme: 'rainbow',
-      soundEnabled: true,
-      animationsEnabled: true,
-      fontSize: 'medium',
-      language: 'en-US',
-      accessibility: {
-        highContrast: false,
-        reducedMotion: false,
-        screenReaderMode: false
-      },
-      gameSettings: {
-        defaultDifficulty: 'medium',
-        showHints: true,
-        autoAdvance: false,
-        timerWarning: true
-      },
-      lastUpdated: new Date().toISOString()
+interface ThemeProviderProps {
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+  storageKey?: string;
+}
+
+export function ThemeProvider({
+  children,
+  defaultTheme = 'system',
+  storageKey = 'myflashplay-ui-theme',
+}: ThemeProviderProps) {
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
     }
-  );
-
-  const [actualTheme, setActualTheme] = useState<'light' | 'dark'>('light');
+    return defaultTheme;
+  });
 
   useEffect(() => {
-    const updateTheme = () => {
-      console.log('Theme update triggered. Current preferences.theme:', preferences.theme);
-      let newTheme: 'light' | 'dark';
-      
-      if (preferences.theme === 'auto') {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        console.log('Auto mode detected. System prefers dark:', prefersDark);
-        newTheme = prefersDark ? 'dark' : 'light';
-      } else {
-        console.log('Manual theme selected:', preferences.theme);
-        newTheme = preferences.theme;
-      }
-      
-      console.log('Setting actualTheme to:', newTheme);
-      setActualTheme(newTheme);
-    };
+    const root = window.document.documentElement;
 
-    updateTheme();
+    root.classList.remove('light', 'dark');
 
-    // Listen for system theme changes only in auto mode
-    if (preferences.theme === 'auto') {
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+
+      root.classList.add(systemTheme);
+      
+      // Listen for system theme changes
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      mediaQuery.addEventListener('change', updateTheme);
-      return () => mediaQuery.removeEventListener('change', updateTheme);
+      const handleChange = () => {
+        root.classList.remove('light', 'dark');
+        const newSystemTheme = mediaQuery.matches ? 'dark' : 'light';
+        root.classList.add(newSystemTheme);
+      };
+      
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
     }
-  }, [preferences.theme]);
 
-  useEffect(() => {
-    // Apply theme to document
-    console.log('Applying theme to document. actualTheme:', actualTheme);
-    document.documentElement.classList.toggle('dark', actualTheme === 'dark');
-    document.documentElement.setAttribute('data-theme', actualTheme);
-    document.documentElement.setAttribute('data-color-scheme', preferences.colorScheme);
-    console.log('Document classes after theme application:', document.documentElement.className);
-  }, [actualTheme, preferences.colorScheme]);
+    root.classList.add(theme);
+  }, [theme]);
 
-  const setTheme = (theme: Theme) => {
-    setPreferences(prev => ({
-      ...prev,
-      theme,
-      lastUpdated: new Date().toISOString()
-    }));
-  };
-
-  const setColorScheme = (colorScheme: ColorScheme) => {
-    setPreferences(prev => ({
-      ...prev,
-      colorScheme,
-      lastUpdated: new Date().toISOString()
-    }));
+  const value = {
+    theme,
+    setTheme: (newTheme: Theme) => {
+      localStorage.setItem(storageKey, newTheme);
+      setTheme(newTheme);
+    },
   };
 
   return (
-    <ThemeContext.Provider
-      value={{
-        theme: preferences.theme,
-        colorScheme: preferences.colorScheme,
-        setTheme,
-        setColorScheme,
-        actualTheme
-      }}
-    >
+    <ThemeProviderContext.Provider value={value}>
       {children}
-    </ThemeContext.Provider>
+    </ThemeProviderContext.Provider>
   );
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
+  const context = useContext(ThemeProviderContext);
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
