@@ -145,24 +145,108 @@ body {
 
 /* High contrast mode */
 .high-contrast {
-  --color-bg: #000;
-  --color-text: #fff;
-  --color-border: #fff;
+  /* Define high contrast color variables */
+  --hc-bg-primary: #000000;
+  --hc-bg-secondary: #1a1a1a;
+  --hc-text-primary: #ffffff;
+  --hc-text-secondary: #e5e5e5;
+  --hc-border: #ffffff;
+  --hc-accent: #00ff00;
+  --hc-danger: #ff0000;
+  --hc-warning: #ffff00;
 }
 
-.high-contrast * {
-  border-color: var(--color-border) !important;
-  color: var(--color-text) !important;
-  background-color: transparent !important;
+/* Apply high contrast to body and main containers */
+.high-contrast body,
+.high-contrast .bg-white,
+.high-contrast .bg-gray-50,
+.high-contrast .bg-gray-100,
+.high-contrast .bg-gray-200 {
+  background-color: var(--hc-bg-primary) !important;
 }
 
+.high-contrast .bg-gray-800,
+.high-contrast .bg-gray-900,
+.high-contrast .bg-gray-700 {
+  background-color: var(--hc-bg-secondary) !important;
+}
+
+/* Text colors */
+.high-contrast .text-gray-900,
+.high-contrast .text-gray-800,
+.high-contrast .text-gray-700,
+.high-contrast .text-black,
+.high-contrast .text-white,
+.high-contrast h1, .high-contrast h2, .high-contrast h3, .high-contrast h4, .high-contrast h5, .high-contrast h6,
+.high-contrast p, .high-contrast span, .high-contrast div {
+  color: var(--hc-text-primary) !important;
+}
+
+.high-contrast .text-gray-600,
+.high-contrast .text-gray-500,
+.high-contrast .text-gray-400 {
+  color: var(--hc-text-secondary) !important;
+}
+
+/* Interactive elements */
 .high-contrast button,
 .high-contrast a,
 .high-contrast input,
 .high-contrast select,
 .high-contrast textarea {
-  background-color: var(--color-bg) !important;
-  border: 2px solid var(--color-border) !important;
+  background-color: var(--hc-bg-primary) !important;
+  color: var(--hc-text-primary) !important;
+  border: 2px solid var(--hc-border) !important;
+}
+
+.high-contrast button:hover,
+.high-contrast a:hover {
+  background-color: var(--hc-bg-secondary) !important;
+  color: var(--hc-accent) !important;
+}
+
+/* Cards and containers */
+.high-contrast .rounded-xl,
+.high-contrast .rounded-lg,
+.high-contrast .shadow-lg,
+.high-contrast .shadow-xl {
+  background-color: var(--hc-bg-secondary) !important;
+  border: 1px solid var(--hc-border) !important;
+}
+
+/* Accent colors */
+.high-contrast .bg-purple-600,
+.high-contrast .bg-purple-500,
+.high-contrast .bg-blue-600,
+.high-contrast .bg-green-600 {
+  background-color: var(--hc-accent) !important;
+  color: var(--hc-bg-primary) !important;
+}
+
+.high-contrast .bg-red-600,
+.high-contrast .bg-red-500 {
+  background-color: var(--hc-danger) !important;
+  color: var(--hc-bg-primary) !important;
+}
+
+.high-contrast .bg-yellow-600,
+.high-contrast .bg-orange-600 {
+  background-color: var(--hc-warning) !important;
+  color: var(--hc-bg-primary) !important;
+}
+
+/* Borders */
+.high-contrast .border,
+.high-contrast .border-gray-200,
+.high-contrast .border-gray-300,
+.high-contrast .border-gray-700 {
+  border-color: var(--hc-border) !important;
+}
+
+/* Focus states */
+.high-contrast *:focus {
+  outline: 3px solid var(--hc-accent) !important;
+  outline-offset: 2px !important;
 }
 
 /* Reduced motion */

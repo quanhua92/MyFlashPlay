@@ -114,9 +114,9 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
       correctIndex = answers.findIndex(answer => answer === card.back);
     }
 
-    // Calculate estimated height based on content
-    const baseHeight = 8; // Base card height in vh
-    const answerHeight = answers.length * 2.5; // Each answer button adds ~2.5vh
+    // Calculate estimated height based on content (larger for mobile)
+    const baseHeight = 12; // Larger base card height in vh for mobile
+    const answerHeight = answers.length * 3.5; // Each answer button adds ~3.5vh (larger buttons)
     const estimatedHeight = baseHeight + answerHeight;
 
     return {
@@ -162,7 +162,7 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
       lane = Math.floor(Math.random() * (12 - laneSpan + 1)); // Ensure card fits within 12 lanes
       
       // Check if this position would cause collision
-      if (!checkCollision(lane, laneSpan, 0, 15)) { // Assume 15vh height for initial check
+      if (!checkCollision(lane, laneSpan, 0, 20)) { // Assume 20vh height for initial check (larger cards)
         foundPosition = true;
       }
       attempts++;
@@ -416,29 +416,30 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
                 }}
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ type: 'linear', duration: 0.1 }}
-                className="absolute bg-white dark:bg-gray-800 rounded-lg shadow-xl p-3 pointer-events-auto"
+                className="absolute bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-4 pointer-events-auto border-2 border-white/20"
                 style={{ 
                   top: 0,
                   left: `${(quiz.lane / 12) * 100}%`,
-                  width: `${(quiz.laneSpan / 12) * 100 - 1}%`, // -1% for visual separation
-                  minWidth: '120px', // Ensure minimum clickable width
+                  width: `${(quiz.laneSpan / 12) * 100 - 0.5}%`, // -0.5% for minimal separation
+                  minWidth: '160px', // Larger minimum width for mobile
+                  minHeight: '120px', // Ensure minimum touch target height
                   zIndex: 10
                 }}
               >
                 {/* Question */}
-                <div className="text-sm font-medium text-gray-900 dark:text-white mb-2 text-center">
+                <div className="text-base font-semibold text-gray-900 dark:text-white mb-3 text-center leading-tight">
                   <SafeContentRenderer content={quiz.card.front} />
                 </div>
                 
                 {/* Answer Buttons */}
-                <div className={`grid gap-1 ${quiz.laneSpan >= 3 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                <div className={`grid gap-2 ${quiz.laneSpan >= 3 ? 'grid-cols-2' : 'grid-cols-1'}`}>
                   {quiz.answers.map((answer, index) => (
                     <button
                       key={index}
                       onClick={() => handleAnswer(quiz.id, index)}
-                      className="px-2 py-1.5 text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors font-medium"
+                      className="px-3 py-2.5 text-sm bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors font-medium active:scale-95 active:bg-purple-300 dark:active:bg-purple-700 min-h-[40px] flex items-center justify-center"
                     >
-                      {answer}
+                      <span className="text-center leading-tight">{answer}</span>
                     </button>
                   ))}
                 </div>

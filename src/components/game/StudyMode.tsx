@@ -16,7 +16,7 @@ interface StudyModeProps {
 export function StudyMode({ deck, onComplete }: StudyModeProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cards] = useState(() => 
-    deck.settings.shuffleCards 
+    deck.settings?.shuffleCards 
       ? [...deck.cards].sort(() => Math.random() - 0.5)
       : deck.cards
   );

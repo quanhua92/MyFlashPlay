@@ -95,15 +95,28 @@ export function PublicDecksPage() {
     const parseResult = markdownProcessor.parse(deck.markdown);
     
     if (parseResult.errors.length === 0 && parseResult.cards.length > 0) {
-      // Create temporary deck for playing
+      // Create temporary deck for playing with proper structure
       const tempDeck = {
         id: tempId,
         name: deck.name,
         description: deck.description,
         emoji: '🌟',
         cards: parseResult.cards,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        metadata: {
+          createdAt: new Date().toISOString(),
+          lastModified: new Date().toISOString(),
+          playCount: 0,
+          source: 'template' as const,
+          originalMarkdown: deck.markdown,
+          tags: [],
+          difficulty: 'beginner' as const,
+          estimatedTime: Math.ceil(parseResult.cards.length / 2) // 2 cards per minute estimate
+        },
+        settings: {
+          shuffleCards: false,
+          repeatIncorrect: true,
+          studyMode: 'sequential' as const
+        }
       };
       
       // Store temporarily in sessionStorage for immediate play
