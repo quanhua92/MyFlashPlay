@@ -9,7 +9,6 @@
  */
 
 import { chromium, type Browser, type Page } from 'playwright';
-import { setTimeout } from 'timers/promises';
 
 interface TestResult {
   name: string;

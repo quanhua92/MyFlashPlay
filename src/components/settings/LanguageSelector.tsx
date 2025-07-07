@@ -1,4 +1,4 @@
-import React, { useTransition } from 'react';
+import { useTransition } from 'react';
 import { ChevronDownIcon } from 'lucide-react';
 import { useLanguage, useTranslation } from '../../i18n';
 import { AVAILABLE_LANGUAGES, type LanguageCode } from '../../types/i18n.types';

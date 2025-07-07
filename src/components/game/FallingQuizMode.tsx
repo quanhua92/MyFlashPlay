@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Zap, Target, Heart } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { SafeContentRenderer } from '@/components/common/SafeContentRenderer';
-import type { Deck, Card, GameSession } from '@/types';
+import type { Deck, Flashcard, GameSession } from '@/types';
 
 interface FallingQuiz {
   id: string;
-  card: Card;
+  card: Flashcard;
   lane: number;
   laneSpan: number; // How many lanes this card spans (1-4)
   position: number; // 0 to 100 (percentage from top)
@@ -37,7 +37,7 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   
-  const gameLoopRef = useRef<number>();
+  const gameLoopRef = useRef<number>(0);
   const startTimeRef = useRef<Date>(new Date());
   const spawnTimerRef = useRef<number>(0);
   const difficultyRef = useRef<number>(1);
@@ -95,7 +95,7 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
   }, [fallingQuizzes]);
 
   // Generate quiz from card
-  const generateQuiz = useCallback((card: Card, lane: number, laneSpan: number): FallingQuiz => {
+  const generateQuiz = useCallback((card: Flashcard, lane: number, laneSpan: number): FallingQuiz => {
     let answers: string[] = [];
     let correctIndex = 0;
 
@@ -213,7 +213,7 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
     }
 
     // Update difficulty
-    const timeInSeconds = (now - startTimeRef.current) / 1000;
+    const timeInSeconds = (now - startTimeRef.current.getTime()) / 1000;
     // Slower progression for easier difficulties
     const progressionTime = selectedDifficulty === 'easy' ? 120 : selectedDifficulty === 'medium' ? 90 : 60;
     const maxLevel = selectedDifficulty === 'easy' ? 1 : selectedDifficulty === 'medium' ? 2 : 3;
@@ -428,7 +428,7 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
                   opacity: 1
                 }}
                 exit={{ scale: 0, opacity: 0 }}
-                transition={{ type: 'linear', duration: 0.1 }}
+                transition={{ ease: 'linear', duration: 0.1 }}
                 className="absolute bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-4 pointer-events-auto border-2 border-white/20"
                 style={{ 
                   top: 0,

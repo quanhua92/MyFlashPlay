@@ -155,10 +155,24 @@ function MemoryGame({
       const session: GameSession = {
         id: uuidv4(),
         deckId: deck.id,
-        gameMode: "memory-match",
+        deckName: deck.name,
+        mode: "memory" as const,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
-        score: score,
+        score: {
+          points: score,
+          accuracy: moves > 0 ? (matchedPairs * 2 / moves) * 100 : 100,
+          correctAnswers: matchedPairs,
+          totalQuestions: pairs,
+          streak: 0,
+          bestStreak: 0
+        },
+        details: {
+          cardResults: [],
+          bonuses: [],
+          difficulty: 'medium',
+          hintsUsed: 0
+        },
         wasCompleted: true,
         moves: moves,
       }

@@ -1,7 +1,7 @@
 import { STORAGE_KEYS, APP_VERSION } from './constants';
 import { storageManager } from './storage';
 import { markdownStorage } from './markdown-storage';
-import type { StoredDecks, StoredScores, StoredProgress, UserPreferences } from '@/types';
+import type { StoredScores, StoredProgress, UserPreferences } from '@/types';
 import JSZip from 'jszip';
 
 // Simple MD5-like hash function for browser environment
@@ -608,7 +608,7 @@ export class DataExporter {
   }
 
   // Simple checksum for data integrity
-  private generateChecksum(data: string): string {
+  private _generateChecksum(data: string): string {
     let hash = 0;
     for (let i = 0; i < data.length; i++) {
       const char = data.charCodeAt(i);

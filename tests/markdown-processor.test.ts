@@ -174,7 +174,7 @@ What is 2 + 2? :: 4
     
     totalTests++;
     const card = result.cards[0];
-    const hasMetadata = card?.metadata.hint && card?.metadata.explanation;
+    const hasMetadata = !!(card?.metadata.hint && card?.metadata.explanation);
     const passed = result.cards.length === 1 && hasMetadata;
     if (passed) passedTests++;
     

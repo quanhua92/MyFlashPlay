@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react"
 import {
   BookOpen,
   Play,
-  Settings,
   Trash2,
   Target,
   Zap,
@@ -99,13 +98,6 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
     })
   }
 
-  const handlePlayClick = () => {
-    if (selectedMode) {
-      // Mode already selected, no need to show dropdown
-      return
-    }
-    setShowModes(!showModes)
-  }
 
   const handleDownload = () => {
     try {
@@ -288,12 +280,12 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-            deck.metadata?.difficulty === 'easy' ? 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30' :
-            deck.metadata?.difficulty === 'medium' ? 'text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30' :
-            deck.metadata?.difficulty === 'hard' ? 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30' :
+            deck.metadata?.difficulty === 'beginner' ? 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30' :
+            deck.metadata?.difficulty === 'intermediate' ? 'text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30' :
+            deck.metadata?.difficulty === 'advanced' ? 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30' :
             'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700'
           }`}>
-            {deck.metadata?.difficulty || 'medium'}
+            {deck.metadata?.difficulty || 'intermediate'}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400">
             {deck.cards.length} {t('decks.cards')}

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Plus, X, ArrowDown, ArrowUp, Copy, FileText, Keyboard } from 'lucide-react';
+import { Plus, X, ArrowDown, ArrowUp, FileText, Keyboard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Card {
@@ -340,7 +340,7 @@ export function QuickCreateInterface({ onMarkdownChange, initialMarkdown = '', i
           {cards.map((card, index) => (
             <motion.div
               key={card.id}
-              ref={(el) => (cardRefs.current[index] = el)}
+              ref={(el) => { cardRefs.current[index] = el; }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}

@@ -1,4 +1,3 @@
-import { storageManager } from './storage';
 import { markdownStorage } from './markdown-storage';
 import { MarkdownParser } from './markdown';
 import { v4 as uuidv4 } from 'uuid';
@@ -188,7 +187,7 @@ export class DataImporter {
       const progressFile = zipContents.file('progress.md');
       if (progressFile) {
         try {
-          const progressContent = await progressFile.async('text');
+          const _progressContent = await progressFile.async('text');
           console.log('✅ [IMPORT] Found progress.md (informational only)');
           results.push('Progress data found (informational only)');
           importLog.push('## Progress Data Found');
@@ -207,7 +206,7 @@ export class DataImporter {
       const achievementsFile = zipContents.file('achievements.md');
       if (achievementsFile) {
         try {
-          const achievementsContent = await achievementsFile.async('text');
+          const _achievementsContent = await achievementsFile.async('text');
           console.log('✅ [IMPORT] Found achievements.md (informational only)');
           results.push('Achievements data found (informational only)');
           importLog.push('## Achievements Data Found');
@@ -226,7 +225,7 @@ export class DataImporter {
       const preferencesFile = zipContents.file('preferences.md');
       if (preferencesFile) {
         try {
-          const preferencesContent = await preferencesFile.async('text');
+          const _preferencesContent = await preferencesFile.async('text');
           console.log('✅ [IMPORT] Found preferences.md (informational only)');
           results.push('Preferences data found (informational only)');
           importLog.push('## Preferences Data Found');
@@ -403,7 +402,7 @@ export class DataImporter {
   }
 
   // Merge deck arrays based on strategy
-  private mergeDecks(
+  private _mergeDecks(
     existing: Deck[], 
     imported: Deck[], 
     options: ImportOptions

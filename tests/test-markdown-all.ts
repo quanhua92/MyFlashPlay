@@ -156,7 +156,7 @@ Which planet is largest?
       
       this.addResult(
         'Correct answer marked',
-        cards[0]?.options?.some(o => o.isCorrect),
+        !!(cards[0]?.options?.some(o => o.isCorrect)),
         'Should have one correct answer'
       );
     } catch (error: any) {
@@ -453,7 +453,10 @@ Capital of France? :: Paris
           type: 'simple' as const, 
           front: 'What is 2+2?', 
           back: '4',
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: true
       },
@@ -464,7 +467,10 @@ Capital of France? :: Paris
           type: 'simple' as const, 
           front: '', 
           back: '4',
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: false,
         expectedError: 'Question/front cannot be empty'
@@ -476,7 +482,10 @@ Capital of France? :: Paris
           type: 'simple' as const, 
           front: 'Question?', 
           back: '',
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: false,
         expectedError: 'Answer/back cannot be empty'
@@ -488,7 +497,10 @@ Capital of France? :: Paris
           type: 'simple' as const, 
           front: '   \t\n   ', 
           back: '   ',
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: false
       }
@@ -530,7 +542,10 @@ Capital of France? :: Paris
           type: 'true-false' as const, 
           front: 'The sky is blue', 
           back: 'true',
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: true
       },
@@ -541,7 +556,10 @@ Capital of France? :: Paris
           type: 'true-false' as const, 
           front: 'Fish can fly', 
           back: 'false',
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: true
       },
@@ -552,7 +570,10 @@ Capital of France? :: Paris
           type: 'true-false' as const, 
           front: 'Water is wet', 
           back: 'TRUE',
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: true
       },
@@ -563,7 +584,10 @@ Capital of France? :: Paris
           type: 'true-false' as const, 
           front: 'Is this valid?', 
           back: 'yes',
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: false,
         expectedError: 'True/false answer must be either "true" or "false"'
@@ -575,7 +599,10 @@ Capital of France? :: Paris
           type: 'true-false' as const, 
           front: 'Is this valid?', 
           back: '1',
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: false
       }
@@ -612,7 +639,10 @@ Capital of France? :: Paris
             { text: '5', isCorrect: false },
             { text: '6', isCorrect: false }
           ],
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: true
       },
@@ -626,7 +656,10 @@ Capital of France? :: Paris
           options: [
             { text: '4', isCorrect: true }
           ],
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: false,
         expectedError: 'Multiple choice must have at least 2 options'
@@ -642,7 +675,10 @@ Capital of France? :: Paris
             { text: '3', isCorrect: false },
             { text: '5', isCorrect: false }
           ],
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: false,
         expectedError: 'Multiple choice must have at least one correct answer'
@@ -660,7 +696,10 @@ Capital of France? :: Paris
             { text: '3', isCorrect: false },
             { text: '4', isCorrect: true }
           ],
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: true,
         expectWarning: true,
@@ -677,7 +716,10 @@ Capital of France? :: Paris
             text: String.fromCharCode(65 + i),
             isCorrect: i === 0
           })),
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: true,
         expectWarning: true,
@@ -719,7 +761,10 @@ Capital of France? :: Paris
           type: 'simple' as const, 
           front: 'What is the capital of France?', 
           back: 'Paris',
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: true,
         expectWarning: false
@@ -731,7 +776,10 @@ Capital of France? :: Paris
           type: 'simple' as const, 
           front: 'A'.repeat(501), 
           back: 'Short answer',
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: true,
         expectWarning: true,
@@ -744,7 +792,10 @@ Capital of France? :: Paris
           type: 'simple' as const, 
           front: 'Short question?', 
           back: 'B'.repeat(1001),
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: true,
         expectWarning: true,
@@ -757,7 +808,10 @@ Capital of France? :: Paris
           type: 'simple' as const, 
           front: 'Q'.repeat(600), 
           back: 'A'.repeat(1100),
-          metadata: {} 
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
         },
         expectValid: true,
         expectWarning: true,
@@ -841,7 +895,10 @@ Capital of France? :: Paris
           type: 'simple' as const, 
           front: 'Question?', 
           back: 'Answer',
-          metadata: {}
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        }
         },
         expectValid: true
       }
@@ -915,7 +972,10 @@ Capital of France? :: Paris
             { text: 'Option B', isCorrect: false },
             { text: 'Option A', isCorrect: false }
           ],
-          metadata: {}
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        }
         },
         expectValid: false,
         expectedError: 'Multiple choice options must be unique'
@@ -927,7 +987,10 @@ Capital of France? :: Paris
           type: 'simple' as const, 
           front: 'Question?', 
           back: 'Answer',
-          metadata: {}
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        }
         },
         expectValid: false,
         expectedError: 'Category is required'
@@ -940,7 +1003,10 @@ Capital of France? :: Paris
           front: 'Question?', 
           back: 'Answer',
           category: 'General',
-          metadata: {}
+          metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        }
         },
         expectValid: true
       }
@@ -978,36 +1044,51 @@ Capital of France? :: Paris
         type: 'simple', 
         front: 'Valid card', 
         back: 'Answer',
-        metadata: {} 
+        metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
       },
       { 
         id: '2', 
         type: 'simple', 
         front: '', 
         back: 'Invalid - empty front',
-        metadata: {} 
+        metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
       },
       { 
         id: '3', 
         type: 'true-false', 
         front: 'Statement', 
         back: 'maybe',
-        metadata: {} 
+        metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
       },
       { 
         id: '4', 
         type: 'multiple-choice', 
         front: 'Question?', 
         back: 'A',
-        options: [{ text: 'A', isCorrect: true }],
-        metadata: {} 
+        options: [{ id: '1', text: 'A', isCorrect: true }],
+        metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
       },
       { 
         id: '5', 
         type: 'simple', 
         front: 'A'.repeat(600), 
         back: 'Long question warning',
-        metadata: {} 
+        metadata: {
+          difficulty: 'easy' as const,
+          tags: []
+        } 
       }
     ];
     
@@ -1044,13 +1125,13 @@ Capital of France? :: Paris
     // Check specific validation results
     this.addResult(
       'Card 2 validation',
-      !results[1].valid && results[1].errors?.some(e => e.includes('empty')),
+      !results[1].valid && !!(results[1].errors?.some(e => e.includes('empty'))),
       'Empty front error detected'
     );
     
     this.addResult(
       'Card 3 validation',
-      !results[2].valid && results[2].errors?.some(e => e.includes('true" or "false')),
+      !results[2].valid && !!(results[2].errors?.some(e => e.includes('true" or "false'))),
       'Invalid true/false error detected'
     );
     

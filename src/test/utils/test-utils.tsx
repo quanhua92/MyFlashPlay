@@ -30,7 +30,7 @@ function customRender(
   
   const testRouter = router || createTestRouter();
   
-  function Wrapper({ children }: { children: ReactNode }) {
+  function Wrapper({ children: _children }: { children: ReactNode }) {
     return (
       <RouterProvider router={testRouter} />
     );

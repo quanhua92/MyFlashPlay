@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '../../test/utils/test-utils';
 import { AchievementNotification } from '../ui/AchievementNotification';
-import { ACHIEVEMENTS } from '../../utils/achievements';
 
 describe('AchievementNotification Component', () => {
   const mockAchievement = {
@@ -10,7 +9,10 @@ describe('AchievementNotification Component', () => {
     description: 'Test description',
     icon: '🎯',
     points: 100,
-    condition: 'test'
+    requirement: {
+      type: 'games-played' as const,
+      value: 1
+    }
   };
   const mockOnClose = vi.fn();
 

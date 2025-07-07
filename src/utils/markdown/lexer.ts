@@ -2,7 +2,7 @@ import type { Token } from './types';
 import { TokenType } from './types';
 
 export class MarkdownLexer {
-  private position = 0;
+  private _position = 0;
   private line = 1;
   private column = 1;
   private content: string;

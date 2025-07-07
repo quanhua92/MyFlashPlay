@@ -5,7 +5,7 @@ import { ConfettiEffect } from '@/components/ui';
 import type { Achievement } from '@/types';
 
 // Mock playSound for tests
-const playSound = (sound: string) => {
+const playSound = (_sound: string) => {
   if (typeof window !== 'undefined') {
     // Only play sound in browser environment
     try {

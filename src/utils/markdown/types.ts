@@ -1,4 +1,4 @@
-import type { Flashcard, Difficulty } from '@/types/flashcard.types';
+import type { Flashcard } from '@/types/flashcard.types';
 
 // Token types for lexical analysis
 export enum TokenType {

@@ -4,7 +4,6 @@ import type {
   Token, 
   ParseContext, 
   ParseResult, 
-  ParseError,
   DeckMetadata,
   ParserPlugin 
 } from './types';
@@ -379,19 +378,19 @@ export class MarkdownParser {
     return card;
   }
 
-  private parseCodeBlock(token: Token, context: ParseContext): Flashcard | null {
+  private parseCodeBlock(_token: Token, _context: ParseContext): Flashcard | null {
     // Handle code blocks in questions
     // This is a placeholder - implement based on requirements
     return null;
   }
   
-  private parseImage(token: Token, context: ParseContext): Flashcard | null {
+  private parseImage(_token: Token, _context: ParseContext): Flashcard | null {
     // Handle images in questions
     // This is a placeholder - implement based on requirements
     return null;
   }
   
-  private parseLatex(token: Token, context: ParseContext): Flashcard | null {
+  private parseLatex(_token: Token, _context: ParseContext): Flashcard | null {
     // Handle LaTeX math in questions
     // This is a placeholder - implement based on requirements
     return null;

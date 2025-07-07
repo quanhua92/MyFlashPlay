@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Filter, X, Search, Tag, FolderOpen, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { Deck, Difficulty } from '@/types';
+import type { Deck } from '@/types';
 
 export interface FilterOptions {
   searchQuery: string;
   selectedTags: string[];
   selectedCategories: string[];
-  selectedDifficulty: Difficulty | 'all';
+  selectedDifficulty: 'beginner' | 'intermediate' | 'advanced' | 'all';
   minCards: number | null;
   maxCards: number | null;
 }
@@ -25,7 +25,7 @@ export function DeckFilters({ decks, filters, onFiltersChange, showAdvanced = fa
   // Extract all unique tags and categories from decks
   const allTags = [...new Set(decks.flatMap(deck => deck.metadata?.tags || []))].sort();
   const allCategories = [...new Set(decks.flatMap(deck => 
-    deck.cards.map(card => card.category).filter(Boolean)
+    deck.cards.map(card => card.category).filter((category): category is string => Boolean(category))
   ))].sort();
 
   const updateFilters = (updates: Partial<FilterOptions>) => {
@@ -83,7 +83,7 @@ export function DeckFilters({ decks, filters, onFiltersChange, showAdvanced = fa
 
     // Difficulty filter
     if (filters.selectedDifficulty !== 'all') {
-      if ((deck.metadata?.difficulty || 'medium') !== filters.selectedDifficulty) {
+      if ((deck.metadata?.difficulty || 'intermediate') !== filters.selectedDifficulty) {
         return false;
       }
     }
@@ -216,9 +216,9 @@ export function DeckFilters({ decks, filters, onFiltersChange, showAdvanced = fa
       <AnimatePresence>
         {(isExpanded || !showAdvanced) && (
           <motion.div
-            initial={showAdvanced ? { height: 0, opacity: 0 } : false}
-            animate={showAdvanced ? { height: 'auto', opacity: 1 } : false}
-            exit={showAdvanced ? { height: 0, opacity: 0 } : false}
+            initial={showAdvanced ? { height: 0, opacity: 0 } : undefined}
+            animate={showAdvanced ? { height: 'auto', opacity: 1 } : undefined}
+            exit={showAdvanced ? { height: 0, opacity: 0 } : undefined}
             transition={{ duration: 0.2 }}
             className={showAdvanced ? 'overflow-hidden' : ''}
           >
@@ -229,19 +229,19 @@ export function DeckFilters({ decks, filters, onFiltersChange, showAdvanced = fa
                   Difficulty
                 </label>
                 <div className="flex gap-2">
-                  {(['all', 'easy', 'medium', 'hard'] as const).map(difficulty => (
+                  {(['all', 'beginner', 'intermediate', 'advanced'] as const).map(difficulty => (
                     <button
                       key={difficulty}
                       onClick={() => updateFilters({ selectedDifficulty: difficulty })}
                       className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                         filters.selectedDifficulty === difficulty
-                          ? difficulty === 'easy' ? 'bg-green-600 text-white' :
-                            difficulty === 'medium' ? 'bg-yellow-600 text-white' :
-                            difficulty === 'hard' ? 'bg-red-600 text-white' :
+                          ? difficulty === 'beginner' ? 'bg-green-600 text-white' :
+                            difficulty === 'intermediate' ? 'bg-yellow-600 text-white' :
+                            difficulty === 'advanced' ? 'bg-red-600 text-white' :
                             'bg-gray-600 text-white'
-                          : difficulty === 'easy' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50' :
-                            difficulty === 'medium' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 hover:bg-yellow-200 dark:hover:bg-yellow-900/50' :
-                            difficulty === 'hard' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50' :
+                          : difficulty === 'beginner' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50' :
+                            difficulty === 'intermediate' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 hover:bg-yellow-200 dark:hover:bg-yellow-900/50' :
+                            difficulty === 'advanced' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50' :
                             'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
@@ -325,7 +325,7 @@ export function applyFilters(decks: Deck[], filters: FilterOptions): Deck[] {
 
     // Difficulty filter
     if (filters.selectedDifficulty !== 'all') {
-      if ((deck.metadata?.difficulty || 'medium') !== filters.selectedDifficulty) {
+      if ((deck.metadata?.difficulty || 'intermediate') !== filters.selectedDifficulty) {
         return false;
       }
     }

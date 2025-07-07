@@ -1,5 +1,5 @@
 import { useMemo, useEffect } from 'react';
-import { AlertTriangle, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
 import { MarkdownParser } from '@/utils/markdown';
 
 interface ValidationResult {

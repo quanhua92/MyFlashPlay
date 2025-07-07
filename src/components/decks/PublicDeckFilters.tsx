@@ -370,9 +370,9 @@ export function PublicDeckFilters({
       <AnimatePresence>
         {(isExpanded || !showAdvanced) && (
           <motion.div
-            initial={showAdvanced ? { height: 0, opacity: 0 } : false}
-            animate={showAdvanced ? { height: "auto", opacity: 1 } : false}
-            exit={showAdvanced ? { height: 0, opacity: 0 } : false}
+            initial={showAdvanced ? { height: 0, opacity: 0 } : undefined}
+            animate={showAdvanced ? { height: "auto", opacity: 1 } : undefined}
+            exit={showAdvanced ? { height: 0, opacity: 0 } : undefined}
             transition={{ duration: 0.2 }}
             className={showAdvanced ? "overflow-hidden" : ""}
           >

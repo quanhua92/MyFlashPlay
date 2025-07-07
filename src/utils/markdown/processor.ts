@@ -36,8 +36,22 @@ export class MarkdownProcessor {
     if (!markdown || typeof markdown !== 'string') {
       return {
         cards: [],
-        errors: ['Invalid markdown content: expected string but received ' + typeof markdown],
-        warnings: []
+        metadata: {},
+        errors: [{
+          line: 1,
+          column: 1,
+          message: 'Invalid markdown content: expected string but received ' + typeof markdown,
+          code: 'INVALID_INPUT',
+          severity: 'error' as const
+        }],
+        warnings: [],
+        stats: {
+          totalLines: 0,
+          totalCards: 0,
+          cardsByType: {},
+          categories: [],
+          parseTime: 0
+        }
       };
     }
     
