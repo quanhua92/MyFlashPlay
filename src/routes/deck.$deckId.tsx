@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { Play, BookOpen, Zap, Target, Brain, Layers, ArrowLeft, Copy, Check, X } from 'lucide-react';
+import { Play, BookOpen, Zap, Target, Brain, Layers, ArrowLeft, Edit, Trash2, Download, Share2, Calendar, Tag, Clock, BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { StudyMode } from '@/components/game/StudyMode';
 import { QuizMode } from '@/components/game/QuizMode';
@@ -9,62 +9,29 @@ import { SpeedChallenge } from '@/components/game/SpeedChallenge';
 import { MemoryMatch } from '@/components/game/MemoryMatch';
 import { FallingQuizMode } from '@/components/game/FallingQuizMode';
 import { SafeContentRenderer } from '@/components/common/SafeContentRenderer';
-import { getPublicDeck } from '@/data/public-decks';
-import { markdownProcessor } from '@/utils/markdown';
-import { markdownStorage } from '@/utils/markdown-storage';
-import { v4 as uuidv4 } from 'uuid';
+import { useDecks } from '@/hooks/useDecks';
 import type { GameMode, GameSession, Deck } from '@/types';
 
-function PublicDeckPlayPage() {
+function DeckDetailPage() {
   const { deckId } = Route.useParams();
   const navigate = useNavigate();
+  const { decks, deleteDeck, isLoading } = useDecks();
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [deck, setDeck] = useState<Deck | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [publicDeckData, setPublicDeckData] = useState<any>(null);
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
-  // Load public deck
+  // Find the deck by ID
   useEffect(() => {
-    const loadDeck = async () => {
-      try {
-        const publicDeck = getPublicDeck(deckId);
-        if (publicDeck) {
-          setPublicDeckData(publicDeck);
-          const result = markdownProcessor.parse(publicDeck.markdown);
-          const cards = result.cards;
-          const processedDeck: Deck = {
-            id: publicDeck.id,
-            name: publicDeck.name,
-            description: publicDeck.description,
-            emoji: publicDeck.name.split(' ')[0] || '📚',
-            cards,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            tags: publicDeck.tags || []
-          };
-          setDeck(processedDeck);
-        } else {
-          console.error('Public deck not found:', deckId);
-          navigate({ to: '/public-decks' });
-        }
-      } catch (error) {
-        console.error('Failed to load public deck:', error);
-        navigate({ to: '/public-decks' });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadDeck();
-  }, [deckId, navigate]);
+    const foundDeck = decks.find(d => d.id === deckId);
+    if (foundDeck) {
+      setDeck(foundDeck);
+    } else if (!isLoading) {
+      navigate({ to: '/decks' });
+    }
+  }, [deckId, decks, isLoading, navigate]);
 
   const handleGameComplete = (session: GameSession) => {
-    console.log('Public deck game completed:', session);
-    
-    // For public decks, we don't save sessions or check achievements
-    // Just return to game mode selection
+    console.log('Game completed:', session);
     setIsPlaying(false);
     setSelectedMode(null);
   };
@@ -79,49 +46,34 @@ function PublicDeckPlayPage() {
     setSelectedMode(null);
   };
 
-  const handleBackToPublic = () => {
-    navigate({ to: '/public-decks' });
+  const handleBackToDecks = () => {
+    navigate({ to: '/decks' });
   };
 
-  // Save deck as copy to user's collection
-  const handleSaveAsCopy = async () => {
-    if (!publicDeckData) return;
-    
-    try {
-      setSaveStatus('saving');
+  const handleEdit = () => {
+    navigate({ to: '/edit/$deckId', params: { deckId: deck!.id } });
+  };
 
-      // Parse the markdown to validate it
-      const parseResult = markdownProcessor.parse(publicDeckData.markdown);
-      if (parseResult.errors.length > 0 || parseResult.cards.length === 0) {
-        throw new Error('Invalid deck format');
-      }
-
-      // Create a new deck with unique ID
-      const deckName = `${publicDeckData.name} (Copy)`;
-      
-      // Save the markdown content
-      const saveResult = markdownStorage.saveDeckFromMarkdown(publicDeckData.markdown, deckName);
-      
-      if (!saveResult.success) {
-        throw new Error(saveResult.error || 'Failed to save deck');
-      }
-
-      setSaveStatus('saved');
-      
-      // Reset status after 3 seconds
-      setTimeout(() => {
-        setSaveStatus('idle');
-      }, 3000);
-
-    } catch (error) {
-      console.error('Failed to save deck:', error);
-      setSaveStatus('error');
-      
-      // Reset status after 3 seconds
-      setTimeout(() => {
-        setSaveStatus('idle');
-      }, 3000);
+  const handleDelete = async () => {
+    if (!deck) return;
+    if (window.confirm(`Are you sure you want to delete "${deck.name}"? This action cannot be undone.`)) {
+      await deleteDeck(deck.id);
+      navigate({ to: '/decks' });
     }
+  };
+
+  const handleDownload = () => {
+    if (!deck) return;
+    const content = deck.cards.map(card => `${card.front} :: ${card.back}`).join('\n');
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${deck.name.replace(/[^a-zA-Z0-9]/g, '-')}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   if (isLoading) {
@@ -140,12 +92,12 @@ function PublicDeckPlayPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Deck Not Found</h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">The requested deck could not be loaded.</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">The requested deck could not be found in your collection.</p>
           <button
-            onClick={handleBackToPublic}
+            onClick={handleBackToDecks}
             className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
           >
-            Back to Public Decks
+            Back to My Decks
           </button>
         </div>
       </div>
@@ -233,11 +185,11 @@ function PublicDeckPlayPage() {
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={handleBackToPublic}
+            onClick={handleBackToDecks}
             className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to Public Decks</span>
+            <span>Back to My Decks</span>
           </button>
           
           <div className="text-center">
@@ -256,56 +208,61 @@ function PublicDeckPlayPage() {
             >
               <SafeContentRenderer content={deck.description || ''} />
             </motion.p>
-            <motion.p 
-              className="text-sm text-gray-500 dark:text-gray-400"
+            
+            {/* Deck Stats */}
+            <motion.div 
+              className="flex items-center justify-center space-x-6 text-sm text-gray-500 dark:text-gray-400"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              {deck.cards.length} cards • Public Deck
-            </motion.p>
-            
-            {/* Save As Copy Button */}
+              <div className="flex items-center space-x-1">
+                <BookOpen className="w-4 h-4" />
+                <span>{deck.cards.length} cards</span>
+              </div>
+              {deck.createdAt && (
+                <div className="flex items-center space-x-1">
+                  <Calendar className="w-4 h-4" />
+                  <span>Created {new Date(deck.createdAt).toLocaleDateString()}</span>
+                </div>
+              )}
+              {deck.tags && deck.tags.length > 0 && (
+                <div className="flex items-center space-x-1">
+                  <Tag className="w-4 h-4" />
+                  <span>{deck.tags.length} tags</span>
+                </div>
+              )}
+            </motion.div>
+
+            {/* Action Buttons */}
             <motion.div
-              className="mt-6"
+              className="mt-6 flex items-center justify-center space-x-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
               <button
-                onClick={handleSaveAsCopy}
-                disabled={saveStatus !== 'idle'}
-                className={`inline-flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all ${
-                  saveStatus === 'idle' ? 'bg-purple-600 hover:bg-purple-700 text-white' :
-                  saveStatus === 'saving' ? 'bg-blue-500 text-white cursor-not-allowed' :
-                  saveStatus === 'saved' ? 'bg-green-500 text-white cursor-not-allowed' :
-                  'bg-red-500 text-white cursor-not-allowed'
-                }`}
+                onClick={handleEdit}
+                className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
-                {saveStatus === 'saving' && (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Saving...</span>
-                  </>
-                )}
-                {saveStatus === 'saved' && (
-                  <>
-                    <Check className="w-4 h-4" />
-                    <span>Saved to Collection!</span>
-                  </>
-                )}
-                {saveStatus === 'error' && (
-                  <>
-                    <X className="w-4 h-4" />
-                    <span>Failed to Save</span>
-                  </>
-                )}
-                {saveStatus === 'idle' && (
-                  <>
-                    <Copy className="w-4 h-4" />
-                    <span>Save as Copy</span>
-                  </>
-                )}
+                <Edit className="w-4 h-4" />
+                <span>Edit</span>
+              </button>
+              
+              <button
+                onClick={handleDownload}
+                className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download</span>
+              </button>
+              
+              <button
+                onClick={handleDelete}
+                className="inline-flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Delete</span>
               </button>
             </motion.div>
           </div>
@@ -336,21 +293,32 @@ function PublicDeckPlayPage() {
           ))}
         </div>
 
-        {/* Info */}
-        <motion.div
-          className="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm max-w-2xl mx-auto"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <p className="mb-2">🎯 This is a public deck preview.</p>
-          <p>To save progress and track achievements, save this deck to your collection from the Public Decks page.</p>
-        </motion.div>
+        {/* Tags Display */}
+        {deck.tags && deck.tags.length > 0 && (
+          <motion.div
+            className="mt-12 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Tags</h3>
+            <div className="flex flex-wrap justify-center gap-2">
+              {deck.tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );
 }
 
-export const Route = createFileRoute('/public/$deckId')({
-  component: PublicDeckPlayPage,
+export const Route = createFileRoute('/deck/$deckId')({
+  component: DeckDetailPage,
 });
