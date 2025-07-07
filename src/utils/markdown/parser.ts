@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { Flashcard, Difficulty } from '@/types/flashcard.types';
+import type { Flashcard, Difficulty } from '@/types';
 import type { 
   Token, 
   ParseContext, 
@@ -9,6 +9,20 @@ import type {
   ParserPlugin 
 } from './types';
 import { TokenType } from './types';
+
+// Parser states (for future use)
+// enum ParserState {
+//   INITIAL = 'INITIAL',
+//   IN_CATEGORY = 'IN_CATEGORY',
+//   IN_MULTIPLE_CHOICE = 'IN_MULTIPLE_CHOICE'
+// }
+
+// AST Node types (for future use)
+// interface ASTNode {
+//   type: string;
+//   children?: ASTNode[];
+//   value?: any;
+// }
 
 export class MarkdownParser {
   private plugins: ParserPlugin[] = [];
@@ -84,7 +98,142 @@ export class MarkdownParser {
     
     return result;
   }
-  
+
+  // Legacy method for backwards compatibility
+  parseMarkdown(markdown: string): Flashcard[] {
+    // Step 1: Tokenize markdown content
+    const tokens = this.tokenize(markdown);
+    
+    // Step 2: Parse using new method
+    const result = this.parse(tokens);
+    
+    // Step 3: Return just the cards for backwards compatibility
+    return result.cards;
+  }
+
+  private tokenize(markdown: string): Token[] {
+    const lines = markdown.split('\n');
+    const tokens: Token[] = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
+      
+      // Empty line
+      if (!trimmed) {
+        tokens.push({ 
+          type: TokenType.EMPTY_LINE, 
+          value: '', 
+          line: i,
+          column: 0,
+          raw: line
+        });
+        continue;
+      }
+
+      // Headers
+      if (trimmed.startsWith('# ')) {
+        tokens.push({ 
+          type: TokenType.HEADER1, 
+          value: trimmed.substring(2).trim(), 
+          line: i,
+          column: 0,
+          raw: line
+        });
+        continue;
+      }
+      
+      if (trimmed.startsWith('## ')) {
+        tokens.push({ 
+          type: TokenType.HEADER2, 
+          value: trimmed.substring(3).trim(), 
+          line: i,
+          column: 0,
+          raw: line
+        });
+        continue;
+      }
+
+      // Comments
+      if (trimmed.startsWith('<!--') && trimmed.endsWith('-->')) {
+        tokens.push({ 
+          type: TokenType.COMMENT, 
+          value: trimmed.slice(4, -3).trim(), 
+          line: i,
+          column: 0,
+          raw: line
+        });
+        continue;
+      }
+
+      // Multiple choice options or correct answer
+      if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        tokens.push({ 
+          type: TokenType.MC_OPTION, 
+          value: trimmed.substring(2).trim(), 
+          line: i,
+          column: 0,
+          raw: line
+        });
+        continue;
+      }
+      
+      if (trimmed.startsWith('> ')) {
+        tokens.push({ 
+          type: TokenType.MC_CORRECT, 
+          value: trimmed.substring(2).trim(), 
+          line: i,
+          column: 0,
+          raw: line
+        });
+        continue;
+      }
+
+      // Question :: Answer format
+      if (trimmed.includes('::')) {
+        const parts = trimmed.split('::');
+        const question = parts[0]?.trim() || '';
+        const answer = parts.slice(1).join('::').trim() || '';
+        tokens.push({ 
+          type: TokenType.QUESTION_ANSWER, 
+          value: trimmed,
+          line: i,
+          column: 0,
+          raw: line,
+          metadata: { question, answer }
+        });
+        continue;
+      }
+
+      // Check if this might be a multiple choice question
+      // (text followed by options on next lines)
+      if (i + 1 < lines.length) {
+        const nextLine = lines[i + 1].trim();
+        if (nextLine.startsWith('- ') || nextLine.startsWith('* ')) {
+          tokens.push({ 
+            type: TokenType.MC_QUESTION, 
+            value: trimmed, 
+            line: i,
+            column: 0,
+            raw: line
+          });
+          continue;
+        }
+      }
+
+      // Default: plain text
+      tokens.push({ 
+        type: TokenType.TEXT, 
+        value: trimmed, 
+        line: i,
+        column: 0,
+        raw: line
+      });
+    }
+
+    return tokens;
+  }
+
   private parseToken(token: Token, context: ParseContext): Flashcard | null {
     // Check plugins first
     for (const plugin of this.plugins) {
@@ -122,22 +271,28 @@ export class MarkdownParser {
         return null;
     }
   }
-  
+
   private parseQuestionAnswer(token: Token, context: ParseContext): Flashcard | null {
     const { question, answer } = token.metadata || {};
-    if (!question || !answer) {
-      this.addError(context, token, 'Invalid question/answer format');
+    
+    // Handle edge cases where question or answer might be empty
+    const frontText = question || '';
+    const backText = answer || '';
+    
+    // Only reject if both are empty (completely invalid)
+    if (!frontText && !backText) {
+      this.addError(context, token, 'Invalid question/answer format - both question and answer are empty');
       return null;
     }
     
     // Detect card type
-    const cardType = this.detectCardType(answer);
+    const cardType = this.detectCardType(backText);
     
     const card: Flashcard = {
       id: uuidv4(),
       type: cardType,
-      front: question,
-      back: this.normalizeAnswer(answer, cardType),
+      front: frontText,
+      back: this.normalizeAnswer(backText, cardType),
       metadata: {
         difficulty: 'easy' as Difficulty,
         tags: []
@@ -153,7 +308,7 @@ export class MarkdownParser {
     
     return card;
   }
-  
+
   private parseMultipleChoice(token: Token, context: ParseContext): Flashcard | null {
     const question = token.value;
     const options: { id: string; text: string; isCorrect: boolean }[] = [];
@@ -223,7 +378,7 @@ export class MarkdownParser {
     
     return card;
   }
-  
+
   private parseCodeBlock(token: Token, context: ParseContext): Flashcard | null {
     // Handle code blocks in questions
     // This is a placeholder - implement based on requirements
@@ -422,3 +577,6 @@ export class MarkdownParser {
     return Array.from(categories);
   }
 }
+
+// Export alias for backwards compatibility
+export { MarkdownParser as MarkdownParserV2 };

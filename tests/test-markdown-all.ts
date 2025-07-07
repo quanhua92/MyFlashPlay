@@ -5,7 +5,7 @@
  * This is a first-class citizen test that MUST pass before any build
  */
 
-import { MarkdownParserV2 } from '../src/utils/markdown-parser-v2';
+import { MarkdownParserV2 } from '../src/utils/markdown/parser';
 import { sampleMarkdownDecks } from '../src/data/sample-decks';
 import { MarkdownValidator } from '../src/utils/markdown/validator';
 import { MarkdownProcessor } from '../src/utils/markdown/processor';
@@ -97,7 +97,7 @@ Question 3 :: Answer 3`,
     
     for (const test of tests) {
       try {
-        const cards = this.parser.parse(test.markdown);
+        const cards = this.parser.parseMarkdown(test.markdown);
         const passed = cards.length === test.expected.count && 
                       cards[0]?.type === test.expected.type;
         
@@ -134,7 +134,7 @@ Which planet is largest?
     `.trim();
     
     try {
-      const cards = this.parser.parse(markdown);
+      const cards = this.parser.parseMarkdown(markdown);
       
       this.addResult(
         'Multiple choice count',
@@ -184,7 +184,7 @@ Water is H2O :: true
     `.trim();
     
     try {
-      const cards = this.parser.parse(markdown);
+      const cards = this.parser.parseMarkdown(markdown);
       
       const mathCards = cards.filter(c => c.category === 'Math');
       const scienceCards = cards.filter(c => c.category === 'Science');
@@ -235,7 +235,7 @@ Water is H2O :: true
     
     for (const lang of languages) {
       try {
-        const cards = this.parser.parse(lang.markdown);
+        const cards = this.parser.parseMarkdown(lang.markdown);
         const hasSpecialChars = cards.length > 0 && lang.check(cards[0].front);
         
         this.addResult(
@@ -258,7 +258,7 @@ Water is H2O :: true
     
     for (const deck of sampleMarkdownDecks) {
       try {
-        const cards = this.parser.parse(deck.markdown);
+        const cards = this.parser.parseMarkdown(deck.markdown);
         totalCards += cards.length;
         
         const passed = cards.length > 0;
@@ -339,7 +339,7 @@ Water is H2O :: true
     
     for (const testCase of edgeCases) {
       try {
-        const cards = this.parser.parse(testCase.markdown);
+        const cards = this.parser.parseMarkdown(testCase.markdown);
         const passed = cards.length === testCase.expectedCards;
         
         this.addResult(
@@ -373,7 +373,7 @@ Capital of France? :: Paris
     `.trim();
     
     try {
-      const cards = this.parser.parse(markdown);
+      const cards = this.parser.parseMarkdown(markdown);
       
       this.addResult(
         'Metadata parsing',
@@ -425,7 +425,7 @@ Capital of France? :: Paris
       
       try {
         const start = performance.now();
-        const cards = this.parser.parse(markdown);
+        const cards = this.parser.parseMarkdown(markdown);
         const duration = performance.now() - start;
         
         const passed = cards.length === size && duration < size * 2; // Max 2ms per card

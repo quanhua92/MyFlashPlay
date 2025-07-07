@@ -1,5 +1,5 @@
 import { storageManager } from './storage';
-import { MarkdownParser } from './markdown';
+import { markdownProcessor } from './markdown';
 import type { Deck } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -11,7 +11,6 @@ export interface MarkdownStorageResult {
 }
 
 export class MarkdownStorage {
-  private readonly parser = new MarkdownParser();
   private readonly PREFIX = 'mdoc_';
   private readonly INDEX_KEY = 'mdoc_index';
 
@@ -55,12 +54,12 @@ export class MarkdownStorage {
         };
       }
       
-      // Extract deck info from markdown
-      const lines = markdown.split('\n');
-      const titleLine = lines.find(line => line.startsWith('# '));
-      const fullTitle = titleLine ? titleLine.substring(2).trim() : (deckName || 'Untitled Deck');
+      // IMPORTANT: Deck title comes from deckName parameter ONLY
+      // # headers in markdown are for categories/sections, NOT deck titles
+      const fullTitle = deckName || 'Untitled Deck';
       const emoji = this.extractEmoji(fullTitle) || '📚';
-      const name = fullTitle.replace(/^[^\w]+\s*/, ''); // Remove emoji
+      // Use the deck name exactly as provided (preserving parentheses, etc)
+      const name = fullTitle;
       
       // Save markdown content
       localStorage.setItem(key, markdown);
@@ -104,7 +103,11 @@ export class MarkdownStorage {
         };
       }
 
-      const deck = this.markdownToDeck(deckId, markdown);
+      // Get deck metadata from index
+      const index = this.getIndex();
+      const deckMetadata = index.find(entry => entry.id === deckId);
+      
+      const deck = this.markdownToDeck(deckId, markdown, deckMetadata?.name, deckMetadata?.emoji);
       
       if (!deck) {
         return {
@@ -324,24 +327,25 @@ export class MarkdownStorage {
   }
 
   // Convert markdown to deck
-  private markdownToDeck(deckId: string, markdown: string): Deck | null {
+  private markdownToDeck(deckId: string, markdown: string, providedName?: string, providedEmoji?: string): Deck | null {
     try {
-      const cards = this.parser.parse(markdown);
+      const parseResult = markdownProcessor.parse(markdown);
+      const cards = parseResult.cards;
       
       if (cards.length === 0) {
         return null;
       }
       
-      // Extract deck info from markdown
-      const lines = markdown.split('\n');
-      const titleLine = lines.find(line => line.startsWith('# '));
-      const descriptionLine = lines.find((line, index) => {
-        return index > 0 && line.trim() && !line.startsWith('#') && !line.startsWith('-');
-      });
+      // IMPORTANT: Use provided name/emoji from index, NOT from markdown content
+      // # headers in markdown are for categories/sections only
+      const name = providedName || 'Untitled Deck';
+      const emoji = providedEmoji || '📚';
       
-      const fullTitle = titleLine ? titleLine.substring(2).trim() : 'Untitled Deck';
-      const emoji = this.extractEmoji(fullTitle) || '📚';
-      const name = fullTitle.replace(/^[^\w]+\s*/, ''); // Remove emoji
+      // Description can be extracted from first non-header line if needed
+      const lines = markdown.split('\n');
+      const descriptionLine = lines.find((line, index) => {
+        return index > 0 && line.trim() && !line.startsWith('#') && !line.startsWith('-') && !line.includes('::');
+      });
       const description = descriptionLine?.trim() || '';
       
       return {
@@ -372,7 +376,7 @@ export class MarkdownStorage {
     }
   }
 
-  // Validate markdown format
+  // Validate markdown format using v2 processor
   private validateMarkdown(markdown: string): boolean {
     try {
       // Basic validation checks
@@ -380,10 +384,9 @@ export class MarkdownStorage {
         return false;
       }
       
-      // Must have at least one card (simplified check)
-      const hasCard = markdown.includes(' :: ');
-      
-      return hasCard;
+      // Use the v2 processor to validate
+      const parseResult = markdownProcessor.parse(markdown);
+      return parseResult.cards.length > 0 && parseResult.errors.length === 0;
     } catch {
       return false;
     }
