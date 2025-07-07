@@ -3,6 +3,10 @@ export const sampleMarkdownDecks = [
   {
     id: 'math-basics',
     name: 'Elementary Math Fun',
+    description: 'A fun quiz about elementary math, including addition, subtraction, multiplication, and division.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'easy',
+    tags: ['math', 'basics', 'fun', 'quiz'],
     markdown: `What is 2 + 2? :: 4
 What is 6 + 7? :: 13
 What is 7 + 8? :: 15
@@ -31,6 +35,10 @@ Which number is bigger?
   {
     id: 'science-animals',
     name: 'Amazing Animals',
+    description: 'Learn amazing facts about different animals.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'easy',
+    tags: ['science', 'animals', 'fun-facts', 'quiz'],
     markdown: `What is the largest mammal? :: The blue whale
 How many hearts does an octopus have? :: Three hearts
 What sound does a lion make? :: Roar
@@ -66,6 +74,10 @@ Which bird cannot fly but can swim very well?
   {
     id: 'space-exploration',
     name: 'Space Adventure',
+    description: 'Explore our solar system and beyond with this space adventure quiz.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'easy',
+    tags: ['space', 'science', 'astronomy', 'quiz'],
     markdown: `What is the closest star to Earth? :: The Sun
 How many planets are in our solar system? :: Eight planets
 Which is the largest planet? :: Jupiter
@@ -92,6 +104,10 @@ Which planet is known as the Red Planet?
   {
     id: 'vietnamese-animals',
     name: 'Động Vật Việt Nam',
+    description: 'Learn the names of animals in Vietnamese.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'easy',
+    tags: ['vietnamese', 'animals', 'vocabulary', 'language'],
     markdown: `Con gì có vằn đen trắng? :: Con ngựa vằn (Zebra)
 Vua của rừng là con gì? :: Con hổ (Tiger)
 Con voi có cái gì rất dài? :: Cái vòi (Trunk)
@@ -112,6 +128,10 @@ Khỉ có đuôi dài :: true`
   {
     id: 'vietnamese-colors',
     name: 'Màu Sắc Việt Nam',
+    description: 'Learn the names of colors in Vietnamese.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'easy',
+    tags: ['vietnamese', 'colors', 'vocabulary', 'language'],
     markdown: `Màu của máu là gì? :: Màu đỏ (Red)
 Màu của lá cây? :: Màu xanh lá cây (Green)
 Màu của bầu trời? :: Màu xanh da trời (Blue)
@@ -139,6 +159,10 @@ Quả cam có màu gì?
   {
     id: 'vietnamese-math',
     name: 'Toán Học Tiếng Việt',
+    description: 'Practice basic math in Vietnamese.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'easy',
+    tags: ['vietnamese', 'math', 'language', 'quiz'],
     markdown: `Hai cộng hai bằng mấy? :: Bốn (4)
 Ba cộng năm bằng mấy? :: Tám (8)
 Sáu cộng bảy bằng mấy? :: Mười ba (13)
@@ -167,7 +191,10 @@ Hai nhân ba bằng mấy?
   {
     id: 'english-vietnamese-practice',
     name: 'English-Vietnamese Practice',
-    tags: ['simple-qa', 'vocabulary', 'true-false', 'multiple-choice'],
+    description: 'Practice English and Vietnamese vocabulary and grammar.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['english', 'vietnamese', 'vocabulary', 'practice', 'multiple-choice', 'true-false'],
     markdown: `# Vocabulary
 Hello :: Xin chào
 Goodbye :: Tạm biệt
@@ -213,7 +240,10 @@ What does "bác sĩ" mean?
   {
     id: 'vietnamese-history-geography',
     name: 'Lịch sử & Địa lý Việt Nam',
-    tags: ['history', 'simple-qa', 'true-false', 'geography', 'multiple-choice'],
+    description: 'Learn about Vietnamese history and geography.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'history', 'geography', 'culture', 'quiz'],
     markdown: `# Lịch sử
 Vị vua nào đã dời đô từ Hoa Lư về Thăng Long?
 :: Lý Công Uẩn (Lý Thái Tổ)
@@ -233,7 +263,10 @@ Hang động tự nhiên lớn nhất thế giới ở Việt Nam có tên là g
   {
     id: 'vietnamese-festivals',
     name: 'Lễ hội Việt Nam',
-    tags: ['festival', 'culture', 'simple-qa', 'multiple-choice'],
+    description: 'Discover traditional Vietnamese festivals.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'easy',
+    tags: ['vietnamese', 'festivals', 'culture', 'quiz'],
     markdown: `# Tết Nguyên Đán
 Tết Nguyên Đán là lễ hội quan trọng nhất của Việt Nam. :: true
 Bánh chưng là món ăn không thể thiếu trong dịp Tết ở miền Bắc. :: true
@@ -249,7 +282,10 @@ Tết Trung Thu còn được gọi là gì?
   {
     id: 'vietnamese-traditional-crafts',
     name: 'Làng nghề Truyền thống',
-    tags: ['craft', 'culture', 'simple-qa', 'true-false', 'multiple-choice'],
+    description: 'Learn about traditional craft villages in Vietnam.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'crafts', 'culture', 'history'],
     markdown: `# Gốm sứ
 Làng gốm Bát Tràng thuộc thành phố nào? :: Hà Nội
 
@@ -267,7 +303,10 @@ Làng tranh Đông Hồ thuộc tỉnh nào?
   {
     id: 'famous-vietnamese-people',
     name: 'Danh nhân Việt Nam',
-    tags: ['history', 'people', 'simple-qa', 'true-false', 'science', 'multiple-choice'],
+    description: 'Learn about famous people in Vietnamese history.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'history', 'people', 'culture'],
     markdown: `# Lãnh tụ
 Chủ tịch Hồ Chí Minh đọc bản Tuyên ngôn Độc lập tại đâu? :: Quảng trường Ba Đình, Hà Nội
 
@@ -285,7 +324,10 @@ Giáo sư Tôn Thất Tùng nổi tiếng trong lĩnh vực nào?
   {
     id: 'vietnamese-folktales',
     name: 'Truyện cổ tích Việt Nam',
-    tags: ['folktale', 'culture', 'simple-qa', 'true-false', 'multiple-choice'],
+    description: 'Explore classic Vietnamese folktales.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'easy',
+    tags: ['vietnamese', 'folktales', 'culture', 'stories'],
     markdown: `# Tấm Cám
 Trong truyện Tấm Cám, con vật nào đã giúp Tấm nhặt thóc? :: Con chim sẻ
 
@@ -299,24 +341,6 @@ Ai là người đã trả lại gươm báu cho Rùa Vàng?
 - Trần Hưng Đạo
 - Nguyễn Trãi
 > Lê Lợi`
-  },
-  {
-    id: 'basic-vietnamese-grammar',
-    name: 'Ngữ pháp Tiếng Việt Cơ bản',
-    tags: ['grammar', 'language', 'simple-qa', 'true-false', 'multiple-choice'],
-    markdown: `# Cấu trúc câu
-Trật tự từ cơ bản trong câu khẳng định của Tiếng Việt là gì? :: Chủ ngữ - Vị ngữ - Tân ngữ (SVO)
-
-# Từ loại
-"Đẹp" là một tính từ. :: true
-
-# Đại từ
-Đại từ nhân xưng ngôi thứ nhất số ít trang trọng là gì?
-- Tôi
-- Tao
-- Mình
-- Tớ
-> Tôi`
   }
 ];
 
