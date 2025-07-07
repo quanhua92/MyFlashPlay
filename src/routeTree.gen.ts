@@ -19,6 +19,7 @@ import { Route as CreateRouteImport } from './routes/create'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayDeckIdRouteImport } from './routes/play.$deckId'
+import { Route as EditDeckIdRouteImport } from './routes/edit.$deckId'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -70,6 +71,11 @@ const PlayDeckIdRoute = PlayDeckIdRouteImport.update({
   path: '/play/$deckId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EditDeckIdRoute = EditDeckIdRouteImport.update({
+  id: '/edit/$deckId',
+  path: '/edit/$deckId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/public-decks': typeof PublicDecksRoute
   '/scores': typeof ScoresRoute
   '/settings': typeof SettingsRoute
+  '/edit/$deckId': typeof EditDeckIdRoute
   '/play/$deckId': typeof PlayDeckIdRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/public-decks': typeof PublicDecksRoute
   '/scores': typeof ScoresRoute
   '/settings': typeof SettingsRoute
+  '/edit/$deckId': typeof EditDeckIdRoute
   '/play/$deckId': typeof PlayDeckIdRoute
 }
 export interface FileRoutesById {
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/public-decks': typeof PublicDecksRoute
   '/scores': typeof ScoresRoute
   '/settings': typeof SettingsRoute
+  '/edit/$deckId': typeof EditDeckIdRoute
   '/play/$deckId': typeof PlayDeckIdRoute
 }
 export interface FileRouteTypes {
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/public-decks'
     | '/scores'
     | '/settings'
+    | '/edit/$deckId'
     | '/play/$deckId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/public-decks'
     | '/scores'
     | '/settings'
+    | '/edit/$deckId'
     | '/play/$deckId'
   id:
     | '__root__'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/public-decks'
     | '/scores'
     | '/settings'
+    | '/edit/$deckId'
     | '/play/$deckId'
   fileRoutesById: FileRoutesById
 }
@@ -157,6 +169,7 @@ export interface RootRouteChildren {
   PublicDecksRoute: typeof PublicDecksRoute
   ScoresRoute: typeof ScoresRoute
   SettingsRoute: typeof SettingsRoute
+  EditDeckIdRoute: typeof EditDeckIdRoute
   PlayDeckIdRoute: typeof PlayDeckIdRoute
 }
 
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayDeckIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/edit/$deckId': {
+      id: '/edit/$deckId'
+      path: '/edit/$deckId'
+      fullPath: '/edit/$deckId'
+      preLoaderRoute: typeof EditDeckIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -245,6 +265,7 @@ const rootRouteChildren: RootRouteChildren = {
   PublicDecksRoute: PublicDecksRoute,
   ScoresRoute: ScoresRoute,
   SettingsRoute: SettingsRoute,
+  EditDeckIdRoute: EditDeckIdRoute,
   PlayDeckIdRoute: PlayDeckIdRoute,
 }
 export const routeTree = rootRouteImport

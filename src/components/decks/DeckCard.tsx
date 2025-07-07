@@ -179,7 +179,7 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
     });
     setShowMenu(false)
     console.log('[DeckCard] Navigating to edit page with deckId:', deck.id);
-    navigate({ to: "/create", search: { editDeck: deck.id } })
+    navigate({ to: "/edit/$deckId", params: { deckId: deck.id } })
   }
 
   const handleDelete = () => {

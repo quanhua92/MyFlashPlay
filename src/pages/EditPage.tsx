@@ -1,8 +1,7 @@
-import { useState, useRef } from 'react';
-import { Upload, FileText, Wand2, CheckCircle, Edit3, Code, Tag, X, Plus, Eye } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Upload, FileText, Wand2, CheckCircle, Edit3, Code, Tag, X, Plus, Eye, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useNavigate } from '@tanstack/react-router';
-import { v4 as uuidv4 } from 'uuid';
+import { useNavigate, useParams } from '@tanstack/react-router';
 import { MarkdownParser } from '@/utils/markdown';
 import { templates, type Template } from '@/data/templates';
 import { useDecks } from '@/hooks/useDecks';
@@ -14,12 +13,13 @@ import { SafeContentRenderer } from '@/components/common/SafeContentRenderer';
 import { useTranslation } from '@/i18n';
 import type { Deck } from '@/types';
 
-type CreateMode = 'interface' | 'markdown';
+type EditMode = 'interface' | 'markdown';
 
-export function CreatePage() {
+export function EditPage() {
   const t = useTranslation();
   const navigate = useNavigate();
-  const { addDeck } = useDecks();
+  const { deckId } = useParams({ from: '/edit/$deckId' });
+  const { updateDeck, getDeck } = useDecks();
   const parser = new MarkdownParser();
 
   // Core state
@@ -29,24 +29,113 @@ export function CreatePage() {
   const [emoji, setEmoji] = useState('📚');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
+  const [editingDeck, setEditingDeck] = useState<Deck | null>(null);
   
   // UI state
-  const [createMode, setCreateMode] = useState<CreateMode>('markdown');
-  const [isCreating, setIsCreating] = useState(false);
-  const [isCreated, setIsCreated] = useState(false);
+  const [editMode, setEditMode] = useState<EditMode>('markdown');
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isUpdated, setIsUpdated] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [validationResult, setValidationResult] = useState<any>({ isValid: true, errors: [], cardCount: 0 });
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   
   // Ref to prevent double updates
   const markdownUpdateRef = useRef<string>('');
+  const loadedDeckRef = useRef<string | null>(null);
 
   // Parse cards from markdown
   const parsedCards = markdown ? parser.parse(markdown) : [];
 
-  const handleCreateDeck = async () => {
-    // Validate before creating
+  // Load deck for editing
+  useEffect(() => {
+    if (deckId && loadedDeckRef.current !== deckId) {
+      console.log('[EditPage] Loading deck for editing:', deckId);
+      setIsLoading(true);
+      setLoadError(null);
+      
+      // First check what markdown is currently in localStorage
+      const storageKey = `mdoc_${deckId}`;
+      const rawMarkdown = localStorage.getItem(storageKey);
+      console.log('[EditPage] Raw markdown from localStorage:', {
+        key: storageKey,
+        found: !!rawMarkdown,
+        length: rawMarkdown?.length || 0
+      });
+      
+      const deckToEdit = getDeck(deckId);
+      console.log('[EditPage] getDeck returned:', {
+        found: !!deckToEdit,
+        id: deckToEdit?.id,
+        name: deckToEdit?.name,
+        cardCount: deckToEdit?.cards?.length
+      });
+      
+      if (deckToEdit) {
+        loadedDeckRef.current = deckId;
+        setEditingDeck(deckToEdit);
+        setDeckName(deckToEdit.name);
+        setDescription(deckToEdit.description);
+        setEmoji(deckToEdit.emoji);
+        setTags(deckToEdit.metadata?.tags || []);
+        
+        // Use raw markdown from localStorage if available
+        if (rawMarkdown) {
+          console.log('[EditPage] Using raw markdown from localStorage');
+          setMarkdown(rawMarkdown);
+        } else {
+          // Convert cards back to markdown format
+          console.log('[EditPage] Converting cards to markdown...');
+          const markdownContent = deckToEdit.cards.map((card) => {
+            if (card.type === 'basic') {
+              return `${card.front} :: ${card.back}`;
+            } else if (card.type === 'multiple_choice') {
+              const choices = card.choices?.map(choice => `  - ${choice}`).join('\n') || '';
+              return `${card.front} ::\n${choices}\n  > ${card.back}`;
+            }
+            return `${card.front} :: ${card.back}`;
+          }).join('\n\n');
+          
+          // Add category headers if present
+          const categories = [...new Set(deckToEdit.cards.map(card => card.category).filter(Boolean))];
+          if (categories.length > 0) {
+            const organizedContent = categories.map(category => {
+              const categoryCards = deckToEdit.cards.filter(card => card.category === category);
+              const categoryMarkdown = categoryCards.map(card => {
+                if (card.type === 'basic') {
+                  return `${card.front} :: ${card.back}`;
+                } else if (card.type === 'multiple_choice') {
+                  const choices = card.choices?.map(choice => `  - ${choice}`).join('\n') || '';
+                  return `${card.front} ::\n${choices}\n  > ${card.back}`;
+                }
+                return `${card.front} :: ${card.back}`;
+              }).join('\n');
+              return `# ${category}\n\n${categoryMarkdown}`;
+            }).join('\n\n');
+            setMarkdown(organizedContent);
+          } else {
+            setMarkdown(markdownContent);
+          }
+        }
+        
+        setIsLoading(false);
+      } else {
+        console.error('[EditPage] Deck not found for editing:', deckId);
+        setLoadError(`Deck with ID ${deckId} not found`);
+        setIsLoading(false);
+      }
+    }
+  }, [deckId, getDeck]);
+
+  const handleUpdateDeck = async () => {
+    if (!editingDeck) {
+      console.error('No deck to update');
+      return;
+    }
+    
+    // Validate before updating
     if (!validationResult?.isValid || parsedCards.length === 0) {
-      console.error('Cannot save deck: validation failed or no cards');
+      console.error('Cannot update deck: validation failed or no cards');
       return;
     }
     
@@ -55,51 +144,36 @@ export function CreatePage() {
       return;
     }
     
-    setIsCreating(true);
+    setIsUpdating(true);
     
     try {
-      const newDeck: Deck = {
-        id: uuidv4(),
+      const updatedDeck: Deck = {
+        ...editingDeck,
         name: deckName.trim(),
         description: description.trim(),
         emoji,
         cards: parsedCards,
         metadata: {
-          createdAt: new Date().toISOString(),
+          ...editingDeck.metadata,
           lastModified: new Date().toISOString(),
-          playCount: 0,
-          source: 'created',
-          originalMarkdown: markdown,
           tags: tags,
-          difficulty: 'beginner',
-          estimatedTime: Math.ceil(parsedCards.length / 10) * 5
-        },
-        settings: {
-          shuffleCards: true,
-          repeatIncorrect: true,
-          studyMode: 'random'
+          originalMarkdown: markdown
         }
       };
-
-      // Add to storage
-      const addResult = addDeck(newDeck);
       
-      if (addResult.success) {
-        console.log(`Successfully created deck ${newDeck.id}`);
-        setIsCreating(false);
-        setIsCreated(true);
-        
-        // Redirect after a short delay
-        setTimeout(() => {
-          navigate({ to: '/decks' });
-        }, 1500);
-      } else {
-        setIsCreating(false);
-        console.error('Failed to create deck:', addResult.error);
-      }
+      updateDeck(editingDeck.id, updatedDeck);
+      console.log(`Updated deck ${editingDeck.id} successfully`);
+      
+      setIsUpdating(false);
+      setIsUpdated(true);
+      
+      // Redirect after a short delay
+      setTimeout(() => {
+        navigate({ to: '/decks' });
+      }, 1500);
     } catch (error) {
-      setIsCreating(false);
-      console.error('Error in deck creation:', error);
+      setIsUpdating(false);
+      console.error('Error in deck update:', error);
     }
   };
 
@@ -153,6 +227,33 @@ export function CreatePage() {
     reader.readAsText(file);
   };
 
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center py-12">
+          <div className="w-8 h-8 border-2 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-300">Loading deck...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center py-12">
+          <p className="text-red-600 dark:text-red-400 mb-4">{loadError}</p>
+          <button
+            onClick={() => navigate({ to: '/decks' })}
+            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            Back to Decks
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto">
       <motion.div
@@ -160,12 +261,22 @@ export function CreatePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
+        <div className="flex items-center mb-6">
+          <button
+            onClick={() => navigate({ to: '/decks' })}
+            className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Decks
+          </button>
+        </div>
+
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            {t('create.title')}
+            {t('create.editTitle')}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            {t('create.subtitle')}
+            {t('create.editSubtitle')}
           </p>
         </div>
 
@@ -277,9 +388,9 @@ export function CreatePage() {
             <div className="flex justify-center">
               <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-1 flex">
                 <button
-                  onClick={() => setCreateMode('interface')}
+                  onClick={() => setEditMode('interface')}
                   className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${
-                    createMode === 'interface'
+                    editMode === 'interface'
                       ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
@@ -288,9 +399,9 @@ export function CreatePage() {
                   {t('create.easyInterface')}
                 </button>
                 <button
-                  onClick={() => setCreateMode('markdown')}
+                  onClick={() => setEditMode('markdown')}
                   className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${
-                    createMode === 'markdown'
+                    editMode === 'markdown'
                       ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
@@ -301,9 +412,9 @@ export function CreatePage() {
               </div>
             </div>
 
-            {/* Content Creation */}
+            {/* Content Editing */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-              {createMode === 'interface' ? (
+              {editMode === 'interface' ? (
                 <QuickCreateInterface 
                   onMarkdownChange={handleQuickCreateChange}
                   initialMarkdown={markdown}
@@ -418,26 +529,26 @@ export function CreatePage() {
                       ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg cursor-pointer'
                       : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                   }`}
-                  onClick={handleCreateDeck}
-                  disabled={isCreating || !deckName.trim() || !validationResult?.isValid}
+                  onClick={handleUpdateDeck}
+                  disabled={isUpdating || !deckName.trim() || !validationResult?.isValid}
                   whileHover={validationResult?.isValid && deckName.trim() ? { scale: 1.02 } : {}}
                   whileTap={validationResult?.isValid && deckName.trim() ? { scale: 0.98 } : {}}
                 >
-                  {isCreating ? (
+                  {isUpdating ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>{t('create.creating')}</span>
+                      <span>{t('create.updating')}</span>
                     </>
-                  ) : isCreated ? (
+                  ) : isUpdated ? (
                     <>
                       <CheckCircle className="w-5 h-5" />
-                      <span>{t('create.created')} {t('create.redirecting')}</span>
+                      <span>{t('create.updated')} {t('create.redirecting')}</span>
                     </>
                   ) : (
                     <span>
                       {validationResult?.isValid 
-                        ? `${t('create.createDeck')} (${parsedCards.length} ${t('create.cards')})` 
-                        : `${t('create.fixErrors')} ${t('create.create')} ${t('create.deck')}`
+                        ? `${t('create.updateDeck')} (${parsedCards.length} ${t('create.cards')})` 
+                        : `${t('create.fixErrors')} ${t('create.update')} ${t('create.deck')}`
                       }
                     </span>
                   )}

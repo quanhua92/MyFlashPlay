@@ -60,7 +60,7 @@ export function ErrorRecovery({ error, errorInfo }: ErrorRecoveryProps) {
           sessionStorage.removeItem(`temp_deck_${tempDeckId}`);
           // Navigate to edit the new deck
           setTimeout(() => {
-            navigate({ to: '/create', search: { editDeck: newDeckId } });
+            navigate({ to: '/edit/$deckId', params: { deckId: newDeckId } });
           }, 1500);
         } else {
           setRecoveryStatus('Failed to save deck. Try going back and saving it manually.');
@@ -76,7 +76,7 @@ export function ErrorRecovery({ error, errorInfo }: ErrorRecoveryProps) {
 
   const editLocalDeck = () => {
     if (deckId) {
-      navigate({ to: '/create', search: { editDeck: deckId } });
+      navigate({ to: '/edit/$deckId', params: { deckId: deckId } });
     } else {
       setRecoveryStatus('Could not determine which deck to edit.');
     }
