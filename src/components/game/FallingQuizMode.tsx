@@ -224,9 +224,13 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
     gameLoopRef.current = requestAnimationFrame(gameLoop);
   }, [gameState, spawnQuiz]);
 
-  // Start game loop
+  // Start game loop and spawn first card immediately
   useEffect(() => {
     if (gameState === 'playing') {
+      // Spawn the first card immediately when the game starts
+      if (fallingQuizzes.length === 0) {
+        spawnQuiz();
+      }
       gameLoopRef.current = requestAnimationFrame(gameLoop);
     }
     return () => {
@@ -234,7 +238,7 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
         cancelAnimationFrame(gameLoopRef.current);
       }
     };
-  }, [gameState, gameLoop]);
+  }, [gameState, gameLoop, spawnQuiz]);
 
   // Handle answer selection
   const handleAnswer = useCallback((quizId: string, answerIndex: number) => {
