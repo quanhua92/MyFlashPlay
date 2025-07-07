@@ -79,10 +79,10 @@ export function PlayTempPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading deck...</p>
+          <p className="text-gray-600 dark:text-gray-300">Loading deck...</p>
         </div>
       </div>
     );
@@ -90,10 +90,10 @@ export function PlayTempPage() {
 
   if (!deck) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Deck Not Found</h2>
-          <p className="text-gray-600 mb-6">The requested deck could not be loaded.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Deck Not Found</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">The requested deck could not be loaded.</p>
           <button
             onClick={handleBackToPublic}
             className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
@@ -131,7 +131,7 @@ export function PlayTempPage() {
         {/* Back Button */}
         <button
           onClick={handleBackToModes}
-          className="absolute top-4 left-4 z-50 flex items-center space-x-2 px-4 py-2 bg-white/90 hover:bg-white text-gray-700 rounded-lg shadow-lg transition-colors"
+          className="absolute top-4 left-4 z-50 flex items-center space-x-2 px-4 py-2 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-lg shadow-lg transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back</span>
@@ -181,13 +181,13 @@ export function PlayTempPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <button
             onClick={handleBackToPublic}
-            className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 mb-4 transition-colors"
+            className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Public Decks</span>
@@ -195,14 +195,14 @@ export function PlayTempPage() {
           
           <div className="text-center">
             <motion.h1 
-              className="text-4xl font-bold text-gray-900 mb-2"
+              className="text-4xl font-bold text-gray-900 dark:text-white mb-2"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
             >
               {deck.emoji} {deck.name}
             </motion.h1>
             <motion.p 
-              className="text-gray-600 mb-4"
+              className="text-gray-600 dark:text-gray-300 mb-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -210,7 +210,7 @@ export function PlayTempPage() {
               <SafeContentRenderer content={deck.description || ''} />
             </motion.p>
             <motion.p 
-              className="text-sm text-gray-500"
+              className="text-sm text-gray-500 dark:text-gray-400"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -225,7 +225,7 @@ export function PlayTempPage() {
           {gameModes.map((mode, index) => (
             <motion.div
               key={mode.id}
-              className="relative overflow-hidden rounded-xl shadow-lg cursor-pointer group"
+              className="relative overflow-hidden rounded-xl shadow-lg cursor-pointer group bg-white dark:bg-gray-800"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
@@ -233,7 +233,7 @@ export function PlayTempPage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => handleStartGame(mode.id as GameMode)}
             >
-              <div className={`bg-gradient-to-br ${mode.color} p-6 text-white h-full`}>
+              <div className={`p-6 text-white h-full bg-gradient-to-br ${mode.color}`}>
                 <div className="flex items-center justify-between mb-4">
                   <mode.icon className="w-8 h-8" />
                   <Play className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -247,7 +247,7 @@ export function PlayTempPage() {
 
         {/* Info */}
         <motion.div
-          className="mt-12 text-center text-gray-500 text-sm max-w-2xl mx-auto"
+          className="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm max-w-2xl mx-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
