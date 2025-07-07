@@ -813,6 +813,564 @@ Garlic :: Tỏi
 Onion :: Hành tây
 Ginger :: Gừng
 Lemongrass :: Sả`
+  },
+  {
+    id: 'public-english-vietnamese-mixed-practice',
+    name: '🎓 English-Vietnamese Mixed Practice',
+    description: 'A mix of question types for practicing English and Vietnamese, including multiple choice and true/false.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['english', 'vietnamese', 'mixed-practice', 'multiple-choice', 'true-false', 'grammar'],
+    markdown: `# Simple Vocabulary
+House :: Nhà
+To run :: Chạy
+Happy :: Vui vẻ
+
+# True/False Statements
+"Dog" means "Con chó" in Vietnamese. :: true
+"Mèo" means "Apple" in English. :: false
+The capital of Vietnam is Hanoi. :: true
+"Nước" means "Fire" in English. :: false
+
+# Multiple Choice: English to Vietnamese
+Which of the following means "water"?
+- Lửa
+- Nước
+- Đất
+- Khí
+> Nước
+
+What is the correct translation for "I am learning"?
+- Tôi đang ăn
+- Tôi đang ngủ
+- Tôi đang học
+- Tôi đang chơi
+> Tôi đang học
+
+Which word means "teacher"?
+- Bác sĩ
+- Kỹ sư
+- Giáo viên
+- Học sinh
+> Giáo viên
+
+# Multiple Choice: Vietnamese to English
+What is "Xe đạp"?
+- Car
+- Bicycle
+- Motorcycle
+- Bus
+> Bicycle
+
+What does "Cảm ơn" mean?
+- Hello
+- Goodbye
+- Please
+- Thank you
+> Thank you
+
+What is "bệnh viện"?
+- School
+- Hospital
+- Market
+- Restaurant
+> Hospital`
+  },
+  {
+    id: 'public-vietnamese-fun-science',
+    name: '🔬 Khoa học Vui',
+    description: 'Các câu hỏi khoa học thú vị bằng Tiếng Việt cho mọi lứa tuổi.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'easy',
+    tags: ['vietnamese', 'science', 'fun', 'quiz'],
+    markdown: `# Khoa học Đại cương
+Nước đóng băng ở bao nhiêu độ C? :: 0 độ C
+Hành tinh nào gần Mặt Trời nhất? :: Sao Thủy
+Công thức hóa học của nước là gì? :: H2O
+Loài động vật lớn nhất trên Trái Đất là gì? :: Cá voi xanh
+
+# Đúng hay Sai?
+Âm thanh có thể truyền trong chân không. :: false
+Thực vật nhận năng lượng từ mặt trời qua quá trình quang hợp. :: true
+
+# Trắc nghiệm Khoa học
+Hành tinh nào được mệnh danh là "Hành tinh Đỏ"?
+- Sao Kim
+- Sao Hỏa
+- Sao Mộc
+- Sao Thổ
+> Sao Hỏa
+
+Kim cương là dạng cứng nhất của nguyên tố nào?
+- Vàng
+- Sắt
+- Carbon
+- Bạc
+> Carbon`
+  },
+  {
+    id: 'public-vietnamese-basic-physics',
+    name: '⚛️ Vật lý Cơ bản',
+    description: 'Các khái niệm và câu hỏi vật lý nền tảng bằng Tiếng Việt.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'physics', 'science', 'education'],
+    markdown: `# Định luật & Khái niệm
+Ai là người phát hiện ra định luật vạn vật hấp dẫn? :: Isaac Newton
+Đơn vị đo lực trong hệ SI là gì? :: Newton
+Năng lượng không tự sinh ra cũng không tự mất đi, nó chỉ chuyển từ dạng này sang dạng khác. :: true
+
+# Trắc nghiệm Vật lý
+Đơn vị đo điện trở là gì?
+- Volt
+- Ampere
+- Ohm
+- Watt
+> Ohm
+
+Công thức của Định luật II Newton là gì?
+- F = m/a
+- F = ma
+- F = m-a
+- F = m+a
+> F = ma
+
+Ánh sáng di chuyển nhanh nhất trong môi trường nào?
+- Nước
+- Không khí
+- Thủy tinh
+- Chân không
+> Chân không`
+  },
+  {
+    id: 'public-vietnamese-literature',
+    name: '📚 Văn học Việt Nam',
+    description: 'Tác giả, tác phẩm và nhân vật nổi tiếng trong văn học Việt Nam.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'literature', 'education', 'culture'],
+    markdown: `# Tác giả & Tác phẩm
+Ai là tác giả của Truyện Kiều? :: Nguyễn Du
+\"Tắt đèn\" là tác phẩm của nhà văn nào? :: Ngô Tất Tố
+\"Số đỏ\" là một cuốn tiểu thuyết châm biếm của ai? :: Vũ Trọng Phụng
+
+# Nhân vật Văn học
+Chị Dậu là nhân vật trong tác phẩm nào?
+- Lão Hạc
+- Tắt đèn
+- Chí Phèo
+- Vợ chồng A Phủ
+> Tắt đèn
+
+# Thơ ca
+\"Bên kia sông Đuống\" là bài thơ nổi tiếng của ai? :: Hoàng Cầm
+\"Tây Tiến\" là một bài thơ của Quang Dũng. :: true`
+  },
+  {
+    id: 'public-vietnamese-music',
+    name: '🎵 Âm nhạc Việt Nam',
+    description: 'Nhạc cụ truyền thống, nhạc sĩ và các thể loại âm nhạc Việt Nam.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'music', 'culture', 'art'],
+    markdown: `# Nhạc cụ Dân tộc
+Đàn bầu là nhạc cụ có mấy dây? :: Một dây
+Cồng chiêng là nhạc cụ đặc trưng của vùng nào ở Việt Nam?
+- Đồng bằng sông Hồng
+- Tây Nguyên
+- Duyên hải Nam Trung Bộ
+- Đồng bằng sông Cửu Long
+> Tây Nguyên
+
+# Nhạc sĩ & Ca khúc
+Ai là tác giả của ca khúc \"Tiến quân ca\"? :: Văn Cao
+\"Diễm xưa\" là một ca khúc nổi tiếng của nhạc sĩ nào? :: Trịnh Công Sơn
+Nhạc sĩ Phạm Tuyên đã viết bài hát \"Như có Bác Hồ trong ngày vui đại thắng\". :: true`
+  },
+  {
+    id: 'public-vietnamese-art',
+    name: '🎨 Mỹ thuật Việt Nam',
+    description: 'Họa sĩ, phong cách và các giai đoạn lịch sử của mỹ thuật Việt Nam.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'hard',
+    tags: ['vietnamese', 'art', 'culture', 'history'],
+    markdown: `# Họa sĩ
+Bùi Xuân Phái là họa sĩ nổi tiếng với các tác phẩm về chủ đề gì? :: Phố cổ Hà Nội
+Tranh lụa là một thể loại nổi tiếng của họa sĩ nào?
+- Tô Ngọc Vân
+- Nguyễn Phan Chánh
+- Nguyễn Gia Trí
+- Trần Văn Cẩn
+> Nguyễn Phan Chánh
+
+# Phong cách & Trường phái
+Tranh Đông Hồ có nguồn gốc từ tỉnh nào? :: Bắc Ninh
+Sơn mài là một chất liệu độc đáo trong hội họa Việt Nam. :: true`
+  },
+  {
+    id: 'public-vietnamese-cinema',
+    name: '🎬 Điện ảnh Việt Nam',
+    description: 'Các bộ phim kinh điển, đạo diễn và diễn viên nổi tiếng của Việt Nam.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'cinema', 'movie', 'culture'],
+    markdown: `# Phim Kinh điển
+\"Bao giờ cho đến tháng Mười\" là một bộ phim của đạo diễn nào? :: Đặng Nhật Minh
+Bộ phim \"Cánh đồng hoang\" lấy bối cảnh ở đâu?
+- Miền Bắc Việt Nam
+- Miền Trung Việt Nam
+- Đồng bằng sông Cửu Long
+- Vùng núi Tây Bắc
+> Đồng bằng sông Cửu Long
+
+# Đạo diễn & Diễn viên
+Đạo diễn Victor Vũ nổi tiếng với dòng phim nào? :: Phim giải trí, ly kỳ
+Trà Giang là một nữ diễn viên gạo cội của điện ảnh Việt Nam. :: true`
+  },
+  {
+    id: 'public-vietnamese-cuisine-advanced',
+    name: '🍲 Ẩm thực Việt Nam Nâng cao',
+    description: 'Đặc sản vùng miền, nguyên liệu và kỹ thuật nấu ăn.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'hard',
+    tags: ['vietnamese', 'food', 'cuisine', 'culture', 'advanced'],
+    markdown: `# Đặc sản Vùng miền
+Cao lầu là đặc sản của thành phố nào?
+- Huế
+- Đà Nẵng
+- Hội An
+- Nha Trang
+> Hội An
+Mì Quảng là món ăn đặc trưng của tỉnh Quảng Nam. :: true
+
+# Nguyên liệu & Kỹ thuật
+Nước mắm thường được làm từ gì? :: Cá và muối
+\"Kho\" là một kỹ thuật nấu ăn phổ biến của Việt Nam, có nghĩa là gì? :: Hầm/rim mặn`
+  },
+  {
+    id: 'public-vietnamese-history-advanced',
+    name: '📜 Lịch sử Việt Nam Nâng cao',
+    description: 'Các triều đại, sự kiện lịch sử và các nhân vật quan trọng.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'hard',
+    tags: ['vietnamese', 'history', 'education', 'advanced'],
+    markdown: `# Triều đại
+Nhà Trần đã ba lần đánh thắng quân xâm lược nào?
+- Mông-Nguyên
+- Tống
+- Minh
+- Thanh
+> Mông-Nguyên
+
+# Sự kiện Lịch sử
+Cuộc khởi nghĩa Hai Bà Trưng diễn ra vào năm nào? :: Năm 40
+Chiến thắng Điện Biên Phủ diễn ra vào năm 1954. :: true
+
+# Nhân vật
+Ai là người lãnh đạo cuộc khởi nghĩa Lam Sơn?
+- Trần Hưng Đạo
+- Lê Lợi
+- Quang Trung
+- Phan Bội Châu
+> Lê Lợi`
+  },
+  {
+    id: 'public-vietnamese-geography-advanced',
+    name: '🗺️ Địa lý Việt Nam Nâng cao',
+    description: 'Các tỉnh, sông ngòi, núi non và vườn quốc gia của Việt Nam.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'geography', 'education', 'nature'],
+    markdown: `# Tỉnh thành
+Tỉnh nào có diện tích lớn nhất Việt Nam?
+- Thanh Hóa
+- Nghệ An
+- Quảng Nam
+- Sơn La
+> Nghệ An
+
+# Sông ngòi & Núi non
+Sông nào dài nhất Việt Nam? :: Sông Đồng Nai
+Việt Nam có chung đường biên giới với bao nhiêu quốc gia? :: Ba (Trung Quốc, Lào, Campuchia)
+
+# Vườn Quốc gia
+Vườn quốc gia Phong Nha-Kẻ Bàng nổi tiếng với hệ thống gì? :: Hang động`
+  },
+  {
+    id: 'public-vietnamese-biology',
+    name: '🧬 Sinh học',
+    description: 'Tế bào, di truyền và các hệ cơ quan trong cơ thể người.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'biology', 'science', 'education'],
+    markdown: `# Tế bào
+Ty thể được mệnh danh là gì của tế bào? :: \"Nhà máy năng lượng\"
+Thành tế bào có ở tế bào động vật không? :: Không
+
+# Di truyền
+ADN là viết tắt của từ gì?
+- Axit Deoxyribonucleic
+- Axit Ribonucleic
+- Adenosine Triphosphate
+- Axit Amin
+> Axit Deoxyribonucleic
+
+# Cơ thể người
+Cơ quan nào lớn nhất trong cơ thể người? :: Da
+Tim người có bao nhiêu ngăn? :: Bốn`
+  },
+  {
+    id: 'public-vietnamese-chemistry',
+    name: '🧪 Hóa học',
+    description: 'Nguyên tố, bảng tuần hoàn và các phản ứng hóa học.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'hard',
+    tags: ['vietnamese', 'chemistry', 'science', 'education'],
+    markdown: `# Nguyên tố & Hợp chất
+Ký hiệu hóa học của Vàng là gì? :: Au
+Oxi chiếm khoảng bao nhiêu phần trăm trong không khí? :: 21%
+
+# Bảng Tuần hoàn
+Nguyên tố nào có số hiệu nguyên tử là 1?
+- Oxi
+- Heli
+- Hydro
+- Carbon
+> Hydro
+
+# Phản ứng
+Phản ứng giữa axit và bazơ được gọi là gì? :: Phản ứng trung hòa`
+  },
+  {
+    id: 'public-world-history',
+    name: '🌍 Lịch sử Thế giới',
+    description: 'Các sự kiện, đế chế và nhân vật lịch sử quan trọng trên thế giới.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'history', 'world', 'education'],
+    markdown: `# Sự kiện
+Chiến tranh thế giới thứ hai kết thúc vào năm nào? :: 1945
+Cuộc cách mạng công nghiệp bắt đầu ở quốc gia nào?
+- Pháp
+- Đức
+- Hoa Kỳ
+- Anh
+> Anh
+
+# Đế chế
+Đế chế La Mã sụp đổ vào thế kỷ thứ mấy? :: Thế kỷ thứ 5
+Kim tự tháp là công trình kiến trúc của nền văn minh nào? :: Ai Cập cổ đại`
+  },
+  {
+    id: 'public-world-geography',
+    name: '🌐 Địa lý Thế giới',
+    description: 'Các châu lục, đại dương và địa danh nổi tiếng trên thế giới.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'easy',
+    tags: ['vietnamese', 'geography', 'world', 'education'],
+    markdown: `# Châu lục & Đại dương
+Châu lục nào lớn nhất thế giới? :: Châu Á
+Đại dương nào lớn nhất thế giới? :: Thái Bình Dương
+
+# Quốc gia & Thành phố
+Thủ đô của Nhật Bản là gì?
+- Bắc Kinh
+- Seoul
+- Tokyo
+- Bangkok
+> Tokyo
+
+# Địa danh
+Tượng Nữ thần Tự do nằm ở thành phố nào? :: New York`
+  },
+  {
+    id: 'public-computer-science',
+    name: '💻 Khoa học Máy tính',
+    description: 'Các khái niệm lập trình, phần cứng và phần mềm.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'technology', 'computer-science', 'education'],
+    markdown: `# Khái niệm Cơ bản
+CPU là viết tắt của từ gì? :: Central Processing Unit (Bộ xử lý trung tâm)
+RAM là loại bộ nhớ gì? :: Bộ nhớ truy cập ngẫu nhiên (dữ liệu sẽ mất khi mất điện)
+
+# Lập trình
+HTML được sử dụng để làm gì?
+- Tạo cấu trúc cho trang web
+- Tạo kiểu cho trang web
+- Thêm tính tương tác cho trang web
+- Quản lý cơ sở dữ liệu
+> Tạo cấu trúc cho trang web
+
+# Phần cứng & Phần mềm
+\"Hệ điều hành\" là phần cứng hay phần mềm? :: Phần mềm`
+  },
+  {
+    id: 'public-vietnamese-astronomy',
+    name: '🔭 Thiên văn học',
+    description: 'Các hành tinh, ngôi sao, thiên hà và khám phá không gian.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'astronomy', 'science', 'space'],
+    markdown: `# Hệ Mặt Trời
+Hành tinh nào có vành đai nổi tiếng? :: Sao Thổ
+Trái Đất là hành tinh thứ mấy tính từ Mặt Trời? :: Thứ ba
+
+# Ngôi sao & Thiên hà
+Thiên hà của chúng ta có tên là gì?
+- Andromeda
+- Triangulum
+- Milky Way (Dải Ngân Hà)
+- Sombrero
+> Milky Way (Dải Ngân Hà)
+
+# Khám phá Không gian
+Ai là người đầu tiên đặt chân lên Mặt Trăng? :: Neil Armstrong`
+  },
+  {
+    id: 'public-vietnamese-mythology',
+    name: '🏛️ Thần thoại Việt Nam & Thế giới',
+    description: 'Các vị thần, sinh vật và câu chuyện thần thoại nổi tiếng.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'mythology', 'culture', 'history'],
+    markdown: `# Thần thoại Việt Nam
+Sơn Tinh và Thủy Tinh là truyền thuyết về việc gì? :: Chống lũ lụt
+Bánh chưng, bánh giầy gắn liền với vị vua Hùng nào? :: Vua Hùng thứ 6
+
+# Thần thoại Thế giới
+Zeus là vị thần đứng đầu trong thần thoại của nước nào?
+- Ai Cập
+- La Mã
+- Hy Lạp
+- Na Uy
+> Hy Lạp
+
+Thor là thần sấm trong thần thoại Bắc Âu. :: true`
+  },
+  {
+    id: 'public-vietnamese-economics',
+    name: '💹 Kinh tế học Cơ bản',
+    description: 'Các khái niệm cơ bản về kinh tế, cung cầu và thị trường.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'hard',
+    tags: ['vietnamese', 'economics', 'education', 'business'],
+    markdown: `# Khái niệm
+Lạm phát là gì? :: Sự tăng mức giá chung của hàng hóa và dịch vụ
+GDP là viết tắt của từ gì? :: Gross Domestic Product (Tổng sản phẩm quốc nội)
+
+# Cung & Cầu
+Khi cầu vượt cung, giá cả sẽ có xu hướng gì?
+- Giảm
+- Tăng
+- Không đổi
+- Biến động ngẫu nhiên
+> Tăng
+
+# Thị trường
+Thị trường độc quyền là thị trường có bao nhiêu người bán? :: Một`
+  },
+  {
+    id: 'public-vietnamese-proverbs',
+    name: '🗣️ Tục ngữ & Thành ngữ Việt Nam',
+    description: 'Các câu tục ngữ, thành ngữ phổ biến và ý nghĩa của chúng.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'language', 'culture', 'proverbs'],
+    markdown: `Đi một ngày đàng, học một sàng khôn. :: Càng đi nhiều, càng tiếp xúc nhiều thì sự hiểu biết ngày càng được mở rộng.
+Ăn quả nhớ kẻ trồng cây. :: Phải biết ơn những người đã tạo ra thành quả cho mình hưởng.
+Thất bại là mẹ thành công. :: true
+
+# Chọn ý nghĩa đúng
+Nghĩa của câu \"Nước chảy đá mòn\" là gì?
+- Nước mạnh hơn đá
+- Kiên trì, nhẫn nại sẽ thành công
+- Thời gian trôi nhanh
+- Mọi thứ đều thay đổi
+> Kiên trì, nhẫn nại sẽ thành công`
+  },
+  {
+    id: 'public-environmental-science',
+    name: '♻️ Khoa học Môi trường',
+    description: 'Hệ sinh thái, ô nhiễm và các biện pháp bảo vệ môi trường.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'medium',
+    tags: ['vietnamese', 'science', 'environment', 'education'],
+    markdown: `# Hệ sinh thái
+Chuỗi thức ăn bắt đầu từ đâu? :: Sinh vật sản xuất (thường là thực vật)
+Hiệu ứng nhà kính gây ra hiện tượng gì? :: Nóng lên toàn cầu
+
+# Ô nhiễm & Bảo vệ
+Tầng Ozon có vai trò gì?
+- Hấp thụ tia cực tím
+- Duy trì nhiệt độ Trái Đất
+- Tạo ra oxy
+- Phản xạ ánh sáng mặt trời
+> Hấp thụ tia cực tím
+
+Sử dụng túi nilon là một hành động thân thiện với môi trường. :: false`
+  },
+  {
+    id: 'public-geology',
+    name: '🌍 Địa chất học',
+    description: 'Các loại đá, khoáng vật và kiến tạo mảng.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'hard',
+    tags: ['vietnamese', 'science', 'geology', 'nature'],
+    markdown: `# Đá & Khoáng vật
+Đá granite thuộc loại đá nào? :: Đá magma
+Khoáng vật nào cứng nhất theo thang độ cứng Mohs? :: Kim cương
+
+# Kiến tạo mảng
+Lớp vỏ Trái Đất được cấu tạo từ các mảng kiến tạo luôn di chuyển. :: true
+Hiện tượng nào xảy ra khi hai mảng kiến tạo va vào nhau?
+- Động đất
+- Núi lửa
+- Hình thành núi
+- Tất cả các đáp án trên
+> Tất cả các đáp án trên`
+  },
+  {
+    id: 'public-psychology',
+    name: '🧠 Tâm lý học Cơ bản',
+    description: 'Các khái niệm, thí nghiệm nổi tiếng và các rối loạn tâm lý.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'hard',
+    tags: ['vietnamese', 'psychology', 'science', 'health'],
+    markdown: `# Khái niệm
+Phản xạ có điều kiện là một khái niệm được nghiên cứu bởi ai? :: Ivan Pavlov
+Trí nhớ ngắn hạn có thể lưu giữ thông tin trong bao lâu? :: Khoảng 20-30 giây
+
+# Thí nghiệm & Rối loạn
+Thí nghiệm \"Nhà tù Stanford\" nghiên cứu về điều gì?
+- Sự tuân thủ
+- Quyền lực và vai trò xã hội
+- Trí nhớ
+- Học tập
+> Quyền lực và vai trò xã hội
+
+Trầm cảm là một rối loạn cảm xúc. :: true`
+  },
+  {
+    id: 'public-sociology',
+    name: '👨‍👩‍👧‍👦 Xã hội học Cơ bản',
+    description: 'Cấu trúc xã hội, văn hóa và hành vi xã hội.',
+    author: 'MyFlashPlay Team',
+    difficulty: 'hard',
+    tags: ['vietnamese', 'sociology', 'science', 'culture'],
+    markdown: `# Khái niệm
+Gia đình được coi là một... :: Thiết chế xã hội
+Chuẩn mực xã hội là gì? :: Các quy tắc, kỳ vọng về hành vi trong một xã hội
+
+# Văn hóa & Xã hội
+Toàn cầu hóa có làm cho các nền văn hóa trở nên giống nhau hơn không?
+- Có
+- Không
+- Chỉ một phần
+- Không liên quan
+> Chỉ một phần
+
+Phân tầng xã hội là sự phân chia xã hội thành các tầng lớp khác nhau. :: true`
   }
 ];
 

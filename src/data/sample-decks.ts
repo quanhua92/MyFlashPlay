@@ -163,6 +163,160 @@ Hai nhân ba bằng mấy?
 - Bảy
 - Tám
 > Sáu`
+  },
+  {
+    id: 'english-vietnamese-practice',
+    name: 'English-Vietnamese Practice',
+    tags: ['simple-qa', 'vocabulary', 'true-false', 'multiple-choice'],
+    markdown: `# Vocabulary
+Hello :: Xin chào
+Goodbye :: Tạm biệt
+Book :: Sách
+Water :: Nước
+
+# True/False
+"School" is "Trường học" in Vietnamese. :: true
+"Cat" is "Con bò" in Vietnamese. :: false
+"Red" is "Màu đỏ" in Vietnamese. :: true
+"Yellow" is "Màu xanh" in Vietnamese. :: false
+
+# Multiple Choice: Eng-Vie
+Which word means "book"?
+- Vở
+- Bút
+- Sách
+- Thước
+> Sách
+
+Which of these means "to eat"?
+- Ăn
+- Uống
+- Ngủ
+- Học
+> Ăn
+
+# Multiple Choice: Vie-Eng
+What is "màu đỏ"?
+- Blue
+- Green
+- Red
+- Yellow
+> Red
+
+What does "bác sĩ" mean?
+- Teacher
+- Doctor
+- Engineer
+- Student
+> Doctor`
+  },
+  {
+    id: 'vietnamese-history-geography',
+    name: 'Lịch sử & Địa lý Việt Nam',
+    tags: ['history', 'simple-qa', 'true-false', 'geography', 'multiple-choice'],
+    markdown: `# Lịch sử
+Vị vua nào đã dời đô từ Hoa Lư về Thăng Long?
+:: Lý Công Uẩn (Lý Thái Tổ)
+
+Chiến dịch Hồ Chí Minh kết thúc vào ngày 30/04/1975. :: true
+
+# Địa lý
+Đỉnh núi cao nhất Việt Nam là gì?
+- Fansipan
+- Phú Sĩ
+- Everest
+- Bạch Mã
+> Fansipan
+
+Hang động tự nhiên lớn nhất thế giới ở Việt Nam có tên là gì? :: Hang Sơn Đoòng`
+  },
+  {
+    id: 'vietnamese-festivals',
+    name: 'Lễ hội Việt Nam',
+    tags: ['festival', 'culture', 'simple-qa', 'multiple-choice'],
+    markdown: `# Tết Nguyên Đán
+Tết Nguyên Đán là lễ hội quan trọng nhất của Việt Nam. :: true
+Bánh chưng là món ăn không thể thiếu trong dịp Tết ở miền Bắc. :: true
+
+# Tết Trung Thu
+Tết Trung Thu còn được gọi là gì?
+- Tết Thiếu nhi
+- Tết Trông Trăng
+- Tết Đoàn viên
+- Tất cả các đáp án trên
+> Tất cả các đáp án trên`
+  },
+  {
+    id: 'vietnamese-traditional-crafts',
+    name: 'Làng nghề Truyền thống',
+    tags: ['craft', 'culture', 'simple-qa', 'true-false', 'multiple-choice'],
+    markdown: `# Gốm sứ
+Làng gốm Bát Tràng thuộc thành phố nào? :: Hà Nội
+
+# Lụa
+Làng lụa Vạn Phúc nổi tiếng với sản phẩm lụa tơ tằm. :: true
+
+# Tranh dân gian
+Làng tranh Đông Hồ thuộc tỉnh nào?
+- Hà Nam
+- Bắc Ninh
+- Hải Dương
+- Hưng Yên
+> Bắc Ninh`
+  },
+  {
+    id: 'famous-vietnamese-people',
+    name: 'Danh nhân Việt Nam',
+    tags: ['history', 'people', 'simple-qa', 'true-false', 'science', 'multiple-choice'],
+    markdown: `# Lãnh tụ
+Chủ tịch Hồ Chí Minh đọc bản Tuyên ngôn Độc lập tại đâu? :: Quảng trường Ba Đình, Hà Nội
+
+# Tướng lĩnh
+Đại tướng Võ Nguyên Giáp là tổng tư lệnh của Quân đội Nhân dân Việt Nam trong chiến dịch Điện Biên Phủ. :: true
+
+# Nhà khoa học
+Giáo sư Tôn Thất Tùng nổi tiếng trong lĩnh vực nào?
+- Toán học
+- Vật lý
+- Y học (phẫu thuật gan)
+- Hóa học
+> Y học (phẫu thuật gan)`
+  },
+  {
+    id: 'vietnamese-folktales',
+    name: 'Truyện cổ tích Việt Nam',
+    tags: ['folktale', 'culture', 'simple-qa', 'true-false', 'multiple-choice'],
+    markdown: `# Tấm Cám
+Trong truyện Tấm Cám, con vật nào đã giúp Tấm nhặt thóc? :: Con chim sẻ
+
+# Cây tre trăm đốt
+Câu thần chú trong truyện Cây tre trăm đốt là "Khắc nhập, khắc xuất". :: true
+
+# Sự tích Hồ Gươm
+Ai là người đã trả lại gươm báu cho Rùa Vàng?
+- Lê Lợi
+- Lê Lai
+- Trần Hưng Đạo
+- Nguyễn Trãi
+> Lê Lợi`
+  },
+  {
+    id: 'basic-vietnamese-grammar',
+    name: 'Ngữ pháp Tiếng Việt Cơ bản',
+    tags: ['grammar', 'language', 'simple-qa', 'true-false', 'multiple-choice'],
+    markdown: `# Cấu trúc câu
+Trật tự từ cơ bản trong câu khẳng định của Tiếng Việt là gì? :: Chủ ngữ - Vị ngữ - Tân ngữ (SVO)
+
+# Từ loại
+"Đẹp" là một tính từ. :: true
+
+# Đại từ
+Đại từ nhân xưng ngôi thứ nhất số ít trang trọng là gì?
+- Tôi
+- Tao
+- Mình
+- Tớ
+> Tôi`
   }
 ];
 
