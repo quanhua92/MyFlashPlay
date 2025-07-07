@@ -34,7 +34,7 @@ export function Navigation() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden sm:flex sm:items-center sm:space-x-2">
+          <div className="hidden lg:flex lg:items-center lg:space-x-2">
             {navItems.map(({ path, label, icon: Icon }) => (
               <Link
                 key={path}
@@ -54,15 +54,15 @@ export function Navigation() {
           </div>
 
           {/* Mobile menu button */}
-          <div className="sm:hidden flex items-center">
+          <div className="lg:hidden flex items-center">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               {mobileMenuOpen ? (
-                <X className="w-6 h-6" />
+                <X className="w-6 h-6 text-gray-900 dark:text-gray-100" />
               ) : (
-                <Menu className="w-6 h-6" />
+                <Menu className="w-6 h-6 text-gray-900 dark:text-gray-100" />
               )}
             </button>
           </div>
@@ -71,7 +71,7 @@ export function Navigation() {
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="sm:hidden bg-white dark:bg-gray-900 border-t dark:border-gray-800">
+        <div className="lg:hidden bg-white dark:bg-gray-900 border-t dark:border-gray-800">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navItems.map(({ path, label, icon: Icon }) => (
               <Link
