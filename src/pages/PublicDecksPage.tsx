@@ -51,7 +51,7 @@ export function PublicDecksPage() {
       const deckName = `${publicDeck.name} (Copy)`;
       
       // Save the markdown content
-      const saveResult = markdownStorage.saveDeck(newDeckId, deckName, publicDeck.markdown);
+      const saveResult = markdownStorage.saveDeckFromMarkdown(publicDeck.markdown, deckName);
       
       if (!saveResult.success) {
         throw new Error(saveResult.error || 'Failed to save deck');
