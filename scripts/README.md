@@ -5,13 +5,13 @@
 ### Test any deployed URL:
 ```bash
 # Test production site
-pnpm test:integration https://myflashplay.vercel.app
+pnpm test:integration https://www.MyFlashPlay.com
 
 # Test local dev server (if running on localhost:3000)
 pnpm test:integration:local
 
 # Quick lightweight test
-pnpm test:quick https://your-app.vercel.app
+pnpm test:quick https://www.MyFlashPlay.com
 ```
 
 ### Self-test (build and test locally):
@@ -83,7 +83,7 @@ pnpm test:quick http://localhost:4173
 
 ## 🌐 Example URLs to Test
 
-- **Vercel**: `https://your-app.vercel.app`
+- **Vercel**: `https://www.MyFlashPlay.com`
 - **Local Dev**: `http://localhost:3000`
 - **Local Preview**: `http://localhost:4173`
 

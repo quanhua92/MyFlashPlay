@@ -5,7 +5,7 @@
  * 
  * Tests core functionality against any deployed URL
  * Usage: pnpm test:integration [URL]
- * Example: pnpm test:integration https://myflashplay.vercel.app
+ * Example: pnpm test:integration https://www.MyFlashPlay.com
  */
 
 import { chromium, type Browser, type Page } from 'playwright';
@@ -31,16 +31,16 @@ class IntegrationTester {
   private async setup() {
     console.log('🚀 Starting MyFlashPlay Integration Tests...');
     console.log(`🌐 Target URL: ${this.baseUrl}`);
-    
-    this.browser = await chromium.launch({ 
+
+    this.browser = await chromium.launch({
       headless: true,
       timeout: 30000
     });
     this.page = await this.browser.newPage();
-    
+
     // Set viewport for consistent testing
     await this.page.setViewportSize({ width: 1280, height: 720 });
-    
+
     // Set default timeouts
     this.page.setDefaultTimeout(15000);
     this.page.setDefaultNavigationTimeout(30000);
@@ -54,7 +54,7 @@ class IntegrationTester {
 
   private async runTest(testName: string, testFn: () => Promise<void>) {
     const startTime = Date.now();
-    
+
     try {
       console.log(`⏳ ${testName}...`);
       await testFn();
@@ -72,17 +72,17 @@ class IntegrationTester {
   // Test 1: Basic page load and navigation
   private async testPageLoad() {
     if (!this.page) throw new Error('Page not initialized');
-    
+
     // First check if URL is reachable
-    const response = await this.page.goto(this.baseUrl, { 
+    const response = await this.page.goto(this.baseUrl, {
       waitUntil: 'networkidle',
-      timeout: 30000 
+      timeout: 30000
     });
-    
+
     if (!response || response.status() >= 400) {
       throw new Error(`Failed to load page: ${response?.status()} ${response?.statusText()}`);
     }
-    
+
     // Check if the page loaded successfully
     const title = await this.page.textContent('h1, title');
     if (!title) {
@@ -102,35 +102,35 @@ class IntegrationTester {
 
     // Navigate to home if not already there
     await this.page.goto(this.baseUrl);
-    
+
     // Wait for decks to load
     await this.page.waitForTimeout(3000);
-    
+
     // Check for any deck cards first (be flexible about the structure)
     const deckCardsCount = await this.page.locator('.bg-white, .rounded-xl, .shadow, [data-testid="deck-card"]').count();
     if (deckCardsCount === 0) {
       throw new Error('No deck cards found on homepage');
     }
-    
+
     console.log(`Found ${deckCardsCount} deck cards on homepage`);
-    
+
     // Look for sample deck content in a more flexible way
-    const sampleDeckContent = await this.page.locator('text=Elementary').count() + 
-                             await this.page.locator('text=Math').count() + 
-                             await this.page.locator('text=Amazing').count() + 
-                             await this.page.locator('text=Animals').count() + 
-                             await this.page.locator('text=Space').count() + 
-                             await this.page.locator('text=Adventure').count();
-    const vietnameseContent = await this.page.locator('text=Động').count() + 
-                             await this.page.locator('text=Vật').count() + 
-                             await this.page.locator('text=Việt').count() + 
-                             await this.page.locator('text=Nam').count();
-    
+    const sampleDeckContent = await this.page.locator('text=Elementary').count() +
+      await this.page.locator('text=Math').count() +
+      await this.page.locator('text=Amazing').count() +
+      await this.page.locator('text=Animals').count() +
+      await this.page.locator('text=Space').count() +
+      await this.page.locator('text=Adventure').count();
+    const vietnameseContent = await this.page.locator('text=Động').count() +
+      await this.page.locator('text=Vật').count() +
+      await this.page.locator('text=Việt').count() +
+      await this.page.locator('text=Nam').count();
+
     if (sampleDeckContent === 0 && vietnameseContent === 0) {
       // Try looking for any text content that suggests decks are working
-      const anyDeckText = await this.page.locator('text=cards').count() + 
-                         await this.page.locator('text=Start Playing').count() + 
-                         await this.page.locator('text=min').count();
+      const anyDeckText = await this.page.locator('text=cards').count() +
+        await this.page.locator('text=Start Playing').count() +
+        await this.page.locator('text=min').count();
       if (anyDeckText === 0) {
         throw new Error('No sample decks found - check deck loading system');
       } else {
@@ -141,8 +141,8 @@ class IntegrationTester {
     // Check if decks show card counts or play buttons
     const hasCardCounts = await this.page.locator('text=/\\d+ cards/').count() > 0;
     const hasPlayButtons = await this.page.locator('text=Start Playing').count() > 0 ||
-                          await this.page.locator('button:has-text("Play")').count() > 0;
-    
+      await this.page.locator('button:has-text("Play")').count() > 0;
+
     if (!hasCardCounts && !hasPlayButtons) {
       throw new Error('No deck interaction elements found (card counts or play buttons)');
     }
@@ -156,51 +156,51 @@ class IntegrationTester {
 
     // Navigate to create page
     await this.page.goto(`${this.baseUrl}/create`);
-    
+
     // Wait for page to load
     await this.page.waitForTimeout(2000);
-    
+
     // Fill in deck name - look for the name input specifically
     const nameInput = this.page.locator('input[placeholder*="name"], input[placeholder*="deck"]').first();
     if (await nameInput.count() > 0) {
       await nameInput.fill('Test Integration Deck');
     }
-    
+
     // Switch to Raw Markdown mode to have direct access to textarea
     const markdownModeButton = this.page.locator('text=Raw Markdown');
     if (await markdownModeButton.count() > 0) {
       await markdownModeButton.click();
       await this.page.waitForTimeout(1000);
     }
-    
+
     // Look for markdown textarea - be more specific about the editor
     const markdownArea = this.page.locator('textarea').last();
     if (await markdownArea.count() === 0) {
       throw new Error('No markdown textarea found');
     }
-    
+
     const testMarkdown = `What is 2 + 2? :: 4
 Capital of France? :: Paris
 The sky is blue :: true`;
-    
+
     await markdownArea.fill(testMarkdown);
-    
+
     // Look for save/create button
     const saveButton = this.page.locator('button:has-text("Save"), button:has-text("Create"), button:has-text("Update")').first();
     if (await saveButton.count() === 0) {
       console.log('⚠️  No save button found, deck creation interface may have changed');
       return; // Don't fail the test if we can't find save button
     }
-    
+
     await saveButton.click();
-    
+
     // Wait for navigation or success indication
     await this.page.waitForTimeout(3000);
-    
+
     // Check if we're redirected to decks page or see success message
     const url = this.page.url();
     const hasSuccess = await this.page.locator('text=success, text=created, text=saved, text=Success').count() > 0;
-    
+
     if (!url.includes('/decks') && !hasSuccess) {
       console.log('⚠️  Deck creation flow may not have completed, but page structure is working');
       // Don't fail - just warn about the flow
@@ -213,23 +213,23 @@ The sky is blue :: true`;
 
     // Go to home page
     await this.page.goto(this.baseUrl);
-    
+
     // Wait for page to load
     await this.page.waitForTimeout(3000);
-    
+
     // Look for play buttons more flexibly
     let playButton = this.page.locator('text=Start Playing').first();
-    
+
     // If no "Start Playing" button, try other common play button texts
     if (await playButton.count() === 0) {
       playButton = this.page.locator('button:has-text("Play"), button:has-text("Start"), a:has-text("Play")').first();
     }
-    
+
     if (await playButton.count() === 0) {
       // Try looking for any interactive button in deck cards
       playButton = this.page.locator('.bg-gradient-to-r button, .rounded-xl button, .shadow button').first();
     }
-    
+
     if (await playButton.count() === 0) {
       console.log('⚠️ No play button found, checking if navigation works differently');
       // Try clicking on deck card itself
@@ -242,26 +242,26 @@ The sky is blue :: true`;
     } else {
       await playButton.click();
     }
-    
+
     // Wait for navigation
     await this.page.waitForTimeout(3000);
-    
+
     // Check if we navigated successfully - be more flexible about what's acceptable
     const url = this.page.url();
     console.log(`After clicking play, navigated to: ${url}`);
-    
+
     const isOnPlayPage = url.includes('/play/') || url.includes('/game/');
     const isOnDecksPage = url.includes('/decks') || url.includes('/public-decks');
     const hasGameModeSelection = await this.page.locator('text=Study Mode').count() > 0 ||
-                                 await this.page.locator('text=Quiz Mode').count() > 0 ||
-                                 await this.page.locator('text=Speed Mode').count() > 0 ||
-                                 await this.page.locator('text=Memory Mode').count() > 0 ||
-                                 await this.page.locator('text=Falling Mode').count() > 0;
+      await this.page.locator('text=Quiz Mode').count() > 0 ||
+      await this.page.locator('text=Speed Mode').count() > 0 ||
+      await this.page.locator('text=Memory Mode').count() > 0 ||
+      await this.page.locator('text=Falling Mode').count() > 0;
     const hasGameContent = await this.page.locator('.flashcard').count() > 0 ||
-                          await this.page.locator('[data-testid="flashcard"]').count() > 0 ||
-                          await this.page.locator('text=Choose a Game Mode').count() > 0 ||
-                          await this.page.locator('text=Select Mode').count() > 0;
-    
+      await this.page.locator('[data-testid="flashcard"]').count() > 0 ||
+      await this.page.locator('text=Choose a Game Mode').count() > 0 ||
+      await this.page.locator('text=Select Mode').count() > 0;
+
     // Accept either being on a play page with game content, or on a decks page (which still shows gameplay functionality)
     if (!isOnPlayPage && !hasGameModeSelection && !hasGameContent && !isOnDecksPage) {
       throw new Error(`Expected to be on play page or see game modes, but on: ${url}`);
@@ -275,10 +275,10 @@ The sky is blue :: true`;
     if (!this.page) throw new Error('Page not initialized');
 
     await this.page.goto(`${this.baseUrl}/create`);
-    
+
     // Wait for page to load
     await this.page.waitForTimeout(3000);
-    
+
     // Check for any form inputs or content creation interface
     const hasInputs = await this.page.locator('input, textarea').count() > 0;
     if (!hasInputs) {
@@ -287,27 +287,27 @@ The sky is blue :: true`;
 
     // Check for markdown format examples or any creation guidance
     const hasMarkdownInfo = await this.page.locator('text=What is').count() > 0 ||
-                           await this.page.locator('text=::').count() > 0 ||
-                           await this.page.locator('text=Capital').count() > 0 ||
-                           await this.page.locator('text=markdown').count() > 0 ||
-                           await this.page.locator('text=format').count() > 0;
+      await this.page.locator('text=::').count() > 0 ||
+      await this.page.locator('text=Capital').count() > 0 ||
+      await this.page.locator('text=markdown').count() > 0 ||
+      await this.page.locator('text=format').count() > 0;
     const hasCreateInterface = await this.page.locator('textarea').count() > 0 ||
-                              await this.page.locator('input[placeholder*="name"]').count() > 0 ||
-                              await this.page.locator('input[placeholder*="deck"]').count() > 0;
-    
+      await this.page.locator('input[placeholder*="name"]').count() > 0 ||
+      await this.page.locator('input[placeholder*="deck"]').count() > 0;
+
     if (!hasMarkdownInfo && !hasCreateInterface) {
       throw new Error('No markdown format information or creation interface found');
     }
 
     // Look for any mode switching or interface options (be flexible about naming)
     const hasInterfaceModes = await this.page.locator('button').count() > 0 ||
-                             await this.page.locator('text=Interface').count() > 0 ||
-                             await this.page.locator('text=Mode').count() > 0 ||
-                             await this.page.locator('text=Easy').count() > 0 ||
-                             await this.page.locator('text=Raw').count() > 0 ||
-                             await this.page.locator('text=Markdown').count() > 0 ||
-                             await this.page.locator('text=Simple').count() > 0;
-    
+      await this.page.locator('text=Interface').count() > 0 ||
+      await this.page.locator('text=Mode').count() > 0 ||
+      await this.page.locator('text=Easy').count() > 0 ||
+      await this.page.locator('text=Raw').count() > 0 ||
+      await this.page.locator('text=Markdown').count() > 0 ||
+      await this.page.locator('text=Simple').count() > 0;
+
     // If no interface modes found, that's just a warning, not a failure
     if (!hasInterfaceModes) {
       console.log('⚠️ Interface mode switching not found, but create page is functional');
@@ -322,25 +322,25 @@ The sky is blue :: true`;
 
     // Switch to mobile viewport
     await this.page.setViewportSize({ width: 375, height: 667 });
-    
+
     await this.page.goto(this.baseUrl);
-    
+
     // Wait for mobile layout to adjust
     await this.page.waitForTimeout(1000);
 
     // Check if navigation exists (header, links, or menu)
     const navigation = await this.page.locator('header, nav, [role="navigation"]').count() > 0 ||
-                      await this.page.locator('a[href*="/"]').count() > 0 ||
-                      await this.page.locator('text=MyFlashPlay').count() > 0;
+      await this.page.locator('a[href*="/"]').count() > 0 ||
+      await this.page.locator('text=MyFlashPlay').count() > 0;
     if (!navigation) {
       throw new Error('No navigation found in mobile view');
     }
 
     // Check if main content is visible in mobile
     const hasMainContent = await this.page.locator('h1').count() > 0 ||
-                          await this.page.locator('.bg-gradient-to-r').count() > 0 ||
-                          await this.page.locator('text=Create Flashcards').count() > 0 ||
-                          await this.page.locator('text=Browse Decks').count() > 0;
+      await this.page.locator('.bg-gradient-to-r').count() > 0 ||
+      await this.page.locator('text=Create Flashcards').count() > 0 ||
+      await this.page.locator('text=Browse Decks').count() > 0;
     if (!hasMainContent) {
       throw new Error('Main content not visible in mobile view');
     }
@@ -355,18 +355,18 @@ The sky is blue :: true`;
 
     // Test 404 page
     await this.page.goto(`${this.baseUrl}/nonexistent-page`);
-    
+
     // Should either show 404 content or redirect to home
     const url = this.page.url();
     const has404Content = await this.page.locator('text=404, text=Not Found, text=not found').count() > 0;
-    
+
     if (!url.includes(this.baseUrl) && !has404Content) {
       throw new Error('404 error not handled properly');
     }
 
     // Test accessibility - check for important ARIA attributes
     await this.page.goto(this.baseUrl);
-    
+
     const hasAriaLabels = await this.page.locator('[aria-label], [aria-labelledby], [role]').count() > 0;
     if (!hasAriaLabels) {
       console.log('⚠️  Warning: Limited accessibility attributes found');
@@ -387,7 +387,7 @@ The sky is blue :: true`;
       await this.runTest('Error Handling', () => this.testErrorHandling());
 
       this.printResults();
-      
+
     } finally {
       await this.teardown();
     }
@@ -395,12 +395,12 @@ The sky is blue :: true`;
 
   private printResults() {
     console.log('\n📊 Test Results Summary');
-    console.log('=' .repeat(50));
-    
+    console.log('='.repeat(50));
+
     const passed = this.results.filter(r => r.status === 'pass').length;
     const failed = this.results.filter(r => r.status === 'fail').length;
     const totalTime = this.results.reduce((sum, r) => sum + r.duration, 0);
-    
+
     this.results.forEach(result => {
       const icon = result.status === 'pass' ? '✅' : '❌';
       const time = result.duration.toString().padStart(4, ' ');
@@ -409,10 +409,10 @@ The sky is blue :: true`;
         console.log(`   └─ ${result.message}`);
       }
     });
-    
-    console.log('=' .repeat(50));
+
+    console.log('='.repeat(50));
     console.log(`📈 ${passed}/${this.results.length} tests passed (${totalTime}ms total)`);
-    
+
     if (failed === 0) {
       console.log('🎉 All tests passed! MyFlashPlay is working correctly.');
       process.exit(0);
@@ -426,11 +426,11 @@ The sky is blue :: true`;
 // Main execution
 async function main() {
   const targetUrl = process.argv[2] || 'http://localhost:3000';
-  
+
   if (!targetUrl.startsWith('http')) {
     console.error('❌ Please provide a valid URL (must start with http:// or https://)');
     console.log('Usage: pnpm test:integration <URL>');
-    console.log('Example: pnpm test:integration https://myflashplay.vercel.app');
+    console.log('Example: pnpm test:integration https://www.MyFlashPlay.com');
     process.exit(1);
   }
 

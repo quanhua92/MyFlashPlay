@@ -4,7 +4,7 @@
 
 **MyFlashPlay** is a modern flashcard application built with React 19, TypeScript, and Vite. It features a simplified markdown-based deck creation system with support for multiple languages (UTF-8), various game modes, and comprehensive testing.
 
-**Live Site**: https://myflashplay.vercel.app
+**Live Site**: https://www.MyFlashPlay.com
 
 ## 🧪 Testing & Quality Assurance
 
@@ -48,7 +48,7 @@ kill %1  # Kill the background serve process
 rm serve.log
 
 # For production testing
-pnpm test:integration https://myflashplay.vercel.app
+pnpm test:integration https://www.MyFlashPlay.com
 ```
 
 #### Alternative: Use concurrently (recommended)
@@ -188,14 +188,14 @@ pnpm test:integration http://localhost:3000
 pnpm test:quick http://localhost:3000
 
 # Production verification only
-pnpm test:integration https://myflashplay.vercel.app
+pnpm test:integration https://www.MyFlashPlay.com
 ```
 
 ### Production Deployment Testing
 
 ```bash
 # Only for production testing after deployment
-pnpm test:integration https://myflashplay.vercel.app
+pnpm test:integration https://www.MyFlashPlay.com
 ```
 
 ## 🎮 Game Modes
@@ -309,4 +309,4 @@ The app includes sample decks demonstrating:
 
 ---
 
-**Remember**: Run `pnpm test:integration https://myflashplay.vercel.app` after any deployment to verify everything works correctly! 🚀
+**Remember**: Run `pnpm test:integration https://www.MyFlashPlay.com` after any deployment to verify everything works correctly! 🚀
