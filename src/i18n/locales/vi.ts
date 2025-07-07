@@ -77,41 +77,6 @@ const vi: TranslationNamespace = {
     clearData: 'Xóa Tất Cả Dữ Liệu',
   },
 
-  // Create Page - Trang tạo bộ thẻ
-  create: {
-    title: 'Tạo Bộ Thẻ Mới',
-    deckNameLabel: 'Tên Bộ Thẻ',
-    deckNamePlaceholder: 'Nhập tên cho bộ thẻ của bạn',
-    descriptionLabel: 'Mô Tả',
-    descriptionPlaceholder: 'Mô tả nội dung của bộ thẻ này',
-    contentLabel: 'Nội Dung Thẻ Ghi Nhớ',
-    contentPlaceholder: 'Câu hỏi 1 :: Câu trả lời 1\nCâu hỏi 2 :: Câu trả lời 2',
-    visibilityLabel: 'Quyền Truy Cập',
-    public: 'Công Khai',
-    private: 'Riêng Tư',
-    createButton: 'Tạo Bộ Thẻ',
-    markdownGuideTitle: 'Hướng Dẫn Markdown',
-    basicFormat: 'Định dạng cơ bản: Câu Hỏi :: Câu Trả Lời',
-    advancedFormat: 'Nâng cao: Nhiều lựa chọn, danh mục và hơn thế nữa',
-  },
-
-  // Deck Management - Quản lý bộ thẻ
-  decks: {
-    title: 'Bộ Thẻ Ghi Nhớ',
-    myDecksTitle: 'Bộ Thẻ Của Tôi',
-    publicDecksTitle: 'Bộ Thẻ Công Khai',
-    createNewDeck: 'Tạo Bộ Thẻ Mới',
-    noDeckFound: 'Không tìm thấy bộ thẻ nào',
-    cards: 'thẻ', // Dùng như: "5 thẻ"
-    lastModified: 'Sửa đổi lần cuối',
-    playDeck: 'Chơi Bộ Thẻ',
-    editDeck: 'Sửa Bộ Thẻ',
-    deleteDeck: 'Xóa Bộ Thẻ',
-    confirmDelete: 'Bạn có chắc chắn muốn xóa bộ thẻ này không?',
-    createFirstDeck: 'Tạo bộ thẻ đầu tiên để bắt đầu!',
-    noPublicDecks: 'Hiện tại không có bộ thẻ công khai nào.',
-  },
-
   // Game Modes - Chế độ chơi
   game: {
     studyMode: 'Chế Độ Học',
