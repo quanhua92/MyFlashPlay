@@ -15,8 +15,9 @@ interface StudyModeProps {
 
 export function StudyMode({ deck, onComplete }: StudyModeProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [cards] = useState(() => 
-    deck.settings?.shuffleCards 
+  const [isCardFlipped, setIsCardFlipped] = useState(false);
+  const [cards] = useState(() =>
+    deck.settings?.shuffleCards
       ? [...deck.cards].sort(() => Math.random() - 0.5)
       : deck.cards
   );
@@ -24,11 +25,11 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
   const [isComplete, setIsComplete] = useState(false);
 
   const currentCard = cards[currentIndex];
-  // const progress = ((currentIndex + 1) / cards.length) * 100; // Removed unused
 
   const goNext = () => {
     if (currentIndex < cards.length - 1) {
       setCurrentIndex(currentIndex + 1);
+      setIsCardFlipped(false);
       playSound('flip');
     } else {
       completeSession();
@@ -38,6 +39,7 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
   const goPrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
+      setIsCardFlipped(false);
       playSound('flip');
     }
   };
@@ -81,6 +83,11 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
     onComplete?.(session);
   };
 
+  const handleFlip = () => {
+    setIsCardFlipped(prev => !prev);
+    playSound('flip');
+  };
+
   // Swipe gestures
   const swipeRef = useSwipeGesture({
     onSwipeLeft: goNext,
@@ -91,8 +98,11 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') goPrevious();
-      if (e.key === 'ArrowRight') goNext();
-      if (e.key === ' ') e.preventDefault(); // Prevent page scroll on space
+      else if (e.key === 'ArrowRight') goNext();
+      else if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        handleFlip();
+      }
     };
 
     window.addEventListener('keydown', handleKeyPress);
@@ -123,6 +133,7 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
             onClick={() => {
               setCurrentIndex(0);
               setIsComplete(false);
+              setIsCardFlipped(false);
             }}
             className="flex items-center space-x-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
           >
@@ -166,7 +177,11 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3 }}
           >
-            <FlashCard card={currentCard} />
+            <FlashCard 
+              card={currentCard} 
+              showBack={isCardFlipped}
+              onFlip={handleFlip}
+            />
           </motion.div>
         </AnimatePresence>
       </div>
@@ -183,7 +198,7 @@ export function StudyMode({ deck, onComplete }: StudyModeProps) {
         </button>
 
         <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>Click card to flip • Use arrow keys to navigate</p>
+          <p>Click, Space, or Enter to flip</p>
         </div>
 
         <button

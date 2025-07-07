@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SafeContentRenderer } from '@/components/common/SafeContentRenderer';
@@ -13,10 +13,17 @@ interface FlashCardProps {
 
 export function FlashCard({ card, onFlip, className, showBack = false }: FlashCardProps) {
   const [isFlipped, setIsFlipped] = useState(showBack);
+
+  useEffect(() => {
+    setIsFlipped(showBack);
+  }, [showBack]);
   
   const handleFlip = () => {
-    setIsFlipped(!isFlipped);
-    onFlip?.();
+    if (onFlip) {
+      onFlip();
+    } else {
+      setIsFlipped(!isFlipped);
+    }
   };
   
   const handleKeyPress = (e: React.KeyboardEvent) => {
