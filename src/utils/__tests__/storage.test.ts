@@ -2,9 +2,23 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { storageManager } from '../storage';
 
 describe('Storage Manager', () => {
+  // Mock localStorage with actual storage
+  const localStorageMock = (() => {
+    let store: Record<string, string> = {};
+    return {
+      getItem: (key: string) => store[key] || null,
+      setItem: (key: string, value: string) => { store[key] = value; },
+      removeItem: (key: string) => { delete store[key]; },
+      clear: () => { store = {}; },
+      length: 0,
+      key: () => null,
+    };
+  })();
+
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
+    Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+    localStorageMock.clear();
   });
 
   it('should save and load data correctly', () => {
@@ -24,7 +38,7 @@ describe('Storage Manager', () => {
 
   it('should handle JSON parsing errors', () => {
     // Set invalid JSON directly in localStorage
-    localStorage.setItem('test-key', 'invalid json');
+    localStorageMock.setItem('test-key', 'invalid json');
     
     const result = storageManager.load('test-key');
     expect(result).toBeNull();
@@ -55,8 +69,8 @@ describe('Storage Manager', () => {
 
   it('should handle localStorage quota exceeded', () => {
     // Mock quota exceeded error
-    const originalSetItem = localStorage.setItem;
-    localStorage.setItem = vi.fn(() => {
+    const originalSetItem = localStorageMock.setItem;
+    localStorageMock.setItem = vi.fn(() => {
       throw new Error('QuotaExceededError');
     });
 
@@ -66,7 +80,7 @@ describe('Storage Manager', () => {
     
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
-    localStorage.setItem = originalSetItem;
+    localStorageMock.setItem = originalSetItem;
   });
 
   // getKeys method not available in current storage manager
