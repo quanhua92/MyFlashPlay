@@ -83,13 +83,22 @@ export function QuickCreateInterface({ onMarkdownChange, initialMarkdown = '', i
     }, 300);
   }, [generateMarkdown]);
 
-  // Initialize from markdown if provided
+  // Initialize from markdown if provided or when initialMarkdown changes
   useEffect(() => {
-    if (initialMarkdown && isInitializing) {
+    console.log('[QuickCreateInterface] initialMarkdown changed:', {
+      hasInitialMarkdown: !!initialMarkdown,
+      length: initialMarkdown.length,
+      preview: initialMarkdown.substring(0, 100) + '...',
+      isInitializing,
+      currentCardCount: cards.length
+    });
+    
+    if (initialMarkdown) {
+      console.log('[QuickCreateInterface] Parsing markdown to cards...');
       parseMarkdownToCards(initialMarkdown);
       setIsInitializing(false);
     }
-  }, [initialMarkdown, isInitializing]);
+  }, [initialMarkdown]);
 
   // Convert cards to markdown whenever cards change (debounced)
   useEffect(() => {
@@ -100,23 +109,34 @@ export function QuickCreateInterface({ onMarkdownChange, initialMarkdown = '', i
   }, [cards, deckTitle, deckDescription, isInitializing, isActive]);
 
   const parseMarkdownToCards = (markdown: string) => {
+    console.log('[QuickCreateInterface parseMarkdownToCards] Parsing markdown:', {
+      length: markdown.length,
+      preview: markdown.substring(0, 200) + '...',
+      fullContent: markdown
+    });
+    
     const lines = markdown.split('\n');
     const parsedCards: Card[] = [];
     let title = '';
     let currentCategory = '';
 
-    for (const line of lines) {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
       const trimmed = line.trim();
+      
+      console.log(`[QuickCreateInterface parseMarkdownToCards] Processing line ${i}: "${trimmed}"`);
       
       // Parse title
       if (trimmed.startsWith('# ')) {
         title = trimmed.substring(2).trim();
+        console.log(`[QuickCreateInterface parseMarkdownToCards] Found title: "${title}"`);
         continue;
       }
       
       // Parse category headers
       if (trimmed.startsWith('## ')) {
         currentCategory = trimmed.substring(3).trim();
+        console.log(`[QuickCreateInterface parseMarkdownToCards] Found category: "${currentCategory}"`);
         continue;
       }
       
@@ -124,14 +144,16 @@ export function QuickCreateInterface({ onMarkdownChange, initialMarkdown = '', i
       if (trimmed.includes(' :: ')) {
         const content = trimmed.startsWith('- ') ? trimmed.substring(2) : trimmed; // Remove "- " if present
         const parts = content.split(' :: ');
-        if (parts.length === 2) {
-          parsedCards.push({
+        if (parts.length >= 2) {
+          const newCard = {
             id: Date.now().toString() + Math.random() + parsedCards.length,
             question: parts[0].trim(),
             answer: parts[1].trim(),
             category: currentCategory || undefined,
-            type: 'simple'
-          });
+            type: 'simple' as const
+          };
+          console.log(`[QuickCreateInterface parseMarkdownToCards] Created card ${parsedCards.length + 1}:`, newCard);
+          parsedCards.push(newCard);
         }
         continue;
       }
@@ -140,9 +162,20 @@ export function QuickCreateInterface({ onMarkdownChange, initialMarkdown = '', i
       if (trimmed.startsWith('- ') && !trimmed.includes(' :: ')) {
         // This is part of a multiple choice question - we'll handle this later
         // For now, skip complex parsing and focus on simple Q&A
+        console.log(`[QuickCreateInterface parseMarkdownToCards] Skipping multiple choice line: "${trimmed}"`);
         continue;
       }
+      
+      if (trimmed) {
+        console.log(`[QuickCreateInterface parseMarkdownToCards] Skipping unrecognized line: "${trimmed}"`);
+      }
     }
+
+    console.log('[QuickCreateInterface parseMarkdownToCards] Final result:', {
+      title,
+      cardCount: parsedCards.length,
+      cards: parsedCards
+    });
 
     setDeckTitle(title);
     setCards(parsedCards);

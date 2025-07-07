@@ -7,13 +7,22 @@ export function useDecks() {
   const [decks, setDecks] = useState<Deck[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  console.log('[useDecks] Hook initialized, current decks:', decks.map(d => ({ id: d.id, name: d.name })));
+  
   // Initialize decks from markdown storage
   useEffect(() => {
     const initializeDecks = async () => {
+      console.log('[useDecks] Starting deck initialization...');
       setIsLoading(true);
       try {
         // Load from markdown storage
         const { decks: markdownDecks, errors } = markdownStorage.loadAllDecks();
+        console.log('[useDecks] Loaded from storage:', {
+          deckCount: markdownDecks.length,
+          errorCount: errors.length,
+          deckIds: markdownDecks.map(d => d.id)
+        });
         
         if (markdownDecks.length > 0) {
           // We have markdown decks, use them
@@ -123,26 +132,41 @@ export function useDecks() {
   };
 
   const getDeck = (deckId: string) => {
+    console.log(`[useDecks getDeck] Called with deckId: ${deckId}`);
+    console.log(`[useDecks getDeck] Current state decks:`, decks.map(d => ({ id: d.id, name: d.name })));
+    
     // First try to find in current state
     const deckFromState = decks.find(deck => deck.id === deckId);
     if (deckFromState) {
-      console.log(`Found deck ${deckId} in state`);
+      console.log(`[useDecks getDeck] Found deck ${deckId} in state:`, {
+        id: deckFromState.id,
+        name: deckFromState.name,
+        cardCount: deckFromState.cards.length
+      });
       return deckFromState;
     }
     
     // If not found in state, try loading from markdown storage directly
-    console.log(`Deck ${deckId} not in state, checking markdown storage...`);
+    console.log(`[useDecks getDeck] Deck ${deckId} not in state, checking markdown storage...`);
     const { deck, result } = markdownStorage.loadDeck(deckId);
+    console.log(`[useDecks getDeck] Storage load result:`, {
+      found: !!deck,
+      deckId: deck?.id,
+      deckName: deck?.name,
+      error: result.error
+    });
+    
     if (deck) {
-      console.log(`Found deck ${deckId} in markdown storage, adding to state`);
+      console.log(`[useDecks getDeck] Found deck ${deckId} in markdown storage, adding to state`);
       // Add to state for future use
       setDecks(prevDecks => {
         const exists = prevDecks.find(d => d.id === deckId);
+        console.log(`[useDecks getDeck] Updating state, exists: ${!!exists}`);
         return exists ? prevDecks : [...prevDecks, deck];
       });
       return deck;
     } else {
-      console.log(`Deck ${deckId} not found anywhere. Result:`, result);
+      console.log(`[useDecks getDeck] Deck ${deckId} not found anywhere. Result:`, result);
     }
     
     return null;

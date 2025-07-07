@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { AlertTriangle, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import { MarkdownParser } from '@/utils/markdown';
 
@@ -343,13 +343,15 @@ export function MarkdownValidator({ markdown, onValidationChange }: MarkdownVali
       });
     }
 
-    // Notify parent component
-    if (onValidationChange) {
-      onValidationChange(result);
-    }
-
     return result;
-  }, [markdown, onValidationChange]);
+  }, [markdown]);
+
+  // Use useEffect to notify parent component to avoid state updates during render
+  useEffect(() => {
+    if (onValidationChange) {
+      onValidationChange(validation);
+    }
+  }, [validation, onValidationChange]);
 
   if (validation.errors.length === 0) {
     return null;

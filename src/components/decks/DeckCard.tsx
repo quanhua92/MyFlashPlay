@@ -27,6 +27,11 @@ interface DeckCardProps {
 }
 
 export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
+  console.log('[DeckCard] Rendering card for deck:', {
+    id: deck.id,
+    name: deck.name,
+    index
+  });
   const t = useTranslation()
   const [showModes, setShowModes] = useState(false)
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null)
@@ -167,7 +172,13 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
   }
 
   const handleEdit = () => {
+    console.log('[DeckCard] Edit clicked for deck:', {
+      id: deck.id,
+      name: deck.name,
+      cardCount: deck.cards.length
+    });
     setShowMenu(false)
+    console.log('[DeckCard] Navigating to edit page with deckId:', deck.id);
     navigate({ to: "/create", search: { editDeck: deck.id } })
   }
 

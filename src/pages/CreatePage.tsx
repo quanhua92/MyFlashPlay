@@ -18,6 +18,7 @@ import type { Deck } from '@/types';
 type CreateMode = 'interface' | 'markdown';
 
 export function CreatePage() {
+  console.log('[CreatePage] Component rendering');
   const t = useTranslation();
   const [markdown, setMarkdown] = useState(templates[0].markdown);
   const [deckName, setDeckName] = useState(templates[0].deckName);
@@ -32,17 +33,113 @@ export function CreatePage() {
   const [tagInput, setTagInput] = useState('');
   const loadedDeckRef = useRef<string | null>(null);
   
+  // Enhanced logging for state changes
+  useEffect(() => {
+    console.log('[CreatePage STATE] Markdown changed:', {
+      length: markdown.length,
+      preview: markdown.substring(0, 100) + '...',
+      parsedCardCount: parsedCards.length,
+      isEditingDeck: !!editingDeck,
+      editingDeckId: editingDeck?.id,
+      loadedDeckRef: loadedDeckRef.current
+    });
+  }, [markdown]);
+  
+  useEffect(() => {
+    console.log('[CreatePage STATE] EditingDeck changed:', {
+      editingDeck: editingDeck ? {
+        id: editingDeck.id,
+        name: editingDeck.name,
+        cardCount: editingDeck.cards.length,
+        firstThreeCards: editingDeck.cards.slice(0, 3).map(card => ({
+          front: card.front.substring(0, 30) + '...',
+          back: card.back.substring(0, 30) + '...'
+        }))
+      } : null,
+      loadedDeckRef: loadedDeckRef.current
+    });
+  }, [editingDeck]);
+  
+  useEffect(() => {
+    console.log('[CreatePage STATE] DeckName changed:', {
+      deckName,
+      editingDeck: editingDeck?.name,
+      loadedDeckRef: loadedDeckRef.current
+    });
+  }, [deckName]);
+  
   const search = useSearch({ from: '/create' });
+  console.log('[CreatePage] Search params:', search);
   const navigate = useNavigate();
   const { addDeck, updateDeck, getDeck } = useDecks();
   const parser = new MarkdownParser();
   const parsedCards = markdown ? parser.parse(markdown) : [];
+  console.log('[CreatePage] Current state:', { 
+    editingDeck: editingDeck?.id, 
+    deckName, 
+    loadedDeckRef: loadedDeckRef.current,
+    cardCount: parsedCards.length 
+  });
+  
+  // Debug: Check what's actually in localStorage for this deck
+  useEffect(() => {
+    if (search.editDeck) {
+      const storageKey = `mdoc_${search.editDeck}`;
+      const rawMarkdown = localStorage.getItem(storageKey);
+      console.log('[CreatePage DEBUG] Current localStorage content:', {
+        deckId: search.editDeck,
+        key: storageKey,
+        found: !!rawMarkdown,
+        length: rawMarkdown?.length || 0,
+        fullContent: rawMarkdown || 'NOT FOUND'
+      });
+    }
+  }, [search.editDeck]);
 
   // Load deck for editing if editDeck parameter is provided
   useEffect(() => {
+    console.log('[CreatePage useEffect] Running with:', {
+      searchEditDeck: search.editDeck,
+      loadedDeckRef: loadedDeckRef.current,
+      condition: search.editDeck && loadedDeckRef.current !== search.editDeck
+    });
+    
     if (search.editDeck && loadedDeckRef.current !== search.editDeck) {
+      console.log('[CreatePage useEffect] Loading deck for editing:', search.editDeck);
+      
+      // First check what markdown is currently in localStorage
+      const storageKey = `mdoc_${search.editDeck}`;
+      const rawMarkdown = localStorage.getItem(storageKey);
+      console.log('[CreatePage useEffect] Raw markdown from localStorage:', {
+        key: storageKey,
+        found: !!rawMarkdown,
+        length: rawMarkdown?.length || 0,
+        preview: rawMarkdown ? rawMarkdown.substring(0, 200) + '...' : 'NOT FOUND'
+      });
+      
       const deckToEdit = getDeck(search.editDeck);
+      console.log('[CreatePage useEffect] getDeck returned:', {
+        found: !!deckToEdit,
+        id: deckToEdit?.id,
+        name: deckToEdit?.name,
+        cardCount: deckToEdit?.cards?.length,
+        firstCardPreview: deckToEdit?.cards?.[0] ? {
+          type: deckToEdit.cards[0].type,
+          front: deckToEdit.cards[0].front.substring(0, 50) + '...',
+          back: deckToEdit.cards[0].back.substring(0, 50) + '...'
+        } : 'NO CARDS'
+      });
+      
       if (deckToEdit) {
+        console.log('[CreatePage useEffect] Setting deck data...');
+        console.log('[CreatePage useEffect] ALL CARDS IN DECK:', deckToEdit.cards.map((card, index) => ({
+          index,
+          type: card.type,
+          front: card.front,
+          back: card.back,
+          category: card.category
+        })));
+        
         loadedDeckRef.current = search.editDeck;
         setEditingDeck(deckToEdit);
         setDeckName(deckToEdit.name);
@@ -50,25 +147,48 @@ export function CreatePage() {
         setEmoji(deckToEdit.emoji);
         setTags(deckToEdit.metadata?.tags || []);
         
-        // Convert cards back to markdown format
-        const markdownContent = deckToEdit.cards.map(card => {
-          if (card.type === 'basic') {
-            return `- ${card.front} :: ${card.back}`;
-          } else if (card.type === 'multiple_choice') {
-            const choices = card.choices?.map(choice => `  - ${choice}`).join('\n') || '';
-            return `- ${card.front} ::\n${choices}\n  > ${card.back}`;
-          }
-          return `- ${card.front} :: ${card.back}`;
-        }).join('\n\n');
-        
-        const fullMarkdown = `# ${deckToEdit.name}\n\n${markdownContent}`;
-        setMarkdown(fullMarkdown);
+        // Option 1: Use raw markdown from localStorage if available
+        if (rawMarkdown) {
+          console.log('[CreatePage useEffect] Using raw markdown from localStorage');
+          setMarkdown(rawMarkdown);
+        } else {
+          // Option 2: Convert cards back to markdown format
+          console.log('[CreatePage useEffect] Converting cards to markdown...');
+          const markdownContent = deckToEdit.cards.map((card, index) => {
+            console.log(`[CreatePage useEffect] Processing card ${index}:`, {
+              type: card.type,
+              front: card.front.substring(0, 50) + '...',
+              back: card.back.substring(0, 50) + '...'
+            });
+            if (card.type === 'basic') {
+              return `${card.front} :: ${card.back}`;
+            } else if (card.type === 'multiple_choice') {
+              const choices = card.choices?.map(choice => `  - ${choice}`).join('\n') || '';
+              return `${card.front} ::\n${choices}\n  > ${card.back}`;
+            }
+            return `${card.front} :: ${card.back}`;
+          }).join('\n');
+          
+          const fullMarkdown = `# ${deckToEdit.name}\n\n${markdownContent}`;
+          console.log('[CreatePage useEffect] Generated markdown:', {
+            length: fullMarkdown.length,
+            preview: fullMarkdown.substring(0, 200) + '...',
+            fullContent: fullMarkdown
+          });
+          setMarkdown(fullMarkdown);
+        }
+      } else {
+        console.error('[CreatePage useEffect] Deck not found for editing:', search.editDeck);
       }
     } else if (!search.editDeck) {
+      console.log('[CreatePage useEffect] No editDeck param, resetting...');
       // Reset when not editing
       loadedDeckRef.current = null;
+      setEditingDeck(null);
+    } else {
+      console.log('[CreatePage useEffect] Skipping - deck already loaded');
     }
-  }, [search.editDeck]);
+  }, [search.editDeck, getDeck]);
 
   const handleCreateDeck = async () => {
     // Validate before creating/updating
@@ -198,12 +318,12 @@ export function CreatePage() {
       >
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            {editingDeck ? t('create.editTitle', 'Edit Flashcards') : t('create.title')}
+            {editingDeck ? t('create.editTitle') : t('create.title')}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
             {editingDeck 
-              ? t('create.editSubtitle', 'Edit your flashcard deck using our easy interface or Markdown directly!')
-              : t('create.subtitle', 'Choose your preferred way to create flashcards - use our easy interface or write Markdown directly!')
+              ? t('create.editSubtitle')
+              : t('create.subtitle')
             }
           </p>
         </div>
@@ -214,12 +334,12 @@ export function CreatePage() {
             {/* Deck Metadata */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {t('create.deckInformation', 'Deck Information')}
+                {t('create.deckInformation')}
               </h3>
               <div className="grid grid-cols-4 gap-4 mb-4">
                 <div className="col-span-1">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t('create.emojiLabel', 'Emoji')}
+                    {t('create.emojiLabel')}
                   </label>
                   <input
                     type="text"
@@ -261,7 +381,7 @@ export function CreatePage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
                   <Tag className="w-4 h-4" />
-                  {t('create.tagsLabel', 'Tags')}
+                  {t('create.tagsLabel')}
                 </label>
                 
                 {/* Tag Input */}
@@ -272,7 +392,7 @@ export function CreatePage() {
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleTagInputKeyDown}
                     className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                    placeholder={t('create.tagsPlaceholder', 'Add tags (press Enter or comma to add)')}
+                    placeholder={t('create.tagsPlaceholder')}
                   />
                   <button
                     type="button"
@@ -281,7 +401,7 @@ export function CreatePage() {
                     className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg transition-colors flex items-center gap-2"
                   >
                     <Plus className="w-4 h-4" />
-                    {t('create.addTag', 'Add')}
+                    {t('create.addTag')}
                   </button>
                 </div>
 
@@ -307,7 +427,7 @@ export function CreatePage() {
                 )}
                 
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  {t('create.tagsHelp', 'Tags help organize and categorize your flashcard decks. Press Enter or comma to add multiple tags.')}
+                  {t('create.tagsHelp')}
                 </p>
               </div>
             </div>
@@ -330,7 +450,7 @@ export function CreatePage() {
                   }`}
                 >
                   <Edit3 className="w-4 h-4" />
-                  {t('create.easyInterface', 'Easy Interface')}
+                  {t('create.easyInterface')}
                 </button>
                 <button
                   onClick={switchToMarkdown}
@@ -341,7 +461,7 @@ export function CreatePage() {
                   }`}
                 >
                   <Code className="w-4 h-4" />
-                  {t('create.rawMarkdown', 'Raw Markdown')}
+                  {t('create.rawMarkdown')}
                 </button>
               </div>
             </div>
@@ -359,7 +479,7 @@ export function CreatePage() {
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                       <Code className="w-5 h-5" />
-                      {t('create.markdownEditor', 'Markdown Editor')}
+                      {t('create.markdownEditor')}
                     </h3>
                     <div className="flex gap-2">
                       <button 
@@ -383,14 +503,14 @@ export function CreatePage() {
                         }}
                       >
                         <Upload className="w-4 h-4" />
-                        <span>{t('create.upload', 'Upload')}</span>
+                        <span>{t('create.upload')}</span>
                       </button>
                       <button 
                         className="flex items-center space-x-2 px-3 py-1.5 text-sm bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors"
                         onClick={() => handleTemplateSelect(templates[0])}
                       >
                         <Wand2 className="w-4 h-4" />
-                        <span>{t('create.template', 'Template')}</span>
+                        <span>{t('create.template')}</span>
                       </button>
                     </div>
                   </div>
@@ -399,7 +519,7 @@ export function CreatePage() {
                     value={markdown}
                     onChange={(e) => setMarkdown(e.target.value)}
                     className="w-full h-96 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm resize-none"
-                    placeholder={t('create.markdownPlaceholder', 'Paste your Markdown content here...')}
+                    placeholder={t('create.markdownPlaceholder')}
                   />
 
                   {/* Validation */}
@@ -409,8 +529,8 @@ export function CreatePage() {
                   />
 
                   <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-                    <span>{t('create.interfaceTip', 'Tip: Switch to Easy Interface for a guided experience')}</span>
-                    <span>{t('create.characterCount', '{{count}} characters', { count: markdown.length })}</span>
+                    <span>{t('create.interfaceTip')}</span>
+                    <span>{t('create.characterCount', { count: markdown.length })}</span>
                   </div>
                 </div>
               )}
@@ -422,7 +542,7 @@ export function CreatePage() {
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 sticky top-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <FileText className="w-5 h-5 mr-2" />
-                {t('create.preview', 'Preview')} ({parsedCards.length} {t('create.cards', 'cards')})
+                {t('create.preview')} ({parsedCards.length} {t('create.cards')})
               </h3>
               
               {parsedCards.length > 0 ? (
@@ -433,7 +553,7 @@ export function CreatePage() {
                       className="border border-gray-200 dark:border-gray-600 rounded-lg p-4"
                     >
                       <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                        {t('create.cardNumber', 'Card {{number}}', { number: index + 1 })} • {card.type} • {card.category || t('create.noCategory', 'No category')}
+                        {t('create.cardNumber', { number: index + 1 })} • {card.type} • {card.category || t('create.noCategory')}
                       </div>
                       <div className="font-medium text-gray-900 dark:text-white mb-2">
                         <SafeContentRenderer content={card.front} />
@@ -446,7 +566,7 @@ export function CreatePage() {
                 </div>
               ) : (
                 <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-                  {t('create.startCreating', 'Start creating to see your flashcards appear here!')}
+                  {t('create.startCreating')}
                 </div>
               )}
 
@@ -465,18 +585,18 @@ export function CreatePage() {
                   {isCreating ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>{t('create.creating', 'Creating...')}</span>
+                      <span>{t('create.creating')}</span>
                     </>
                   ) : isCreated ? (
                     <>
                       <CheckCircle className="w-5 h-5" />
-                      <span>{editingDeck ? t('create.updated', 'Updated!') : t('create.created', 'Created!')} {t('create.redirecting', 'Redirecting...')}</span>
+                      <span>{editingDeck ? t('create.updated') : t('create.created')} {t('create.redirecting')}</span>
                     </>
                   ) : (
                     <span>
                       {validationResult?.isValid 
-                        ? `${editingDeck ? t('create.updateDeck', 'Update') : t('create.createDeck', 'Create')} ${t('create.deck', 'Deck')} (${parsedCards.length} ${t('create.cards', 'cards')})` 
-                        : `${t('create.fixErrors', 'Fix validation errors to')} ${editingDeck ? t('create.update', 'update') : t('create.create', 'create')} ${t('create.deck', 'deck')}`
+                        ? `${editingDeck ? t('create.updateDeck') : t('create.createDeck')} ${t('create.deck')} (${parsedCards.length} ${t('create.cards')})` 
+                        : `${t('create.fixErrors')} ${editingDeck ? t('create.update') : t('create.create')} ${t('create.deck')}`
                       }
                     </span>
                   )}
