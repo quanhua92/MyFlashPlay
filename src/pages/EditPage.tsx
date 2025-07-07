@@ -15,6 +15,72 @@ import type { Deck } from '@/types';
 
 type EditMode = 'interface' | 'markdown';
 
+function reconstructMarkdownFromCards(deck: Deck): string {
+  // Group cards by category
+  const cardsByCategory = new Map<string, typeof deck.cards>();
+  const cardsWithoutCategory: typeof deck.cards = [];
+  
+  deck.cards.forEach(card => {
+    if (card.category) {
+      if (!cardsByCategory.has(card.category)) {
+        cardsByCategory.set(card.category, []);
+      }
+      cardsByCategory.get(card.category)!.push(card);
+    } else {
+      cardsWithoutCategory.push(card);
+    }
+  });
+  
+  // Build markdown content
+  const sections: string[] = [];
+  
+  // Add deck title if we have categories
+  if (cardsByCategory.size > 0 || deck.description) {
+    sections.push(`# ${deck.emoji} ${deck.name}`);
+    if (deck.description) {
+      sections.push('');
+      sections.push(deck.description);
+    }
+    sections.push('');
+  }
+  
+  // Add categorized cards
+  for (const [category, cards] of cardsByCategory) {
+    sections.push(`## ${category}`);
+    sections.push('');
+    
+    const cardMarkdown = cards.map(card => {
+      if (card.type === 'basic') {
+        return `${card.front} :: ${card.back}`;
+      } else if (card.type === 'multiple_choice') {
+        const choices = card.choices?.map(choice => `- ${choice}`).join('\n') || '';
+        return `${card.front}\n${choices}\n> ${card.back}`;
+      }
+      return `${card.front} :: ${card.back}`;
+    }).join('\n\n');
+    
+    sections.push(cardMarkdown);
+    sections.push('');
+  }
+  
+  // Add cards without category
+  if (cardsWithoutCategory.length > 0) {
+    const cardMarkdown = cardsWithoutCategory.map(card => {
+      if (card.type === 'basic') {
+        return `${card.front} :: ${card.back}`;
+      } else if (card.type === 'multiple_choice') {
+        const choices = card.choices?.map(choice => `- ${choice}`).join('\n') || '';
+        return `${card.front}\n${choices}\n> ${card.back}`;
+      }
+      return `${card.front} :: ${card.back}`;
+    }).join('\n\n');
+    
+    sections.push(cardMarkdown);
+  }
+  
+  return sections.join('\n').trim();
+}
+
 export function EditPage() {
   const t = useTranslation();
   const navigate = useNavigate();
@@ -83,39 +149,15 @@ export function EditPage() {
         if (rawMarkdown) {
           console.log('[EditPage] Using raw markdown from localStorage');
           setMarkdown(rawMarkdown);
+        } else if (deckToEdit.metadata?.originalMarkdown) {
+          // Try to use original markdown from metadata
+          console.log('[EditPage] Using original markdown from metadata');
+          setMarkdown(deckToEdit.metadata.originalMarkdown);
         } else {
-          // Convert cards back to markdown format
+          // Convert cards back to markdown format as last resort
           console.log('[EditPage] Converting cards to markdown...');
-          const markdownContent = deckToEdit.cards.map((card) => {
-            if (card.type === 'basic') {
-              return `${card.front} :: ${card.back}`;
-            } else if (card.type === 'multiple_choice') {
-              const choices = card.choices?.map(choice => `  - ${choice}`).join('\n') || '';
-              return `${card.front} ::\n${choices}\n  > ${card.back}`;
-            }
-            return `${card.front} :: ${card.back}`;
-          }).join('\n\n');
-          
-          // Add category headers if present
-          const categories = [...new Set(deckToEdit.cards.map(card => card.category).filter(Boolean))];
-          if (categories.length > 0) {
-            const organizedContent = categories.map(category => {
-              const categoryCards = deckToEdit.cards.filter(card => card.category === category);
-              const categoryMarkdown = categoryCards.map(card => {
-                if (card.type === 'basic') {
-                  return `${card.front} :: ${card.back}`;
-                } else if (card.type === 'multiple_choice') {
-                  const choices = card.choices?.map(choice => `  - ${choice}`).join('\n') || '';
-                  return `${card.front} ::\n${choices}\n  > ${card.back}`;
-                }
-                return `${card.front} :: ${card.back}`;
-              }).join('\n');
-              return `# ${category}\n\n${categoryMarkdown}`;
-            }).join('\n\n');
-            setMarkdown(organizedContent);
-          } else {
-            setMarkdown(markdownContent);
-          }
+          const markdownContent = reconstructMarkdownFromCards(deckToEdit);
+          setMarkdown(markdownContent);
         }
         
         setIsLoading(false);
@@ -162,6 +204,10 @@ export function EditPage() {
       };
       
       updateDeck(editingDeck.id, updatedDeck);
+      
+      // Also save the raw markdown to localStorage
+      localStorage.setItem(`mdoc_${editingDeck.id}`, markdown);
+      
       console.log(`Updated deck ${editingDeck.id} successfully`);
       
       setIsUpdating(false);

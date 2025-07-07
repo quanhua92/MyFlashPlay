@@ -1,13 +1,26 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, Upload, Info } from 'lucide-react';
+import { Download, Upload, Info, Plus } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { useDecks } from '@/hooks/useDecks';
 import { DeckCard } from '@/components/decks/DeckCard';
+import { DeckFilters, applyFilters, type FilterOptions } from '@/components/decks/DeckFilters';
 import { useTranslation } from '@/i18n';
 
 export function DecksPage() {
   const t = useTranslation();
   const { decks, isLoading, deleteDeck } = useDecks();
+  
+  const [filters, setFilters] = useState<FilterOptions>({
+    searchQuery: '',
+    selectedTags: [],
+    selectedCategories: [],
+    selectedDifficulty: 'all',
+    minCards: null,
+    maxCards: null
+  });
+
+  const filteredDecks = applyFilters(decks, filters);
 
   if (isLoading) {
     return (
@@ -31,6 +44,17 @@ export function DecksPage() {
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
             {t('decks.subtitle', 'Manage and play your flashcard collections')}
           </p>
+
+          {/* Quick Actions */}
+          <div className="flex justify-center gap-4 mb-6">
+            <Link
+              to="/create"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-shadow"
+            >
+              <Plus className="w-5 h-5" />
+              {t('decks.createNewDeck', 'Create New Deck')}
+            </Link>
+          </div>
           
           {/* Export/Import Notice */}
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 max-w-2xl mx-auto">
@@ -64,16 +88,61 @@ export function DecksPage() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {decks.map((deck, index) => (
-            <DeckCard
-              key={deck.id}
-              deck={deck}
-              index={index}
-              onDelete={deleteDeck}
-            />
-          ))}
-        </div>
+        {/* Filters */}
+        {decks.length > 0 && (
+          <DeckFilters
+            decks={decks}
+            filters={filters}
+            onFiltersChange={setFilters}
+            showAdvanced={true}
+          />
+        )}
+
+        {/* Deck Grid */}
+        {filteredDecks.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredDecks.map((deck, index) => (
+              <DeckCard
+                key={deck.id}
+                deck={deck}
+                index={index}
+                onDelete={deleteDeck}
+              />
+            ))}
+          </div>
+        ) : decks.length > 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              No decks match your current filters.
+            </p>
+            <button
+              onClick={() => setFilters({
+                searchQuery: '',
+                selectedTags: [],
+                selectedCategories: [],
+                selectedDifficulty: 'all',
+                minCards: null,
+                maxCards: null
+              })}
+              className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+            >
+              Clear all filters
+            </button>
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              You haven't created any decks yet.
+            </p>
+            <Link
+              to="/create"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-shadow"
+            >
+              <Plus className="w-5 h-5" />
+              Create Your First Deck
+            </Link>
+          </div>
+        )}
       </motion.div>
     </div>
   );
