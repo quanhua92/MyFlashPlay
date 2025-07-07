@@ -13,10 +13,10 @@ export function AchievementsPage() {
   const stats = achievementManager.getStats();
   
   const categories = [
-    { id: 'all', name: t('achievements.allAchievements', 'All Achievements'), icon: Trophy },
-    { id: 'beginner', name: t('achievements.beginner', 'Beginner'), icon: Star },
-    { id: 'streak', name: t('achievements.streaks', 'Streaks'), icon: TrendingUp },
-    { id: 'master', name: t('achievements.master', 'Master'), icon: Trophy }
+    { id: 'all', name: t('achievements.allAchievements'), icon: Trophy },
+    { id: 'beginner', name: t('achievements.beginner'), icon: Star },
+    { id: 'streak', name: t('achievements.streaks'), icon: TrendingUp },
+    { id: 'master', name: t('achievements.master'), icon: Trophy }
   ];
   
   const filteredAchievements = achievements.filter(achievement => {
@@ -45,10 +45,10 @@ export function AchievementsPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            {t('achievements.title', 'Achievement Gallery')}
+            {t('achievements.title')}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            {t('achievements.subtitle', 'Track your progress and unlock rewards!')}
+            {t('achievements.subtitle')}
           </p>
         </div>
 
@@ -61,7 +61,7 @@ export function AchievementsPage() {
             className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-6 text-white text-center"
           >
             <div className="text-3xl font-bold mb-1">{stats.totalUnlocked}</div>
-            <div className="text-sm opacity-90">{t('achievements.unlocked', 'Unlocked')}</div>
+            <div className="text-sm opacity-90">{t('achievements.unlocked')}</div>
           </motion.div>
           
           <motion.div
@@ -71,7 +71,7 @@ export function AchievementsPage() {
             className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-6 text-white text-center"
           >
             <div className="text-3xl font-bold mb-1">{stats.totalAchievements}</div>
-            <div className="text-sm opacity-90">{t('achievements.total', 'Total')}</div>
+            <div className="text-sm opacity-90">{t('achievements.total')}</div>
           </motion.div>
           
           <motion.div
@@ -81,7 +81,7 @@ export function AchievementsPage() {
             className="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl p-6 text-white text-center"
           >
             <div className="text-3xl font-bold mb-1">{stats.totalPoints}</div>
-            <div className="text-sm opacity-90">{t('achievements.points', 'Points')}</div>
+            <div className="text-sm opacity-90">{t('achievements.points')}</div>
           </motion.div>
           
           <motion.div
@@ -91,7 +91,7 @@ export function AchievementsPage() {
             className="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl p-6 text-white text-center"
           >
             <div className="text-3xl font-bold mb-1">{Math.round(stats.completionPercentage)}%</div>
-            <div className="text-sm opacity-90">{t('achievements.complete', 'Complete')}</div>
+            <div className="text-sm opacity-90">{t('achievements.complete')}</div>
           </motion.div>
         </div>
 
@@ -149,7 +149,7 @@ export function AchievementsPage() {
                 {/* Progress */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">{t('achievements.progress', 'Progress')}</span>
+                    <span className="text-gray-500 dark:text-gray-400">{t('achievements.progress')}</span>
                     <span className="font-semibold text-purple-600 dark:text-purple-400">
                       {achievement.progress} / {achievement.maxProgress}
                     </span>
@@ -172,7 +172,7 @@ export function AchievementsPage() {
                   </span>
                   {achievement.unlockedAt && (
                     <span className="text-sm text-green-600 dark:text-green-400 font-semibold">
-                      ✓ {t('achievements.unlocked', 'Unlocked')}
+                      ✓ {t('achievements.unlocked')}
                     </span>
                   )}
                 </div>
@@ -190,7 +190,7 @@ export function AchievementsPage() {
             className="mt-12 text-center"
           >
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              {t('achievements.keepPlaying', 'Keep playing to unlock more achievements!')} 🎯
+              {t('achievements.keepPlaying')} 🎯
             </p>
           </motion.div>
         )}

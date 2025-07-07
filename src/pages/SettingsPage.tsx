@@ -341,7 +341,7 @@ export function SettingsPage() {
             {t('settings.title')}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            {t('settings.subtitle', 'Customize your MyFlashPlay experience')}
+            {t('settings.subtitle')}
           </p>
         </div>
 
@@ -407,7 +407,7 @@ export function SettingsPage() {
               <div>
                 <label className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {t('settings.soundEffects', 'Sound Effects')}
+                    {t('settings.soundEffects')}
                   </span>
                   <button
                     onClick={() => setPreferences({ 

@@ -26,7 +26,7 @@ export function DecksPage() {
     return (
       <div className="text-center py-16">
         <div className="animate-spin w-8 h-8 border-2 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-gray-600 dark:text-gray-300">{t('decks.loadingDecks', 'Loading your decks...')}</p>
+        <p className="text-gray-600 dark:text-gray-300">{t('decks.loadingDecks')}</p>
       </div>
     );
   }
@@ -42,7 +42,7 @@ export function DecksPage() {
             {t('decks.myDecksTitle')}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
-            {t('decks.subtitle', 'Manage and play your flashcard collections')}
+            {t('decks.subtitle')}
           </p>
 
           {/* Quick Actions */}
@@ -52,7 +52,7 @@ export function DecksPage() {
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-shadow"
             >
               <Plus className="w-5 h-5" />
-              {t('decks.createNewDeck', 'Create New Deck')}
+              {t('decks.createNewDeck')}
             </Link>
           </div>
           
@@ -62,10 +62,10 @@ export function DecksPage() {
               <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
               <div className="text-left">
                 <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
-                  {t('decks.exportImportTitle', 'Export & Import Your Decks')}
+                  {t('decks.exportImportTitle')}
                 </h3>
                 <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
-                  {t('decks.exportImportDescription', 'Want to backup your decks or share them? You can export and import your flashcard collections.')}
+                  {t('decks.exportImportDescription')}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Link 
@@ -73,14 +73,14 @@ export function DecksPage() {
                     className="inline-flex items-center space-x-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
                   >
                     <Download className="w-4 h-4" />
-                    <span>{t('decks.exportDecks', 'Export Decks')}</span>
+                    <span>{t('decks.exportDecks')}</span>
                   </Link>
                   <Link 
                     to="/settings"
                     className="inline-flex items-center space-x-2 px-3 py-1.5 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"
                   >
                     <Upload className="w-4 h-4" />
-                    <span>{t('decks.importDecks', 'Import Decks')}</span>
+                    <span>{t('decks.importDecks')}</span>
                   </Link>
                 </div>
               </div>
