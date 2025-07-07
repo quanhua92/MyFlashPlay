@@ -2,17 +2,19 @@ import { Link, useRouterState } from '@tanstack/react-router';
 import { Home, Plus, BookOpen, Trophy, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/i18n';
 
 export function MobileNavigation() {
   const router = useRouterState();
   const currentPath = router.location.pathname;
+  const t = useTranslation();
 
   const navItems = [
-    { path: '/' as const, label: 'Home', icon: Home },
-    { path: '/create' as const, label: 'Create', icon: Plus },
-    { path: '/decks' as const, label: 'My Decks', icon: BookOpen },
-    { path: '/public-decks' as const, label: 'Public', icon: Globe },
-    { path: '/achievements' as const, label: 'Achievements', icon: Trophy }
+    { path: '/' as const, label: t('nav.home'), icon: Home },
+    { path: '/create' as const, label: t('nav.create'), icon: Plus },
+    { path: '/decks' as const, label: t('nav.myDecks'), icon: BookOpen },
+    { path: '/public-decks' as const, label: t('nav.publicDecks'), icon: Globe },
+    { path: '/achievements' as const, label: t('nav.achievements'), icon: Trophy }
   ];
 
   return (

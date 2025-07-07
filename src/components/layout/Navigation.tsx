@@ -2,20 +2,22 @@ import { Link, useRouterState } from '@tanstack/react-router';
 import { Home, Plus, BookOpen, Trophy, Menu, X, Settings, TrendingUp, Globe } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/i18n';
 
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouterState();
   const currentPath = router.location.pathname;
+  const t = useTranslation();
 
   const navItems = [
-    { path: '/' as const, label: 'Home', icon: Home },
-    { path: '/create' as const, label: 'Create', icon: Plus },
-    { path: '/decks' as const, label: 'My Decks', icon: BookOpen },
-    { path: '/public-decks' as const, label: 'Public Decks', icon: Globe },
-    { path: '/achievements' as const, label: 'Achievements', icon: Trophy },
-    { path: '/progress' as const, label: 'Progress', icon: TrendingUp },
-    { path: '/settings' as const, label: 'Settings', icon: Settings }
+    { path: '/' as const, label: t('nav.home'), icon: Home },
+    { path: '/create' as const, label: t('nav.create'), icon: Plus },
+    { path: '/decks' as const, label: t('nav.myDecks'), icon: BookOpen },
+    { path: '/public-decks' as const, label: t('nav.publicDecks'), icon: Globe },
+    { path: '/achievements' as const, label: t('nav.achievements'), icon: Trophy },
+    { path: '/progress' as const, label: t('nav.progress'), icon: TrendingUp },
+    { path: '/settings' as const, label: t('nav.settings'), icon: Settings }
   ];
 
   return (
@@ -26,7 +28,7 @@ export function Navigation() {
             <Link to="/" className="flex items-center space-x-3">
               <span className="text-3xl">🎯</span>
               <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                MyFlashPlay
+                {t('nav.appTitle')}
               </span>
             </Link>
           </div>

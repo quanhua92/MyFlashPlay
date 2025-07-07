@@ -12,11 +12,13 @@ import { QuickCreateInterface } from '@/components/create/QuickCreateInterface';
 import { TemplateSelector } from '@/components/create/TemplateSelector';
 import { MarkdownValidator } from '@/components/create/MarkdownValidator';
 import { SafeContentRenderer } from '@/components/common/SafeContentRenderer';
+import { useTranslation } from '@/i18n';
 import type { Deck } from '@/types';
 
 type CreateMode = 'interface' | 'markdown';
 
 export function CreatePage() {
+  const t = useTranslation();
   const [markdown, setMarkdown] = useState(templates[0].markdown);
   const [deckName, setDeckName] = useState(templates[0].deckName);
   const [description, setDescription] = useState(templates[0].deckDescription);
@@ -196,12 +198,12 @@ export function CreatePage() {
       >
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            {editingDeck ? 'Edit Flashcards' : 'Create Flashcards'}
+            {editingDeck ? t('create.editTitle', 'Edit Flashcards') : t('create.title')}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
             {editingDeck 
-              ? 'Edit your flashcard deck using our easy interface or Markdown directly!'
-              : 'Choose your preferred way to create flashcards - use our easy interface or write Markdown directly!'
+              ? t('create.editSubtitle', 'Edit your flashcard deck using our easy interface or Markdown directly!')
+              : t('create.subtitle', 'Choose your preferred way to create flashcards - use our easy interface or write Markdown directly!')
             }
           </p>
         </div>
@@ -212,12 +214,12 @@ export function CreatePage() {
             {/* Deck Metadata */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Deck Information
+                {t('create.deckInformation', 'Deck Information')}
               </h3>
               <div className="grid grid-cols-4 gap-4 mb-4">
                 <div className="col-span-1">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Emoji
+                    {t('create.emojiLabel', 'Emoji')}
                   </label>
                   <input
                     type="text"
@@ -230,28 +232,28 @@ export function CreatePage() {
                 </div>
                 <div className="col-span-3">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Deck Name
+                    {t('create.deckNameLabel')}
                   </label>
                   <input
                     type="text"
                     value={deckName}
                     onChange={(e) => setDeckName(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                    placeholder="Enter deck name"
+                    placeholder={t('create.deckNamePlaceholder')}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Description
+                  {t('create.descriptionLabel')}
                 </label>
                 <input
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                  placeholder="Enter deck description"
+                  placeholder={t('create.descriptionPlaceholder')}
                 />
               </div>
 
@@ -259,7 +261,7 @@ export function CreatePage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
                   <Tag className="w-4 h-4" />
-                  Tags
+                  {t('create.tagsLabel', 'Tags')}
                 </label>
                 
                 {/* Tag Input */}
@@ -270,7 +272,7 @@ export function CreatePage() {
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleTagInputKeyDown}
                     className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                    placeholder="Add tags (press Enter or comma to add)"
+                    placeholder={t('create.tagsPlaceholder', 'Add tags (press Enter or comma to add)')}
                   />
                   <button
                     type="button"
@@ -279,7 +281,7 @@ export function CreatePage() {
                     className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg transition-colors flex items-center gap-2"
                   >
                     <Plus className="w-4 h-4" />
-                    Add
+                    {t('create.addTag', 'Add')}
                   </button>
                 </div>
 
@@ -305,7 +307,7 @@ export function CreatePage() {
                 )}
                 
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  Tags help organize and categorize your flashcard decks. Press Enter or comma to add multiple tags.
+                  {t('create.tagsHelp', 'Tags help organize and categorize your flashcard decks. Press Enter or comma to add multiple tags.')}
                 </p>
               </div>
             </div>
@@ -328,7 +330,7 @@ export function CreatePage() {
                   }`}
                 >
                   <Edit3 className="w-4 h-4" />
-                  Easy Interface
+                  {t('create.easyInterface', 'Easy Interface')}
                 </button>
                 <button
                   onClick={switchToMarkdown}
@@ -339,7 +341,7 @@ export function CreatePage() {
                   }`}
                 >
                   <Code className="w-4 h-4" />
-                  Raw Markdown
+                  {t('create.rawMarkdown', 'Raw Markdown')}
                 </button>
               </div>
             </div>
@@ -357,7 +359,7 @@ export function CreatePage() {
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                       <Code className="w-5 h-5" />
-                      Markdown Editor
+                      {t('create.markdownEditor', 'Markdown Editor')}
                     </h3>
                     <div className="flex gap-2">
                       <button 
@@ -381,14 +383,14 @@ export function CreatePage() {
                         }}
                       >
                         <Upload className="w-4 h-4" />
-                        <span>Upload</span>
+                        <span>{t('create.upload', 'Upload')}</span>
                       </button>
                       <button 
                         className="flex items-center space-x-2 px-3 py-1.5 text-sm bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors"
                         onClick={() => handleTemplateSelect(templates[0])}
                       >
                         <Wand2 className="w-4 h-4" />
-                        <span>Template</span>
+                        <span>{t('create.template', 'Template')}</span>
                       </button>
                     </div>
                   </div>
@@ -397,7 +399,7 @@ export function CreatePage() {
                     value={markdown}
                     onChange={(e) => setMarkdown(e.target.value)}
                     className="w-full h-96 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm resize-none"
-                    placeholder="Paste your Markdown content here..."
+                    placeholder={t('create.markdownPlaceholder', 'Paste your Markdown content here...')}
                   />
 
                   {/* Validation */}
@@ -407,8 +409,8 @@ export function CreatePage() {
                   />
 
                   <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-                    <span>Tip: Switch to Easy Interface for a guided experience</span>
-                    <span>{markdown.length} characters</span>
+                    <span>{t('create.interfaceTip', 'Tip: Switch to Easy Interface for a guided experience')}</span>
+                    <span>{t('create.characterCount', '{{count}} characters', { count: markdown.length })}</span>
                   </div>
                 </div>
               )}
@@ -420,7 +422,7 @@ export function CreatePage() {
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 sticky top-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <FileText className="w-5 h-5 mr-2" />
-                Preview ({parsedCards.length} cards)
+                {t('create.preview', 'Preview')} ({parsedCards.length} {t('create.cards', 'cards')})
               </h3>
               
               {parsedCards.length > 0 ? (
@@ -431,7 +433,7 @@ export function CreatePage() {
                       className="border border-gray-200 dark:border-gray-600 rounded-lg p-4"
                     >
                       <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                        Card {index + 1} • {card.type} • {card.category || 'No category'}
+                        {t('create.cardNumber', 'Card {{number}}', { number: index + 1 })} • {card.type} • {card.category || t('create.noCategory', 'No category')}
                       </div>
                       <div className="font-medium text-gray-900 dark:text-white mb-2">
                         <SafeContentRenderer content={card.front} />
@@ -444,7 +446,7 @@ export function CreatePage() {
                 </div>
               ) : (
                 <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-                  Start creating to see your flashcards appear here!
+                  {t('create.startCreating', 'Start creating to see your flashcards appear here!')}
                 </div>
               )}
 
@@ -463,18 +465,18 @@ export function CreatePage() {
                   {isCreating ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Creating...</span>
+                      <span>{t('create.creating', 'Creating...')}</span>
                     </>
                   ) : isCreated ? (
                     <>
                       <CheckCircle className="w-5 h-5" />
-                      <span>{editingDeck ? 'Updated!' : 'Created!'} Redirecting...</span>
+                      <span>{editingDeck ? t('create.updated', 'Updated!') : t('create.created', 'Created!')} {t('create.redirecting', 'Redirecting...')}</span>
                     </>
                   ) : (
                     <span>
                       {validationResult?.isValid 
-                        ? `${editingDeck ? 'Update' : 'Create'} Deck (${parsedCards.length} cards)` 
-                        : `Fix validation errors to ${editingDeck ? 'update' : 'create'} deck`
+                        ? `${editingDeck ? t('create.updateDeck', 'Update') : t('create.createDeck', 'Create')} ${t('create.deck', 'Deck')} (${parsedCards.length} ${t('create.cards', 'cards')})` 
+                        : `${t('create.fixErrors', 'Fix validation errors to')} ${editingDeck ? t('create.update', 'update') : t('create.create', 'create')} ${t('create.deck', 'deck')}`
                       }
                     </span>
                   )}

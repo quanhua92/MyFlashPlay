@@ -18,6 +18,7 @@
     "test:markdown:verbose": "VERBOSE=true tsx --tsconfig tsconfig.test.json tests/test-markdown-all.ts",
     "test:integration": "tsx scripts/integration-test.ts",
     "test:integration:local": "tsx scripts/integration-test.ts http://localhost:3000",
+    "validate-translations": "tsx scripts/validate-translations.js",
     "test:integration:preview": "tsx scripts/integration-test.ts http://localhost:4173",
     "test:quick": "tsx scripts/quick-test.ts",
     "test:quick:local": "tsx scripts/quick-test.ts http://localhost:3000",

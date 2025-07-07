@@ -16,6 +16,7 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Link, useNavigate } from "@tanstack/react-router"
+import { useTranslation } from "@/i18n"
 import type { Deck, GameMode } from "@/types"
 
 interface DeckCardProps {
@@ -25,6 +26,7 @@ interface DeckCardProps {
 }
 
 export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
+  const t = useTranslation()
   const [showModes, setShowModes] = useState(false)
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null)
   const [showMenu, setShowMenu] = useState(false)
@@ -48,36 +50,36 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
   const gameModes = [
     {
       id: "study",
-      name: "Study",
-      description: "Learn at your own pace",
+      name: t('game.studyMode'),
+      description: t('decks.studyDescription', 'Learn at your own pace'),
       icon: BookOpen,
       color: "blue",
     },
     {
       id: "quiz",
-      name: "Quiz",
-      description: "Test your knowledge",
+      name: t('game.quizMode'),
+      description: t('decks.quizDescription', 'Test your knowledge'),
       icon: Target,
       color: "green",
     },
     {
       id: "speed",
-      name: "Speed",
-      description: "Race against time",
+      name: t('game.speedMode'),
+      description: t('decks.speedDescription', 'Race against time'),
       icon: Zap,
       color: "yellow",
     },
     {
       id: "memory",
-      name: "Memory",
-      description: "Match pairs",
+      name: t('game.memoryMode'),
+      description: t('decks.memoryDescription', 'Match pairs'),
       icon: Brain,
       color: "purple",
     },
     {
       id: "falling",
-      name: "Falling",
-      description: "Answer falling quizzes",
+      name: t('game.fallingMode'),
+      description: t('decks.fallingDescription', 'Answer falling quizzes'),
       icon: Layers,
       color: "indigo",
     },
@@ -169,7 +171,7 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
 
   const handleDelete = () => {
     setShowMenu(false)
-    if (confirm(`Are you sure you want to delete "${deck.name}"?`)) {
+    if (confirm(t('decks.confirmDelete') + ` "${deck.name}"?`)) {
       onDelete(deck.id)
     }
   }
@@ -190,7 +192,7 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
               {deck.name}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {deck.cards.length} cards
+              {deck.cards.length} {t('decks.cards')}
             </p>
           </div>
         </div>
@@ -200,7 +202,7 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
           <button
             onClick={() => setShowMenu(!showMenu)}
             className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-            title="Deck options"
+            title={t('decks.deckOptions', 'Deck options')}
           >
             <MoreVertical className="w-4 h-4" />
           </button>
@@ -220,7 +222,7 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
                     className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     <Edit className="w-4 h-4" />
-                    <span>Edit Deck</span>
+                    <span>{t('decks.editDeck')}</span>
                   </button>
 
                   <button
@@ -228,7 +230,7 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
                     className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     <Download className="w-4 h-4" />
-                    <span>Download Deck</span>
+                    <span>{t('decks.downloadDeck', 'Download Deck')}</span>
                   </button>
 
                   <div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
@@ -238,7 +240,7 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
                     className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
-                    <span>Delete Deck</span>
+                    <span>{t('decks.deleteDeck')}</span>
                   </button>
                 </div>
               </motion.div>
@@ -264,7 +266,7 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
             {deck.metadata?.difficulty || 'medium'}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {deck.cards.length} cards
+            {deck.cards.length} {t('decks.cards')}
           </span>
         </div>
         <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -293,8 +295,8 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
 
       {/* Stats */}
       <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 mb-4">
-        <span>Played {deck.metadata?.playCount || 0} times</span>
-        <span>Last played: {deck.metadata?.lastModified ? new Date(deck.metadata.lastModified).toLocaleDateString() : 'Never'}</span>
+        <span>{t('decks.playedTimes', 'Played {{count}} times', { count: deck.metadata?.playCount || 0 })}</span>
+        <span>{t('decks.lastPlayed', 'Last played')}: {deck.metadata?.lastModified ? new Date(deck.metadata.lastModified).toLocaleDateString() : t('decks.never', 'Never')}</span>
       </div>
 
       {/* Mode Selection */}
@@ -309,14 +311,14 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
             className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-2 px-4 rounded-lg font-medium hover:shadow-md transition-shadow flex items-center justify-center space-x-2"
           >
             <Play className="w-4 h-4" />
-            <span>Start Study</span>
+            <span>{t('decks.startStudy', 'Start Study')}</span>
           </Link>
 
           {/* More Modes Button */}
           <button
             onClick={() => setShowModes(!showModes)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center"
-            title="More game modes"
+            title={t('decks.moreGameModes', 'More game modes')}
           >
             {showModes ? (
               <ChevronDown className="w-4 h-4" />
@@ -337,7 +339,7 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
               className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-700/50"
             >
               <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                Select a game mode:
+                {t('decks.selectGameMode', 'Select a game mode:')}
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {gameModes.map((mode) => {

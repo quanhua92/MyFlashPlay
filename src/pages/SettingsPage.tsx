@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, Upload, Moon, Sun, Monitor, Volume2, VolumeX, Save, AlertCircle, Accessibility, Database, Trash2, Shield, HardDrive, FileText } from 'lucide-react';
+import { Download, Upload, Moon, Sun, Monitor, Volume2, VolumeX, Save, AlertCircle, Accessibility, Database, Trash2, Shield, HardDrive, FileText, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTheme } from '@/components/layout/ThemeProvider';
 import { dataExporter } from '@/utils/data-export';
@@ -7,10 +7,14 @@ import { dataImporter, type MergeStrategy } from '@/utils/data-import';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS } from '@/utils/constants';
 import { AccessibilitySettings } from '@/components/common/AccessibilitySettings';
+import { LanguageSelector } from '@/components/settings/LanguageSelector';
+import { LanguagePreview } from '@/components/settings/LanguagePreview';
+import { useTranslation } from '@/i18n';
 import type { UserPreferences } from '@/types';
 
 export function SettingsPage() {
   const { theme, setTheme } = useTheme();
+  const t = useTranslation();
   const [preferences, setPreferences] = useLocalStorage<UserPreferences>(
     STORAGE_KEYS.PREFERENCES,
     {
@@ -331,25 +335,49 @@ export function SettingsPage() {
       >
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Settings
+            {t('settings.title')}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            Customize your MyFlashPlay experience
+            {t('settings.subtitle', 'Customize your MyFlashPlay experience')}
           </p>
         </div>
 
         <div className="space-y-8">
+          {/* Language Settings */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg"
+          >
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+              <Globe className="w-5 h-5 mr-2" />
+              {t('settings.languageTitle')}
+            </h2>
+            <LanguageSelector />
+            
+            {/* Development Preview - Remove in production */}
+            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <LanguagePreview />
+            </div>
+          </motion.div>
+
           {/* Theme Settings */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg"
+          >
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
               <Sun className="w-5 h-5 mr-2" />
-              Appearance
+              {t('settings.themeTitle')}
             </h2>
             
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Theme
+                  {t('settings.themeTitle')}
                 </label>
                 <div className="grid grid-cols-3 gap-3">
                   {[
@@ -367,7 +395,7 @@ export function SettingsPage() {
                       }`}
                     >
                       <Icon className="w-6 h-6 mx-auto mb-2" />
-                      <span className="text-sm font-medium">{label}</span>
+                      <span className="text-sm font-medium">{t(`settings.${value}`)}</span>
                     </button>
                   ))}
                 </div>
@@ -376,7 +404,7 @@ export function SettingsPage() {
               <div>
                 <label className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Sound Effects
+                    {t('settings.soundEffects', 'Sound Effects')}
                   </span>
                   <button
                     onClick={() => setPreferences({ 
@@ -394,13 +422,18 @@ export function SettingsPage() {
                 </label>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Export Settings */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg"
+          >
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
               <Download className="w-5 h-5 mr-2" />
-              Export Data
+              {t('settings.exportData')}
             </h2>
             
             <div className="space-y-3">
@@ -409,7 +442,7 @@ export function SettingsPage() {
                 className="w-full flex items-center justify-center space-x-2 p-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
               >
                 <Save className="w-5 h-5" />
-                <span>Export Data</span>
+                <span>{t('settings.exportData')}</span>
               </button>
               
               {exportStatus && (
@@ -418,13 +451,18 @@ export function SettingsPage() {
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
 
           {/* Import Settings */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg"
+          >
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
               <Upload className="w-5 h-5 mr-2" />
-              Import Data
+              {t('settings.importData')}
             </h2>
             
             <div className="space-y-4">
@@ -512,10 +550,15 @@ export function SettingsPage() {
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
 
           {/* Advanced localStorage Management */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-yellow-200 dark:border-yellow-800">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-yellow-200 dark:border-yellow-800"
+          >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
                 <Database className="w-5 h-5 mr-2" />
@@ -729,16 +772,21 @@ export function SettingsPage() {
               )}
 
             </div>
-          </div>
+          </motion.div>
 
           {/* Accessibility Settings */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg"
+          >
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
               <Accessibility className="w-5 h-5 mr-2" />
               Accessibility
             </h2>
             <AccessibilitySettings />
-          </div>
+          </motion.div>
         </div>
       </motion.div>
     </div>

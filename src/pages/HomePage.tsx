@@ -3,9 +3,11 @@ import { Plus, BookOpen, Sparkles, Target, Trophy, Zap } from "lucide-react"
 import { motion } from "framer-motion"
 import { useDecks } from "@/hooks/useDecks"
 import { achievementManager } from "@/utils/achievements"
+import { useTranslation } from "@/i18n"
 
 export function HomePage() {
   const { decks } = useDecks()
+  const t = useTranslation()
   const achievementStats = achievementManager.getStats()
   achievementManager.checkDailyStreak() // Check daily streak on home page visit
 
@@ -28,20 +30,20 @@ export function HomePage() {
   const features = [
     {
       icon: Target,
-      title: "Fun Learning",
-      description: "Interactive flashcards with colorful animations",
+      title: t('home.feature1Title'),
+      description: t('home.feature1Description'),
       color: "from-purple-500 to-pink-500",
     },
     {
       icon: Zap,
-      title: "Multiple Modes",
-      description: "Study, quiz, speed challenges, and memory games",
+      title: t('home.feature2Title'),
+      description: t('home.feature2Description'),
       color: "from-blue-500 to-cyan-500",
     },
     {
       icon: Trophy,
-      title: "Track Progress",
-      description: `Earn achievements and see your improvement (${achievementStats.totalUnlocked}/${achievementStats.totalAchievements} unlocked)`,
+      title: t('home.feature3Title'),
+      description: t('home.feature3Description'),
       color: "from-green-500 to-emerald-500",
     },
     {
@@ -63,12 +65,11 @@ export function HomePage() {
       >
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
           <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-            MyFlashPlay
+            {t('nav.appTitle')}
           </span>
         </h1>
         <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-          Turn learning into an adventure! Create flashcards from Markdown and
-          play fun educational games.
+          {t('home.subtitle')}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -77,7 +78,7 @@ export function HomePage() {
             className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
           >
             <Plus className="w-5 h-5" />
-            <span>Create Flashcards</span>
+            <span>{t('home.getStartedButton')}</span>
           </Link>
 
           <Link
@@ -85,7 +86,7 @@ export function HomePage() {
             className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-8 py-4 rounded-xl text-lg font-semibold border-2 border-gray-200 dark:border-gray-700 hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
           >
             <BookOpen className="w-5 h-5" />
-            <span>Browse Decks</span>
+            <span>{t('nav.myDecks')}</span>
           </Link>
         </div>
       </motion.div>
@@ -98,7 +99,7 @@ export function HomePage() {
         className="py-16"
       >
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-          Why Kids Love MyFlashPlay
+          {t('home.featuresTitle')}
         </h2>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -134,7 +135,7 @@ export function HomePage() {
         className="py-16"
       >
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-          Try These Sample Decks
+          {t('home.sampleDecksTitle')}
         </h2>
 
         {/* Debug info in development */}
@@ -175,7 +176,7 @@ export function HomePage() {
                 search={{ mode: undefined }}
                 className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-3 rounded-xl font-semibold hover:shadow-lg transition-shadow"
               >
-                Start Playing
+                {t('common.play')}
               </Link>
             </motion.div>
           ))}
