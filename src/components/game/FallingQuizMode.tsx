@@ -12,6 +12,7 @@ interface FallingQuiz {
   laneSpan: number; // How many lanes this card spans (1-4)
   position: number; // 0 to 100 (percentage from top)
   speed: number;
+  originalSpeed: number; // To restore speed after mouse leave
   answers: string[];
   correctIndex: number;
   height: number; // Card height in vh units for collision detection
@@ -118,6 +119,7 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
     const baseHeight = 12; // Larger base card height in vh for mobile
     const answerHeight = answers.length * 3.5; // Each answer button adds ~3.5vh (larger buttons)
     const estimatedHeight = baseHeight + answerHeight;
+    const speed = getDifficultySettings(selectedDifficulty, difficultyRef.current).speed;
 
     return {
       id: `quiz-${card.id}-${Date.now()}-${Math.random()}`,
@@ -125,12 +127,13 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
       lane,
       laneSpan,
       position: 0,
-      speed: getDifficultySettings(selectedDifficulty, difficultyRef.current).speed,
-      answers: answers.slice(0, 4), // Max 4 answers
+      speed: speed,
+      originalSpeed: speed, // Set original speed
+      answers: answers.slice(0, 4),
       correctIndex,
       height: estimatedHeight
     };
-  }, [deck.cards, checkCollision]);
+  }, [deck.cards, selectedDifficulty, checkCollision]);
 
   // Spawn new quiz
   const spawnQuiz = useCallback(() => {
@@ -222,7 +225,7 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
     setTimeElapsed(Math.floor(timeInSeconds));
 
     gameLoopRef.current = requestAnimationFrame(gameLoop);
-  }, [gameState, spawnQuiz]);
+  }, [gameState, spawnQuiz, selectedDifficulty]);
 
   // Start game loop and spawn first card immediately
   useEffect(() => {
@@ -238,7 +241,7 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
         cancelAnimationFrame(gameLoopRef.current);
       }
     };
-  }, [gameState, gameLoop, spawnQuiz]);
+  }, [gameState, gameLoop, spawnQuiz, fallingQuizzes.length]);
 
   // Handle answer selection
   const handleAnswer = useCallback((quizId: string, answerIndex: number) => {
@@ -300,9 +303,24 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
         onComplete(session);
       }
     }
-  }, [fallingQuizzes, streak, answeredQuizzes, deck, score, timeElapsed, onComplete]);
+  }, [fallingQuizzes, streak, answeredQuizzes, deck, score, onComplete, bestStreak, correctAnswers, selectedDifficulty]);
 
-  // Setup screen
+  const handleMouseEnter = (quizId: string) => {
+    setFallingQuizzes(prevQuizzes =>
+      prevQuizzes.map(quiz =>
+        quiz.id === quizId ? { ...quiz, speed: quiz.originalSpeed / 10 } : quiz
+      )
+    );
+  };
+
+  const handleMouseLeave = (quizId: string) => {
+    setFallingQuizzes(prevQuizzes =>
+      prevQuizzes.map(quiz =>
+        quiz.id === quizId ? { ...quiz, speed: quiz.originalSpeed } : quiz
+      )
+    );
+  };
+
   if (gameState === 'setup') {
     return (
       <div className="h-screen bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center">
@@ -420,8 +438,11 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
         <div className="absolute inset-0 pointer-events-none">
           <AnimatePresence>
             {fallingQuizzes.map(quiz => (
+              // Added mouse event handlers
               <motion.div
                 key={quiz.id}
+                onMouseEnter={() => handleMouseEnter(quiz.id)}
+                onMouseLeave={() => handleMouseLeave(quiz.id)}
                 initial={{ y: -100, opacity: 0 }}
                 animate={{ 
                   y: `${quiz.position}vh`,
@@ -482,7 +503,7 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
                 <p>Final Score: <span className="font-bold text-purple-600">{score}</span></p>
                 <p>Questions Answered: <span className="font-bold">{answeredQuizzes.size}/{deck.cards.length}</span></p>
                 <p>Time: <span className="font-bold">{Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')}</span></p>
-                <p>Best Streak: <span className="font-bold">{streak}</span></p>
+                <p>Best Streak: <span className="font-bold">{bestStreak > 0 ? bestStreak : streak}</span></p>
               </div>
             </motion.div>
           </motion.div>
