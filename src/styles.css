@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --kid-blue: #4F46E5;
   --kid-pink: #EC4899;
