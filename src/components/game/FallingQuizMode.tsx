@@ -9,10 +9,12 @@ interface FallingQuiz {
   id: string;
   card: Card;
   lane: number;
+  laneSpan: number; // How many lanes this card spans (1-4)
   position: number; // 0 to 100 (percentage from top)
   speed: number;
   answers: string[];
   correctIndex: number;
+  height: number; // Card height in vh units for collision detection
 }
 
 type Difficulty = 'easy' | 'medium' | 'hard';
@@ -73,8 +75,27 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
     };
   };
 
+  // Check collision with existing quizzes
+  const checkCollision = useCallback((lane: number, laneSpan: number, position: number, height: number) => {
+    return fallingQuizzes.some(quiz => {
+      // Check if lanes overlap
+      const laneOverlap = (
+        lane < quiz.lane + quiz.laneSpan && 
+        lane + laneSpan > quiz.lane
+      );
+      
+      // Check if positions overlap (with some buffer)
+      const positionOverlap = (
+        position < quiz.position + quiz.height + 5 && // 5vh buffer
+        position + height + 5 > quiz.position
+      );
+      
+      return laneOverlap && positionOverlap;
+    });
+  }, [fallingQuizzes]);
+
   // Generate quiz from card
-  const generateQuiz = useCallback((card: Card, lane: number): FallingQuiz => {
+  const generateQuiz = useCallback((card: Card, lane: number, laneSpan: number): FallingQuiz => {
     let answers: string[] = [];
     let correctIndex = 0;
 
@@ -93,16 +114,23 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
       correctIndex = answers.findIndex(answer => answer === card.back);
     }
 
+    // Calculate estimated height based on content
+    const baseHeight = 8; // Base card height in vh
+    const answerHeight = answers.length * 2.5; // Each answer button adds ~2.5vh
+    const estimatedHeight = baseHeight + answerHeight;
+
     return {
       id: `quiz-${card.id}-${Date.now()}-${Math.random()}`,
       card,
       lane,
+      laneSpan,
       position: 0,
       speed: getDifficultySettings(selectedDifficulty, difficultyRef.current).speed,
       answers: answers.slice(0, 4), // Max 4 answers
-      correctIndex
+      correctIndex,
+      height: estimatedHeight
     };
-  }, [deck.cards]);
+  }, [deck.cards, checkCollision]);
 
   // Spawn new quiz
   const spawnQuiz = useCallback(() => {
@@ -116,11 +144,38 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
     if (availableCards.length === 0) return;
 
     const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
-    const randomLane = Math.floor(Math.random() * 3);
     
-    const newQuiz = generateQuiz(randomCard, randomLane);
+    // Determine card span based on difficulty and content
+    let laneSpan = 2; // Default span of 2 lanes
+    if (selectedDifficulty === 'easy') {
+      laneSpan = Math.random() < 0.7 ? 3 : 2; // 70% chance of 3-lane span in easy mode
+    } else if (selectedDifficulty === 'hard') {
+      laneSpan = Math.random() < 0.5 ? 1 : 2; // 50% chance of 1-lane span in hard mode
+    }
+    
+    // Try to find a valid position without collision
+    let attempts = 0;
+    let foundPosition = false;
+    let lane = 0;
+    
+    while (attempts < 20 && !foundPosition) {
+      lane = Math.floor(Math.random() * (12 - laneSpan + 1)); // Ensure card fits within 12 lanes
+      
+      // Check if this position would cause collision
+      if (!checkCollision(lane, laneSpan, 0, 15)) { // Assume 15vh height for initial check
+        foundPosition = true;
+      }
+      attempts++;
+    }
+    
+    // If no collision-free position found, use a random lane anyway (fallback)
+    if (!foundPosition) {
+      lane = Math.floor(Math.random() * (12 - laneSpan + 1));
+    }
+    
+    const newQuiz = generateQuiz(randomCard, lane, laneSpan);
     setFallingQuizzes(prev => [...prev, newQuiz]);
-  }, [deck.cards, fallingQuizzes, answeredQuizzes, generateQuiz]);
+  }, [deck.cards, fallingQuizzes, answeredQuizzes, generateQuiz, selectedDifficulty, checkCollision]);
 
   // Game loop
   const gameLoop = useCallback(() => {
@@ -339,50 +394,58 @@ export function FallingQuizMode({ deck, difficulty: initialDifficulty = 'easy', 
       </div>
 
       {/* Game Area */}
-      <div className="flex h-full">
-        {/* Three Lanes */}
-        {Array.from({ length: 3 }, (_, laneIndex) => (
-          <div key={laneIndex} className="flex-1 relative border-r border-white/20 last:border-r-0">
-            {/* Falling Quizzes */}
-            <AnimatePresence>
-              {fallingQuizzes
-                .filter(quiz => quiz.lane === laneIndex)
-                .map(quiz => (
-                  <motion.div
-                    key={quiz.id}
-                    initial={{ y: -100, opacity: 0 }}
-                    animate={{ 
-                      y: `${quiz.position}vh`,
-                      opacity: 1
-                    }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: 'linear', duration: 0.1 }}
-                    className="absolute left-2 right-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3"
-                    style={{ top: 0 }}
-                  >
-                    {/* Question */}
-                    <div className="text-sm font-medium text-gray-900 dark:text-white mb-2 text-center">
-                      <SafeContentRenderer content={quiz.card.front} />
-                    </div>
-                    
-                    {/* Answer Buttons */}
-                    <div className="grid grid-cols-1 gap-1">
-                      {quiz.answers.map((answer, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleAnswer(quiz.id, index)}
-                          className="px-2 py-1 text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors"
-                        >
-                          {answer}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                ))
-              }
-            </AnimatePresence>
-          </div>
-        ))}
+      <div className="flex h-full relative">
+        {/* Twelve Lanes Grid */}
+        <div className="w-full grid grid-cols-12 h-full">
+          {Array.from({ length: 12 }, (_, laneIndex) => (
+            <div key={laneIndex} className="relative border-r border-white/10 last:border-r-0">
+            </div>
+          ))}
+        </div>
+        
+        {/* Falling Quizzes - Positioned Absolutely */}
+        <div className="absolute inset-0 pointer-events-none">
+          <AnimatePresence>
+            {fallingQuizzes.map(quiz => (
+              <motion.div
+                key={quiz.id}
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ 
+                  y: `${quiz.position}vh`,
+                  opacity: 1
+                }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ type: 'linear', duration: 0.1 }}
+                className="absolute bg-white dark:bg-gray-800 rounded-lg shadow-xl p-3 pointer-events-auto"
+                style={{ 
+                  top: 0,
+                  left: `${(quiz.lane / 12) * 100}%`,
+                  width: `${(quiz.laneSpan / 12) * 100 - 1}%`, // -1% for visual separation
+                  minWidth: '120px', // Ensure minimum clickable width
+                  zIndex: 10
+                }}
+              >
+                {/* Question */}
+                <div className="text-sm font-medium text-gray-900 dark:text-white mb-2 text-center">
+                  <SafeContentRenderer content={quiz.card.front} />
+                </div>
+                
+                {/* Answer Buttons */}
+                <div className={`grid gap-1 ${quiz.laneSpan >= 3 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                  {quiz.answers.map((answer, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleAnswer(quiz.id, index)}
+                      className="px-2 py-1.5 text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors font-medium"
+                    >
+                      {answer}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Game Over Screen */}
