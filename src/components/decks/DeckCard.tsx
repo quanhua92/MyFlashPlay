@@ -17,6 +17,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "@/i18n"
+import { ConfirmDialog } from "@/components/common/ConfirmDialog"
 import type { Deck, GameMode } from "@/types"
 
 interface DeckCardProps {
@@ -30,6 +31,7 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
   const [showModes, setShowModes] = useState(false)
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null)
   const [showMenu, setShowMenu] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
 
@@ -171,18 +173,26 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
 
   const handleDelete = () => {
     setShowMenu(false)
-    if (confirm(t('decks.confirmDelete') + ` "${deck.name}"?`)) {
-      onDelete(deck.id)
-    }
+    setShowDeleteDialog(true)
+  }
+
+  const handleConfirmDelete = () => {
+    setShowDeleteDialog(false)
+    onDelete(deck.id)
+  }
+
+  const handleCancelDelete = () => {
+    setShowDeleteDialog(false)
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.1 * index }}
-      className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-200"
-    >
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 * index }}
+        className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-200"
+      >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
@@ -379,5 +389,17 @@ export function DeckCard({ deck, index, onDelete }: DeckCardProps) {
         </AnimatePresence>
       </div>
     </motion.div>
+
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        title={t('decks.deleteDeck')}
+        message={`${t('decks.confirmDelete')} "${deck.name}"?`}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
+        variant="danger"
+      />
+    </>
   )
 }
