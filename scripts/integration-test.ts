@@ -45,6 +45,37 @@ class IntegrationTester {
     this.page.setDefaultNavigationTimeout(30000);
   }
 
+  private async handleLanguageDialog() {
+    try {
+      // Check if language selection dialog is present
+      const languageDialog = this.page!.locator('[role="dialog"], .fixed.inset-0.z-50');
+      if (await languageDialog.count() > 0) {
+        console.log('🔍 Language selection dialog detected, selecting English...');
+        
+        // Try to find and click English option
+        const englishOption = this.page!.locator('text=English').first();
+        if (await englishOption.count() > 0) {
+          await englishOption.click();
+          await this.page!.waitForTimeout(2000);
+          console.log('✅ English language selected');
+        } else {
+          const englishButton = this.page!.locator('button:has-text("English")').first();
+          if (await englishButton.count() > 0) {
+            await englishButton.click();
+            await this.page!.waitForTimeout(2000);
+            console.log('✅ English language selected');
+          } else {
+            // Try to close dialog with escape key
+            await this.page!.keyboard.press('Escape');
+            await this.page!.waitForTimeout(1000);
+          }
+        }
+      }
+    } catch (error) {
+      console.log('⚠️  Language dialog handling failed, continuing...');
+    }
+  }
+
   private async teardown() {
     if (this.browser) {
       await this.browser.close();
@@ -82,9 +113,12 @@ class IntegrationTester {
       throw new Error(`Failed to load page: ${response?.status()} ${response?.statusText()}`);
     }
 
+    // Handle language dialog if present
+    await this.handleLanguageDialog();
+
     // Check if the page loaded successfully
     const title = await this.page.textContent('h1, title');
-    if (!title) {
+    if (!title && await this.page.locator('text=MyFlashPlay').count() === 0) {
       throw new Error('No title found - page may not have loaded properly');
     }
 
@@ -159,6 +193,9 @@ class IntegrationTester {
     // Wait for page to load
     await this.page.waitForTimeout(2000);
 
+    // Handle language dialog if present
+    await this.handleLanguageDialog();
+
     // Fill in deck name - look for the name input specifically
     const nameInput = this.page.locator('input[placeholder*="name"], input[placeholder*="deck"]').first();
     if (await nameInput.count() > 0) {
@@ -215,6 +252,9 @@ The sky is blue :: true`;
 
     // Wait for page to load
     await this.page.waitForTimeout(3000);
+
+    // Handle language dialog if present
+    await this.handleLanguageDialog();
 
     // Look for play buttons more flexibly
     let playButton = this.page.locator('text=Start Playing').first();

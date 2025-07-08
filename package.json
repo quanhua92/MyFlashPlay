@@ -18,13 +18,18 @@
     "test:markdown:verbose": "VERBOSE=true tsx --tsconfig tsconfig.test.json tests/test-markdown-all.ts",
     "test:integration": "tsx scripts/integration-test.ts",
     "test:integration:local": "tsx scripts/integration-test.ts http://localhost:3000",
+    "test:ultimate": "tsx scripts/ultimate-integration-test.ts",
+    "test:ultimate:local": "tsx scripts/ultimate-integration-test.ts http://localhost:3000",
+    "test:robust": "tsx scripts/robust-integration-test.ts",
+    "test:robust:local": "tsx scripts/robust-integration-test.ts http://localhost:3000",
     "validate-translations": "tsx scripts/validate-translations.js",
     "test:integration:preview": "tsx scripts/integration-test.ts http://localhost:4173",
     "test:quick": "tsx scripts/quick-test.ts",
     "test:quick:local": "tsx scripts/quick-test.ts http://localhost:3000",
     "build:quick": "vite build",
     "test:self": "pkill -f vite || true && lsof -ti:4173 | xargs kill -9 2>/dev/null || true && sleep 1 && concurrently -k -s first --success first \"pnpm build:quick && pnpm serve --port 4173\" \"wait-on http://localhost:4173 --timeout 20000 && pnpm test:quick http://localhost:4173\"",
-    "test:self:full": "pkill -f vite || true && lsof -ti:4173 | xargs kill -9 2>/dev/null || true && concurrently -k -s first \"pnpm build && timeout 180s pnpm serve --port 4173\" \"wait-on http://localhost:4173 --timeout 30000 && timeout 120s pnpm test:integration:preview\""
+    "test:self:full": "pkill -f vite || true && lsof -ti:4173 | xargs kill -9 2>/dev/null || true && concurrently -k -s first \"pnpm build && timeout 180s pnpm serve --port 4173\" \"wait-on http://localhost:4173 --timeout 30000 && timeout 120s pnpm test:integration:preview\"",
+    "test:self:ultimate": "pkill -f vite || true && lsof -ti:4173 | xargs kill -9 2>/dev/null || true && concurrently -k -s first \"pnpm build && timeout 300s pnpm serve --port 4173\" \"wait-on http://localhost:4173 --timeout 30000 && timeout 240s pnpm test:ultimate http://localhost:4173\""
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",
