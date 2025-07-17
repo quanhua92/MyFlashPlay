@@ -1,6 +1,16 @@
 import { useLocalStorage } from './useLocalStorage';
 import type { UserPreferences } from '../types/storage.types';
 
+// Get browser's preferred language, defaulting to English
+function getBrowserLanguage(): string {
+  if (typeof navigator !== 'undefined') {
+    const browserLang = navigator.language || navigator.languages?.[0] || 'en';
+    // Always default to English regardless of browser language
+    return 'en-US';
+  }
+  return 'en-US';
+}
+
 const DEFAULT_PREFERENCES: UserPreferences = {
   version: '1.0.0',
   theme: 'auto',
@@ -8,7 +18,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   soundEnabled: true,
   animationsEnabled: true,
   fontSize: 'medium',
-  language: 'en-US',
+  language: getBrowserLanguage(),
   accessibility: {
     highContrast: false,
     reducedMotion: false,
