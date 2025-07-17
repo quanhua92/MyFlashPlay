@@ -9,7 +9,6 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS } from '@/utils/constants';
 import { AccessibilitySettings } from '@/components/common/AccessibilitySettings';
 import { LanguageSelector } from '@/components/settings/LanguageSelector';
-import { LanguagePreview } from '@/components/settings/LanguagePreview';
 import { useTranslation } from '@/i18n';
 import type { UserPreferences } from '@/types';
 
@@ -359,10 +358,6 @@ export function SettingsPage() {
             </h2>
             <LanguageSelector />
             
-            {/* Development Preview - Remove in production */}
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <LanguagePreview />
-            </div>
           </motion.div>
 
           {/* Theme Settings */}
