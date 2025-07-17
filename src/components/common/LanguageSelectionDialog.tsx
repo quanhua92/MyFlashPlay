@@ -51,16 +51,16 @@ export const LanguageSelectionDialog: React.FC<LanguageSelectionDialogProps> = (
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden">
               {/* Header */}
               <div className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-blue-600 p-8 text-white">
-                <button
-                  onClick={onClose}
-                  className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-colors"
-                >
-                  <X size={20} />
-                </button>
-                
                 {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+                
+                <button
+                  onClick={onClose}
+                  className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-colors z-20"
+                >
+                  <X size={20} />
+                </button>
                 
                 <div className="relative z-10">
                   <motion.div
@@ -82,6 +82,37 @@ export const LanguageSelectionDialog: React.FC<LanguageSelectionDialogProps> = (
 
               {/* Language Options */}
               <div className="p-6">
+                {/* Accept Button */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex gap-3 mb-6"
+                >
+                  <motion.button
+                    onClick={onClose}
+                    className="flex-1 px-6 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Skip for now
+                  </motion.button>
+                  <motion.button
+                    onClick={handleConfirm}
+                    className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl relative overflow-hidden"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/20 opacity-0 hover:opacity-100 transition-opacity"></div>
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      Continue with {AVAILABLE_LANGUAGES.find(l => l.code === selectedLanguage)?.name}
+                      <span className="text-lg">
+                        {AVAILABLE_LANGUAGES.find(l => l.code === selectedLanguage)?.flag}
+                      </span>
+                    </span>
+                  </motion.button>
+                </motion.div>
+
                 <div className="grid gap-3 max-h-80 overflow-y-auto">
                   {AVAILABLE_LANGUAGES.map((language, index) => (
                     <motion.button
@@ -89,7 +120,7 @@ export const LanguageSelectionDialog: React.FC<LanguageSelectionDialogProps> = (
                       onClick={() => handleLanguageSelect(language.code)}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 + index * 0.1, duration: 0.3 }}
+                      transition={{ delay: 0.4 + index * 0.1, duration: 0.3 }}
                       className={`
                         flex items-center gap-4 p-4 rounded-xl transition-all duration-200 group relative overflow-hidden
                         ${selectedLanguage === language.code
@@ -139,37 +170,6 @@ export const LanguageSelectionDialog: React.FC<LanguageSelectionDialogProps> = (
                     </motion.button>
                   ))}
                 </div>
-
-                {/* Footer */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="flex gap-3 mt-8"
-                >
-                  <motion.button
-                    onClick={onClose}
-                    className="flex-1 px-6 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Skip for now
-                  </motion.button>
-                  <motion.button
-                    onClick={handleConfirm}
-                    className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl relative overflow-hidden"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/20 opacity-0 hover:opacity-100 transition-opacity"></div>
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      Continue with {AVAILABLE_LANGUAGES.find(l => l.code === selectedLanguage)?.name}
-                      <span className="text-lg">
-                        {AVAILABLE_LANGUAGES.find(l => l.code === selectedLanguage)?.flag}
-                      </span>
-                    </span>
-                  </motion.button>
-                </motion.div>
               </div>
             </div>
           </motion.div>
